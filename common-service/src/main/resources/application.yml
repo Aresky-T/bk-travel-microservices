@@ -1,0 +1,21 @@
+server:
+  port: 8762
+spring:
+  application:
+    name: common-service
+common:
+  jwt:
+    header: Authorization
+    prefix: Bearer
+    secret: aresky_sercret_ast5ld3mdkisbaoyqmtnx7casdkycgajgf334twi5y35_124qwirweaser234
+    expiration: 86400000
+  open-api:
+    dev-url: http://localhost:8761
+    product-url: https://bk-travel.vercel.app/
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    filter: true
