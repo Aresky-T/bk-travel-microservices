@@ -1,50 +1,70 @@
 package com.aresky.authservice.config;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.annotations.OpenAPI30;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
+@OpenAPI30
 @Configuration
 public class SwaggerConfig {
-    @Value("${common.open-api.dev-url}")
-    private String devUrl;
 
-    @Value("${common.open-api.product-url}")
-    private String prodUrl;
+        private SecurityScheme createAPIKeyScheme() {
+                return new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .bearerFormat("JWT")
+                                .scheme("Bearer");
+        }
 
-    @Bean
-    OpenAPI myOpenAPI() {
-        Server devServer = new Server();
-        devServer.setUrl(devUrl);
-        devServer.setDescription("Server URL in Development environment");
+        @Bean
+        OpenAPI openAPI() {
+                SecurityRequirement securityRequirement = new SecurityRequirement();
+                securityRequirement.addList("Bearer Authentication");
 
-        Server prodServer = new Server();
-        prodServer.setUrl(prodUrl);
-        prodServer.setDescription("Server URL in Production environment");
+                Components components = new Components();
+                components.addSecuritySchemes("Bearer Authentication", createAPIKeyScheme());
 
-        Contact contact = new Contact();
-        contact.setEmail("tn6354103@gmail.com");
-        contact.setName("Aresky");
-        contact.setUrl("https://github.com/Aresky-T");
+                Contact contact = new Contact();
+                contact.setName("Aresky");
+                contact.setEmail("tn6354103@gmail.com");
+                contact.setUrl("https://github.com/Aresky-T");
 
-        License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
+                String title = "Tutorial Management API";
+                String description = "This API exposes endpoints to manage tutorials.";
+                String termsOfService = "https://www.bezkoder.com/terms";
+                String version = "1.0.0";
 
-        Info info = new Info()
-                .title("Tutorial Management API")
-                .version("1.0")
-                .contact(contact)
-                .description("This API exposes endpoints to manage tutorials.")
-                .termsOfService("https://www.bezkoder.com/terms")
-                .license(mitLicense);
+                License license = new License();
+                license.setName("MIT License");
+                license.setUrl("https://choosealicense.com/licenses/mit/");
 
-        return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
-    }
+                Server devServer = new Server();
+                devServer.setDescription("Server URL in Development environment");
+                devServer.setUrl("http://localhost:8081");
+
+                Server productServer = new Server();
+                productServer.setDescription("Server URL in Production environment");
+                productServer.setUrl("https://localhost:8080");
+
+                Info info = new Info();
+                info.contact(contact);
+                info.description(description);
+                info.title(title);
+                info.version(version);
+                info.license(license);
+                info.termsOfService(termsOfService);
+
+                return new OpenAPI()
+                                .info(info)
+                                .addSecurityItem(securityRequirement)
+                                .components(components);
+        }
 }

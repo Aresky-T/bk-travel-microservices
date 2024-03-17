@@ -1,0 +1,34 @@
+{
+  "properties": [
+    {
+      "name": "auth.jwt.header",
+      "type": "java.lang.String",
+      "description": "A description for 'auth.jwt.header'"
+    },
+    {
+      "name": "auth.jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "A description for 'auth.jwt.expiration'"
+    },
+    {
+      "name": "auth.jwt.secret",
+      "type": "java.lang.String",
+      "description": "A description for 'auth.jwt.secret'"
+    },
+    {
+      "name": "auth.jwt.prefix",
+      "type": "java.lang.String",
+      "description": "A description for 'auth.jwt.prefix'"
+    },
+    {
+      "name": "open-api.product-url",
+      "type": "java.lang.String",
+      "description": "A description for 'open-api.product-url'"
+    },
+    {
+      "name": "open-api.dev-url",
+      "type": "java.lang.String",
+      "description": "A description for 'open-api.dev-url'"
+    }
+  ]
+}

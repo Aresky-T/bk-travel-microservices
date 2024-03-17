@@ -2,6 +2,14 @@
   "configurations": [
     {
       "type": "java",
+      "name": "AccountServiceApplication",
+      "request": "launch",
+      "mainClass": "com.aresky.accountservice.AccountServiceApplication",
+      "projectName": "account-service",
+      "vmArgs": " -Dcom.sun.management.jmxremote"
+    },
+    {
+      "type": "java",
       "name": "Spring Boot-CommonServiceApplication<common-service>",
       "request": "launch",
       "cwd": "${workspaceFolder}",
@@ -29,6 +37,17 @@
       "cwd": "${workspaceFolder}",
       "mainClass": "com.aresky.discoveryserver.DiscoveryServerApplication",
       "projectName": "discovery-server",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=42349 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=discovery-server"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-GatewayServiceApplication<gateway-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.aresky.gatewayservice.GatewayServiceApplication",
+      "projectName": "gateway-service",
       "args": "",
       "envFile": "${workspaceFolder}/.env"
     }
