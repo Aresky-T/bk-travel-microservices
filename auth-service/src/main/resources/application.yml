@@ -4,22 +4,32 @@ spring:
   application:
     name: auth-service
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/bk_travel_auth
+    url: r2dbc:mysql://localhost:3306/bk_travel_auth?serverTimeZone=UTC
     username: root
     password: root
   liquibase:
     enabled: true
-    url: jdbc:mysql://localhost:3306/bk_travel_auth
+    url: jdbc:mysql://localhost:3306/bk_travel_auth?serverTimeZone=UTC
     user: root
     password: root
     change-log: classpath:db/changelog/changelog-master.xml
-eureka:
-  client:
-    service-url:
-      defaulZone: http://localhost:8761/eureka
+# eureka:
+#   client:
+#     service-url:
+#       defaultZone: http://localhost:8761/eureka
 springdoc:
-  packages-to-scan: com.aresky.auth-service.controller
+  packages-to-scan: com.aresky.authservice.controller
   swagger-ui:
-    path: /auth-service-api-document
+    enabled: true
+    path: "/swagger-ui.html"
   api-docs:
-    path: /auth-service-api-document
+    path: /api-docs
+open-api:
+  dev-url: http://localhost:8761
+  product-url: https://bk-travel.vercel.app/
+auth:
+  jwt:
+    header: Authorization
+    prefix: Bearer
+    secret: aresky_sercret_ast5ld3mdkisbaoyqmtnx7casdkycgajgf334twi5y35_124qwirweaser234
+    expiration: 86400000

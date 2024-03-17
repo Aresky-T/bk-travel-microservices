@@ -1,0 +1,18 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: account-service
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/bk_travel_account?serverTimeZone=UTC
+    username: root
+    password: root
+  liquibase:
+    url: jdbc:mysql://localhost:3306/bk_travel_account?serverTimeZone=UTC
+    user: root
+    password: root
+    change-log: classpath:db/changelog/changelog-master.xml
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

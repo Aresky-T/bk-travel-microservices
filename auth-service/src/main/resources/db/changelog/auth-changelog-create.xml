@@ -25,7 +25,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="role" type="enum('USER', 'ADMIN', 'EMPLOYEE')"
-                defaultValue="CURRENT_TIMESTAMP">
+                defaultValue="USER">
                 <constraints nullable="false" />
             </column>
         </createTable>
@@ -54,6 +54,18 @@
         </preConditions>
         <addColumn tableName="auth">
             <column name="updated_time" type="DATETIME" defaultValue="now()">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="add colume status" author="aresky">
+        <preConditions onFail="CONTINUE" onFailMessage="column status already exists in table auth">
+            <not>
+                <columnExists tableName="auth" columnName="status" />
+            </not>
+        </preConditions>
+        <addColumn tableName="auth">
+            <column name="status" type="enum('ACTIVE', 'BLOCKED')" defaultValue="ACTIVE">
                 <constraints nullable="false" />
             </column>
         </addColumn>

@@ -6,6 +6,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class LoginForm {
-    private String username;
-    private String password;
+	private String username;
+	private String password;
+
+	public LoginForm(String username, String password) {
+		super();
+		this.username = username;
+		this.password = password;
+	}
 }
