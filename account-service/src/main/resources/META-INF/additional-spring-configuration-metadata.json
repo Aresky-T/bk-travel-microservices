@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "eureka.server.hostname",
+      "type": "java.lang.String",
+      "description": "A description for 'eureka.server.hostname'"
+    },
+    {
+      "name": "eureka.server.port",
+      "type": "java.lang.Integer",
+      "description": "A description for 'eureka.server.port'"
+    },
+    {
+      "name": "mysql-server.hostname",
+      "type": "java.lang.String",
+      "description": "A description for 'mysql-server.hostname'"
+    },
+    {
+      "name": "mysql-server.default-host",
+      "type": "java.lang.String",
+      "description": "A description for 'mysql-server.default-host'"
+    },
+    {
+      "name": "mysql-server.port",
+      "type": "java.lang.Integer",
+      "description": "A description for 'mysql-server.port'"
+    },
+    {
+      "name": "mysql-server.user",
+      "type": "java.lang.String",
+      "description": "A description for 'mysql-server.user'"
+    },
+    {
+      "name": "mysql-server.password",
+      "type": "java.lang.String",
+      "description": "A description for 'mysql-server.password'"
+    }
+  ]
+}
