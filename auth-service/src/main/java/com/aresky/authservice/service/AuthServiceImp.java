@@ -44,6 +44,7 @@ public class AuthServiceImp implements IAuthService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Transactional
     @Override
     public Mono<LoginResponse> handleLogin(LoginForm form) {
         String username = form.getUsername();
@@ -75,6 +76,7 @@ public class AuthServiceImp implements IAuthService {
                 }).switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)));
     }
 
+    @Transactional
     @Override
     public Mono<Boolean> handleSignup(SignupForm form) {
         return isExistsByUsername(form.getUsername())
@@ -196,6 +198,7 @@ public class AuthServiceImp implements IAuthService {
                 .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
+    @Transactional
     @Override
     public Mono<Boolean> lock(long id) {
         return authRepository.findById(id)
@@ -210,6 +213,7 @@ public class AuthServiceImp implements IAuthService {
                 .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)));
     }
 
+    @Transactional
     @Override
     public Mono<Boolean> activate(long id) {
         return authRepository.findById(id)
@@ -224,6 +228,8 @@ public class AuthServiceImp implements IAuthService {
                 .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)));
     }
 
+    @SuppressWarnings("null")
+    @Transactional
     @Override
     public Mono<Boolean> delete(long id) {
         return authRepository.findById(id)
@@ -231,6 +237,7 @@ public class AuthServiceImp implements IAuthService {
                 .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)));
     }
 
+    @Transactional
     @Override
     public Mono<Boolean> updateRole(long id, ERole role) {
         return authRepository.findById(id)
