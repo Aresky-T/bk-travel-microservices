@@ -1,0 +1,92 @@
+version: "3.8"
+services:
+  mysql-server:
+    image: mysql:8.3.0
+    container_name: mysql-server
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=aresky
+      - MYSQL_PASSWORD=11052000
+    volumes:
+      - mysql-server-volume:/var/lib/mysql
+      - mysql-spring-boot-config-daemon:/etc/mysql/conf.d
+    networks:
+      - bk-travel-ms-network
+  discovery-server:
+    image: discovery-server-image:v1.0.0
+    container_name: discovery-server
+    depends_on:
+      - mysql-server
+    ports:
+      - 8761:8761
+    build:
+      context: ./discovery-server
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./discovery-server
+        target: /app
+    networks:
+      - bk-travel-ms-network
+  gateway-service:
+    image: gateway-service-image:v1.0.0
+    container_name: gateway-service
+    depends_on:
+      - mysql-server
+      - discovery-server
+    ports:
+      - 8080:8080
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./gateway-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
+  auth-service:
+    image: auth-service-image:v1.0.0
+    container_name: auth-service
+    depends_on:
+      - mysql-server
+      - discovery-server
+    ports:
+      - 8081:8081
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./auth-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
+  account-service:
+    image: account-service-image:v1.0.0
+    container_name: account-service
+    depends_on:
+      - mysql-server
+      - discovery-server
+    ports:
+      - 8082:8082
+    build:
+      context: ./account-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./account-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
+
+volumes:
+  mysql-server-volume:
+  mysql-spring-boot-config-daemon:
+networks:
+  bk-travel-ms-network:
+    name: bk-travel-ms-network
+    driver: bridge
+    external: true

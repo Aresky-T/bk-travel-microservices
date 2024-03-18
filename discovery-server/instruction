@@ -1,0 +1,6 @@
+docker run -d \
+    -p 8761:8761 \
+    --name discovery-server \
+    --mount type=bind,source=$(pwd),target=/app \
+    --network bk-travel-ms-network \
+    discovery-server-image:latest
