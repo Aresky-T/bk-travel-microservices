@@ -17,8 +17,10 @@ spring:
         locator:
           enabled: true
 eureka:
+  server:
+    host: discovery-server
   instance:
     hostname: localhost
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://${eureka.server.host}:8761/eureka

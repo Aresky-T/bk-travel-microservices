@@ -4,15 +4,26 @@ spring:
   application:
     name: account-service
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/bk_travel_account?serverTimeZone=UTC
-    username: root
-    password: root
+    url: r2dbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account?serverTimeZone=UTC
+    username: ${mysql-server.user}
+    password: ${mysql-server.hostname}
   liquibase:
-    url: jdbc:mysql://localhost:3306/bk_travel_account?serverTimeZone=UTC
-    user: root
-    password: root
+    url: jdbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account?serverTimeZone=UTC
+    user: ${mysql-server.user}
+    password: ${mysql-server.password}
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
+  server:
+    hostname: discovery-server
+    port: 8761
+  instance:
+    hostname: localhost
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://${eureka.server.hostname}:${eureka.server.port}/eureka
+mysql-server:
+  hostname: mysql-server
+  default-host: localhost
+  user: root
+  password: root
+  port: 3306
