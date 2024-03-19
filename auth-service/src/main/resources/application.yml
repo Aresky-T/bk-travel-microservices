@@ -38,3 +38,9 @@ auth:
 mysql-server:
   hostname: mysql-server
   port: 3306
+kafka:
+  bootstrap-servers:
+    url: http://localhost:9092
+  consumer:
+    auto-offset-reset: latest
+    group-id: bk-travel-group
