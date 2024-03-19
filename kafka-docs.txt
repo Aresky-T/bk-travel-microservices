@@ -1,0 +1,5 @@
+kafka:
+  bootstrap-servers:
+    url: http://kafka-broker-01:9092
+  consumer:
+    group-id: bk-travel-group
