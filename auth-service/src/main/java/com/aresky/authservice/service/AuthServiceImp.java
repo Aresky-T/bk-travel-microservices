@@ -76,6 +76,11 @@ public class AuthServiceImp implements IAuthService {
                 }).switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)));
     }
 
+    @Override
+    public Mono<Boolean> isValidAuth(long id) {
+        return isExistsById(id);
+    }
+
     @Transactional
     @Override
     public Mono<Boolean> handleSignup(SignupForm form) {

@@ -2,6 +2,8 @@ package com.aresky.authservice.controller;
 
 import com.aresky.authservice.constants.CompleteNotification;
 
+import com.aresky.authservice.constants.KafkaTopic;
+import com.aresky.authservice.event.KafkaProducerEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,10 +40,27 @@ public class AuthController {
     @Autowired
     private IAuthService authService;
 
+    @Autowired
+    private KafkaProducerEvent producerEvent;
+
     @GetMapping("/home")
     public Mono<String> home() {
         return Mono.just("Welcome to auth service");
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public Mono<ResponseEntity<Page<AuthResponse>>> getAll(Pageable pageable) {
+        return authService.findAll(pageable)
+                .map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/validate")
+    public Mono<ResponseEntity<?>> validateAuthAccount(@RequestParam long authId){
+        return producerEvent
+                .sendMessage(new KafkaProducerEvent.CustomMessage(KafkaTopic.AUTH_VALIDATION_REQUEST, String.valueOf(authId)))
+                .then(Mono.just(ResponseEntity.ok("success")));
+    };
 
     @PostMapping("/login")
     public Mono<ResponseEntity<LoginResponse>> login(@RequestBody LoginForm form) {
@@ -60,13 +79,6 @@ public class AuthController {
                     return Mono
                             .error(new AuthException("Error: Username already exists!", HttpStatus.BAD_REQUEST, "404"));
                 });
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public Mono<ResponseEntity<Page<AuthResponse>>> getAll(Pageable pageable) {
-        return authService.findAll(pageable)
-                .map(data -> ResponseEntity.ok(data));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','USER','EMPLOYEE')")

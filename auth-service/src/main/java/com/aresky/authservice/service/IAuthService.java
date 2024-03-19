@@ -45,4 +45,6 @@ public interface IAuthService {
     Mono<Boolean> handleUpdatePassword(UpdatePasswordForm form, String username);
 
     Mono<LoginResponse> handleLogin(LoginForm form);
+
+    Mono<Boolean> isValidAuth(long id);
 }
