@@ -3,12 +3,23 @@ server:
 spring:
   application:
     name: account-service
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+        size-parameter: size
+        page-parameter: page
+      sort:
+        sort-parameter: sort
+    r2dbc:
+      repositories:
+        enabled: true
   r2dbc:
-    url: r2dbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account?serverTimeZone=UTC
+    url: r2dbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account
     username: ${mysql-server.user}
-    password: ${mysql-server.hostname}
+    password: ${mysql-server.password}
   liquibase:
-    url: jdbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account?serverTimeZone=UTC
+    url: jdbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account
     user: ${mysql-server.user}
     password: ${mysql-server.password}
     change-log: classpath:db/changelog/changelog-master.xml
@@ -16,14 +27,11 @@ eureka:
   server:
     hostname: discovery-server
     port: 8761
-  instance:
-    hostname: localhost
   client:
     service-url:
       defaultZone: http://${eureka.server.hostname}:${eureka.server.port}/eureka
 mysql-server:
   hostname: mysql-server
-  default-host: localhost
   user: root
   password: root
   port: 3306
