@@ -5,11 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
-import com.aresky.accountservice.repository.AccountRepository;
-
-@EnableR2dbcRepositories(basePackageClasses = {
-		AccountRepository.class
-})
+@EnableR2dbcRepositories
 @EnableDiscoveryClient
 @SpringBootApplication
 public class AccountServiceApplication {
