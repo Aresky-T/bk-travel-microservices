@@ -1,5 +1,7 @@
 package com.aresky.accountservice.model;
 
+import java.io.Serializable;
+import java.time.Clock;
 import java.time.ZonedDateTime;
 
 import org.springframework.data.annotation.Id;
@@ -12,35 +14,43 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "account")
-public class Account {
+public class Account implements Serializable {
 
     @Id
-    private Long id;
+    private Integer id;
 
-    @Column("avatar_url")
-    private String avatarUrl;
+    @Column("username")
+    private String username;
 
-    @Column("full_name")
-    private String fullName;
+    @Column("email")
+    private String email;
 
-    @Column("address")
-    private String address;
+    @Column("password")
+    private String password;
 
-    @Column("phone")
-    private String phone;
+    @Column("role")
+    private ERole role;
 
-    @Column("date_of_birth")
-    private ZonedDateTime dateOfBirth;
+    @Column("activation_status")
+    private EActivationStatus activationStatus;
 
-    @Column("gender")
-    private EGender gender;
-
-    @Column("auth_id")
-    private int authId;
+    @Column("online_status")
+    private EOnlineStatus onlineStatus;
 
     @Column("created_time")
     private ZonedDateTime createdTime;
 
-    @Column("updated_time")
-    private ZonedDateTime updatedTime;
+    public Account(String username) {
+        this.username = username;
+    }
+
+    public Account(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = ERole.USER;
+        this.activationStatus = EActivationStatus.ACTIVE;
+        this.onlineStatus = EOnlineStatus.OFFLINE;
+        this.createdTime = ZonedDateTime.now(Clock.systemDefaultZone());
+    }
 }
