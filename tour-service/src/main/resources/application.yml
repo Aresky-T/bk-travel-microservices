@@ -1,0 +1,36 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: tour-service
+  liquibase:
+    url: jdbc:mysql://mysql-server:3306/bk_travel_tour
+    user: root
+    password: root
+    change-log: classpath:db/changelog/changelog-master.xml
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        page-parameter: pageNumber
+        one-indexed-parameters: true
+# ---------------
+# Euraka config
+# ---------------
+eureka:
+  server:
+    host: discovery-server
+    port: 8761
+  client:
+    service-url:
+      defaultZone: http://${eureka.server.host}:${eureka.server.port}/eureka
+# ---------------
+# Euraka config
+# ---------------
+bk-travel:
+  config:
+    database:
+      server:
+        url: r2dbc:mysql://mysql-server:3306/bk_travel_tour
+        username: root
+        password: root

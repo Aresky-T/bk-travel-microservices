@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "bk-travel.config.database.server",
+      "type": "com/aresky/tourservice/config/DatabaseConfig.java",
+      "description": "Configuration for database server"
+    }
+  ]
+}
