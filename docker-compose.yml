@@ -81,10 +81,27 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  tour-service:
+    image: tour-service-image:v1.0.0
+    container_name: tour-service
+    depends_on:
+      - mysql-server
+    build:
+      context: ./tour-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    volumes:
+      - type: bind
+        source: ./tour-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 
 volumes:
   mysql-server-volume:
   mysql-spring-boot-config-daemon:
+
 networks:
   bk-travel-ms-network:
     name: bk-travel-ms-network
