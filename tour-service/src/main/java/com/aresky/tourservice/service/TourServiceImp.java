@@ -1,0 +1,464 @@
+package com.aresky.tourservice.service;
+
+import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.Map.Entry;
+
+import com.aresky.tourservice.utils.TourUtils;
+import com.aresky.tourservice.utils.TourUtils.TourParams.Param;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
+
+import com.aresky.tourservice.dto.request.SubTourCreateForm;
+import com.aresky.tourservice.dto.request.TourCreateForm;
+import com.aresky.tourservice.dto.request.TourFilter;
+import com.aresky.tourservice.dto.request.TourUpdateForm;
+import com.aresky.tourservice.dto.response.SubTourResponse;
+import com.aresky.tourservice.dto.response.TourResponse;
+import com.aresky.tourservice.exception.TourException;
+import com.aresky.tourservice.model.ETourStatus;
+import com.aresky.tourservice.model.SubTour;
+import com.aresky.tourservice.model.Tour;
+import com.aresky.tourservice.repository.SubTourRepository;
+import com.aresky.tourservice.repository.TourRepository;
+
+import io.r2dbc.spi.Row;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+@Service
+public class TourServiceImp implements ITourService {
+
+    @Autowired
+    private TourRepository tourRepository;
+
+    @Autowired
+    private SubTourRepository subTourRepository;
+
+    @Autowired
+    private DatabaseClient databaseClient;
+
+    @Override
+    public Mono<Void> createTour(TourCreateForm form) {
+        return existsTourByTitle(form.getTitle())
+                .flatMap(isExists -> {
+                    if (isExists) {
+                        throw new TourException("This tour already exist");
+                    }
+                    return tourRepository.save(TourCreateForm.toEntity(form))
+                            .then();
+                });
+    }
+
+    @Override
+    public Mono<Void> createSubTour(SubTourCreateForm form) {
+        Mono<Tour> tourMono = tourRepository.findById(form.getTourId());
+        Mono<Boolean> subTourExistMono = existsSubTourByTitle(form.getTitle());
+
+        return Mono.zip(tourMono, subTourExistMono)
+                .flatMap(tuple -> {
+                    Tour tour = tuple.getT1();
+                    boolean isSubTourExist = tuple.getT2();
+
+                    if (Objects.isNull(tour)) {
+                        throw new TourException("This tour doesn't exist!");
+                    }
+
+                    if (isSubTourExist) {
+                        throw new TourException("This sub tour already exist!");
+                    }
+
+                    SubTour subTour = SubTourCreateForm.toEntity(form);
+                    subTour.setAvailableSeats(tour.getTotalSeats());
+
+                    return subTourRepository.save(subTour)
+                            .then();
+                });
+    }
+
+    @Override
+    public Mono<Void> updateTourWithSubTour(TourUpdateForm form) {
+        // Mono<Tour> tourMono = Mono.just(TourUpdateForm.buildTour(form));
+        // Mono<SubTour> subTourMono = Mono.just(TourUpdateForm.buildSubTour(form));
+
+        // return tourRepository.existsById(form.getId())
+        // .flatMap(isExistTour -> {
+        // if(!isExistTour){
+        // throw new TourException("This tour doesn't exist!");
+        // }
+
+        // });
+        return Mono.empty();
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> updateTourWithSubTour(int tourId, int subTourId, Map<String, Object> fields) {
+        Mono<Tour> tourMono = tourRepository.findById(tourId)
+                .switchIfEmpty(Mono.error(new TourException("This tour doesn't exist!")));
+        Mono<SubTour> subTourMono = subTourRepository.findById(subTourId)
+                .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
+
+        return updateTourWithSubTour(tourMono, subTourMono, fields);
+    }
+
+    @Override
+    public Mono<Void> updateTourWithSubTour(int tourId, String tourCode, Map<String, Object> fields) {
+        Mono<Tour> tourMono = tourRepository.findById(tourId)
+                .switchIfEmpty(Mono.error(new TourException("This tour doesn't exist!")));
+
+        Mono<SubTour> subTourMono = subTourRepository.findByTourCode(tourCode)
+                .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
+
+        return updateTourWithSubTour(tourMono, subTourMono, fields);
+    }
+
+    @Override
+    public Mono<Page<TourResponse>> findAllTours(Pageable pageable) {
+        return tourRepository.findAllBy(pageable)
+                .switchIfEmpty(Mono.empty())
+                .map(TourResponse::toDTO)
+                .collectList()
+                .zipWith(tourRepository.count())
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+    }
+
+    @Override
+    public Mono<Page<TourResponse>> findAllTours(Pageable pageable, TourFilter tourFilter) {
+        TourUtils.TourParams tourParams = TourUtils.buildTourParams()
+                .bind(TourFilter.DEPARTURE_LOCATION, tourFilter.getDepartureLocation())
+                .bind(TourFilter.DESTINATION, tourFilter.getDestination())
+                .bind(TourFilter.VEHICLE, tourFilter.getVehicle())
+                .bind(TourFilter.MIN_PRICE, tourFilter.getMinPrice())
+                .bind(TourFilter.MAX_PRICE, tourFilter.getMaxPrice());
+
+        String query = generateQuery(tourFilter).concat(" LIMIT :limit OFFSET :offset");
+
+        DatabaseClient.GenericExecuteSpec executeSpec = databaseClient.sql(query);
+        for (Param param : tourParams.getParams()) {
+            executeSpec = executeSpec.bind(param.getName(), param.getValue());
+        }
+
+        return executeSpec
+                .bind("limit", pageable.getPageSize())
+                .bind("offset", pageable.getOffset())
+                .map((row, metadata) -> mapRowToTour(row))
+                .all()
+                .map(TourResponse::toDTO)
+                .collectList()
+                .map(tourResponses -> {
+                    int sizes = tourResponses.size();
+                    return new PageImpl<>(tourResponses, pageable, sizes);
+                });
+    }
+
+    @Override
+    public Mono<List<TourResponse>> findLatestTours(int count) {
+        throw new UnsupportedOperationException("Unimplemented method 'findLatestTours'");
+    }
+
+    @Override
+    public Mono<TourResponse> findTourById(int id) {
+        return tourRepository.findById(id)
+                .map(TourResponse::toDTO)
+                .switchIfEmpty(Mono.error(new TourException("Invalid id")));
+    }
+
+    @Override
+    public Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable) {
+        return subTourRepository.findAllBy(pageable)
+                .switchIfEmpty(Mono.empty())
+                .flatMap(subTour -> tourRepository.findById(subTour.getTourId())
+                        .map(tour -> SubTourResponse.toDTO(subTour, tour)))
+                .collectList()
+                .zipWith(subTourRepository.count())
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
+    }
+
+    @Override
+    public Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable, TourFilter tourFilter) {
+        TourUtils.TourParams tourParams = TourUtils.buildTourParams()
+                .bind(TourFilter.DEPARTURE_LOCATION, tourFilter.getDepartureLocation())
+                .bind(TourFilter.DESTINATION, tourFilter.getDestination())
+                .bind(TourFilter.VEHICLE, tourFilter.getVehicle())
+                .bind(TourFilter.MIN_PRICE, tourFilter.getMinPrice())
+                .bind(TourFilter.MAX_PRICE, tourFilter.getMaxPrice());
+
+        String query = generateQuery(tourFilter);
+        DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(query);
+
+        for (Param param : tourParams.getParams()) {
+            spec = spec.bind(param.getName(), param.getValue());
+        }
+
+        return spec.map((row, metadata) -> mapRowToTour(row))
+                .all()
+                .flatMap(tour -> {
+                    if (tour.getTotalSubTours() == 0) {
+                        return Flux.empty();
+                    }
+
+                    return subTourRepository.findAllByTourId(tour.getId())
+                            .map(subTour -> SubTourResponse.toDTO(subTour, tour));
+                })
+                .collectList()
+                .map(dtos -> new PageImpl<>(dtos, pageable, dtos.size()));
+    }
+
+    @Override
+    public Mono<List<SubTourResponse>> findAllSubTours(int tourId) {
+        throw new UnsupportedOperationException("Unimplemented method 'findAllSubTours'");
+    }
+
+    @Override
+    public Mono<List<SubTourResponse>> findLatestSubTours(int count) {
+        throw new UnsupportedOperationException("Unimplemented method 'findLatestSubTours'");
+    }
+
+    @Override
+    public Mono<SubTourResponse> findSubTourByTourCode(String tourCode) {
+        return subTourRepository.findByTourCode(tourCode)
+                .flatMap(subTour -> {
+                    return tourRepository.findById(subTour.getTourId())
+                            .map(tour -> SubTourResponse.toDTO(subTour, tour));
+                })
+                .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
+    }
+
+    @Override
+    public Mono<SubTourResponse> findSubTourById(int subTourId) {
+        return subTourRepository.findById(subTourId)
+                .flatMap(subTour -> {
+                    return tourRepository.findById(subTour.getTourId())
+                            .map(tour -> SubTourResponse.toDTO(subTour, tour));
+                })
+                .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> deleteTourById(int id) {
+        return tourRepository.existsById(id)
+                .filter(isExists -> isExists)
+                .flatMap(isExists -> tourRepository.deleteById(id).then())
+                .switchIfEmpty(Mono.error(new TourException("This tour doesn't exist!")));
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> deleteSubTourById(int id) {
+        System.out.println(id);
+        return subTourRepository.existsById(id)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")))
+                .flatMap(isExists -> {
+                    System.out.println(isExists);
+                    return subTourRepository.deleteById(id).then();
+                });
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> deleteSubTourByTourCode(String tourCode) {
+        return subTourRepository.existsByTourCode(tourCode).filter(isExists -> isExists)
+                .flatMap(isExists -> subTourRepository.deleteByTourCode(tourCode).then())
+                .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> deleteAllSubToursByTourId(int tourId) {
+        return subTourRepository.deleteAllByTourId(tourId);
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> updateOnlyTour(int tourId, Map<String, Object> fields) {
+        return tourRepository.findById(tourId)
+                .flatMap(tour -> tourRepository
+                        .save(this.updateTourByFields(tour, fields)).then());
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> updateOnlySubTour(int subTourId, Map<String, Object> fields) {
+        return subTourRepository.findById(subTourId)
+                .flatMap(subTour -> subTourRepository
+                        .save(this.updateSubTourByFields(subTour, fields)).then());
+    }
+
+    @Override
+    public Mono<Boolean> existsTourById(int id) {
+        return tourRepository.existsById(id);
+    }
+
+    @Override
+    public Mono<Boolean> existsTourByTitle(String title) {
+        return tourRepository.existsByTitle(title);
+    }
+
+    @Override
+    public Mono<Boolean> existsSubTourById(int id) {
+        return subTourRepository.existsById(id);
+    }
+
+    @Override
+    public Mono<Boolean> existsSubTourByTitle(String title) {
+        return subTourRepository.existsByTitle(title);
+    }
+
+    @Override
+    public Mono<Boolean> existsSubTourByTourCode(String tourCode) {
+        return subTourRepository.existsByTourCode(tourCode);
+    }
+
+    @Transactional
+    private Mono<Void> updateTourWithSubTour(Mono<Tour> tourMono, Mono<SubTour> subTourMono,
+            Map<String, Object> fields) {
+        String[] blackListKeys = { "id", "tourCode", "tourId" };
+        return Mono.zip(tourMono, subTourMono)
+                .flatMap(tuple -> {
+                    Tour tour = tuple.getT1();
+                    SubTour subTour = tuple.getT2();
+
+                    fields.forEach((key, value) -> {
+                        if (List.of(blackListKeys).contains(key.trim())) {
+                            throw new TourException("Can not update field: " + key);
+                        }
+
+                        Field field = ReflectionUtils.findField(tour.getClass(), key);
+
+                        if (field == null) {
+                            field = ReflectionUtils.findField(subTour.getClass(), key);
+                        }
+
+                        if (field != null) {
+                            field.setAccessible(true);
+                            boolean isInstanceOfTour = field.getDeclaringClass().isInstance(tour);
+
+                            if (field.getType().equals(ETourStatus.class)) {
+                                ReflectionUtils.setField(
+                                        field,
+                                        field.getDeclaringClass().cast(isInstanceOfTour ? tour : subTour),
+                                        ETourStatus.valueOf(String.valueOf(value)));
+                            } else {
+                                ReflectionUtils.setField(
+                                        field,
+                                        field.getDeclaringClass().cast(isInstanceOfTour ? tour : subTour),
+                                        field.getType().cast(value));
+                            }
+                        }
+                    });
+
+                    return tourRepository.save(tour)
+                            .then(subTourRepository.save(subTour))
+                            .then();
+                });
+    }
+
+    private Tour updateTourByFields(Tour tour, Map<String, Object> fields) {
+        String[] blackListKeys = { "id" };
+
+        for (Entry<String, Object> entry : fields.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (List.of(blackListKeys).contains(key.trim())) {
+                continue;
+            }
+
+            Field field = ReflectionUtils.findField(Tour.class, key);
+            if (field != null) {
+                field.setAccessible(true);
+                ReflectionUtils.setField(field, tour, field.getType().cast(value));
+            }
+        }
+
+        return tour;
+    }
+
+    private SubTour updateSubTourByFields(SubTour subTour, Map<String, Object> fields) {
+        String[] blackListKeys = {
+                "id", "tourCode", "tourId"
+        };
+
+        for (Entry<String, Object> entry : fields.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (List.of(blackListKeys).contains(key.trim())) {
+                continue;
+            }
+
+            Field field = ReflectionUtils.findField(SubTour.class, key);
+            if (field != null) {
+                field.setAccessible(true);
+                System.out.println("Type of field: " + field.getType().getName());
+
+                if (field.getType().equals(ETourStatus.class)) {
+                    ReflectionUtils.setField(field, subTour, ETourStatus.valueOf(String.valueOf(value)));
+                } else {
+                    ReflectionUtils.setField(field, subTour, field.getType().cast(value));
+                }
+            }
+        }
+
+        return subTour;
+    }
+
+    private Tour mapRowToTour(Row row) {
+        return Tour.builder()
+                .id(row.get("id", Integer.class))
+                .title(row.get("title", String.class))
+                .destinations(row.get("destinations", String.class))
+                .duration(row.get("duration", String.class))
+                .departureLocation(row.get("departure_location", String.class))
+                .schedules(row.get("schedules", String.class))
+                .vehicle(row.get("vehicle", String.class))
+                .totalSeats(row.get("total_seats", Integer.class))
+                .adultPrice(row.get("adult_price", Integer.class))
+                .childrenPrice(row.get("children_price", Integer.class))
+                .babyPrice(row.get("baby_price", Integer.class))
+                .image1(row.get("image1", String.class))
+                .image2(row.get("image2", String.class))
+                .image3(row.get("image3", String.class))
+                .image4(row.get("image4", String.class))
+                .totalSubTours(row.get("total_sub_tours", Integer.class))
+                .createdTime(row.get("created_time", ZonedDateTime.class))
+                .build();
+    }
+
+    private static String generateQuery(TourFilter tourFilter) {
+        String query = "SELECT * FROM tour WHERE 1=1";
+
+        if (tourFilter.getDepartureLocation() != null) {
+            query += " AND departure_location = :" + TourFilter.DEPARTURE_LOCATION;
+        }
+
+        if (tourFilter.getDestination() != null) {
+            query += " AND destinations LIKE CONCAT('%', :" + TourFilter.DESTINATION + ", '%')";
+        }
+
+        if (tourFilter.getVehicle() != null) {
+            query += " AND vehicle LIKE CONCAT ('%', :" + TourFilter.VEHICLE + ", '%')";
+        }
+
+        if (tourFilter.getMinPrice() != null) {
+            query += " AND adult_price >= :" + TourFilter.MIN_PRICE;
+        }
+
+        if (tourFilter.getMaxPrice() != null) {
+            query += " AND adult_price <= :" + TourFilter.MAX_PRICE;
+        }
+
+        return query;
+    }
+}
