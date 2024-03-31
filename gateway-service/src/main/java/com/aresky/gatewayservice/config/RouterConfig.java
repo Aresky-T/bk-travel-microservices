@@ -1,47 +1,44 @@
 package com.aresky.gatewayservice.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.aresky.gatewayservice.config.Routes.Route;
+
 @Configuration
 public class RouterConfig {
-    public static String AUTH_SERVICE_ID = "auth-service";
-    public static String ACCOUNT_SERVICE_ID = "account_service";
 
-    public static String AUTH_SERVICE_URI = "http://localhost:8081";
-    public static String ACCOUNT_SERVICE_URI = "http://localhost:8082";
+        @Autowired
+        private Routes routes;
 
-    public static String[] AUTH_SERVICE_PATHS = {
-            "/auth/**",
-            "/api/v1/auth/**"
-    };
-    public static String[] ACCOUNT_SERVICE_PATHS = {
-            "/api/v1/accounts/**",
-            "/accounts/**"
-    };
+        @Bean
+        public RouteLocator routeLocator(RouteLocatorBuilder builder) {
 
-    @Bean
-    RouteLocator routeLocator(RouteLocatorBuilder builder) {
+                Routes.Route authRoute = routes.getRoute("auth-service");
+                Routes.Route accountRoute = routes.getRoute("account-service");
+                Routes.Route tourRoute = routes.getRoute("tour-service");
+                Routes.Route bookingService = routes.getRoute("booking-service");
+                Route touristAttractionService = routes.getRoute("tourist-attraction-service");
 
-        CustomService authService = new CustomService(
-                "auth-service",
-                AUTH_SERVICE_PATHS,
-                AUTH_SERVICE_URI);
-
-        CustomService accountService = new CustomService(
-                "account-service",
-                ACCOUNT_SERVICE_PATHS,
-                ACCOUNT_SERVICE_URI);
-
-        return builder.routes()
-                .route(authService.getId(), r -> r
-                        .path(authService.getPaths())
-                        .uri(authService.getUri()))
-                .route(accountService.getId(), r -> r
-                        .path(accountService.getPaths())
-                        .uri(accountService.getUri()))
-                .build();
-    }
+                return builder.routes()
+                                .route(authRoute.getId(), r -> r
+                                                .path(authRoute.getPaths())
+                                                .uri(authRoute.getUri()))
+                                .route(accountRoute.getId(), r -> r
+                                                .path(accountRoute.getPaths())
+                                                .uri(accountRoute.getUri()))
+                                .route(tourRoute.getId(), r -> r
+                                                .path(tourRoute.getPaths())
+                                                .uri(tourRoute.getUri()))
+                                .route(bookingService.getId(), r -> r
+                                                .path(bookingService.getPaths())
+                                                .uri(bookingService.getUri()))
+                                .route(touristAttractionService.getId(), r -> r
+                                                .path(touristAttractionService.getPaths())
+                                                .uri(touristAttractionService.getUri()))
+                                .build();
+        }
 }

@@ -24,3 +24,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://${eureka.server.host}:8761/eureka
+auth:
+  jwt:
+    header: Authorization
+    prefix: Bearer
+    secret: aresky_sercret_ast5ld3mdkisbaoyqmtnx7casdkycgajgf334twi5y35_124qwirweaser234
+    expiration: 86400000
