@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table sub_tour" author="Aresky">
+        <createTable tableName="sub_tour">
+            <column name="id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="tour_code" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="departure_time" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
+            <column name="available_seats" type="INT">
+                <constraints nullable="false" checkConstraint="available_seats >= 0" />
+            </column>
+            <column
+                name="status"
+                type="ENUM('HIDDEN', 'NOT_STARTED','ON_GOING','FINISHED', 'BE_DELAYED', 'CANCELED')"
+                defaultValue="HIDDEN"
+            >
+                <constraints nullable="false" />
+            </column>
+            <column name="tour_id" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_tour_id"
+                    referencedColumnNames="id"
+                    referencedTableName="tour"
+                />
+            </column>
+            <column name="tour_guide_id" type="INT">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addAutoIncrement
+            tableName="sub_tour"
+            columnName="id"
+            columnDataType="INT"
+            defaultOnNull="false"
+            startWith="1"
+        />
+    </changeSet>
+</databaseChangeLog>

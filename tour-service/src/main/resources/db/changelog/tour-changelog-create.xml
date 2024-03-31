@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table tour" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table tour already exist">
+            <not>
+                <tableExists tableName="tour" />
+            </not>
+        </preConditions>
+        <createTable tableName="tour">
+            <column name="id" type="INT">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="destinations" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="duration" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="departure_location" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="total_seats" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="vehicle" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="schedules" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="adult_price" type="INT">
+                <constraints nullable="false" checkConstraint="adult_price >= 0" />
+            </column>
+            <column name="children_price" type="INT">
+                <constraints nullable="false" checkConstraint="children_price >= 0" />
+            </column>
+            <column name="baby_price" type="INT">
+                <constraints nullable="false" checkConstraint="baby_price >= 0" />
+            </column>
+            <column name="image1" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="image2" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="image3" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="image4" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addAutoIncrement
+            tableName="tour"
+            columnName="id"
+            columnDataType="INT"
+            defaultOnNull="false"
+            startWith="1"
+        />
+    </changeSet>
+    <changeSet id="add column total_sub_tours" author="Aresky">
+        <preConditions onFail="CONTINUE" onFailMessage="Table tour doesn't exist">
+            <tableExists tableName="tour" />
+        </preConditions>
+        <addColumn tableName="tour">
+            <column name="total_sub_tours" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false" checkConstraint="total_sub_tours >= 0" />
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

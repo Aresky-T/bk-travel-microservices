@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <!-- <changeSet id="Create table tour" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table tour already exists">
+            <not>
+                <tableExists tableName="tour" />
+            </not>
+        </preConditions>
+        <sqlFile path="db/mysql/tour.sql" />
+    </changeSet>
+    <changeSet id="Create table sub_tour" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table tour already exists">
+            <not>
+                <tableExists tableName="sub_tour" />
+            </not>
+        </preConditions>
+        <sqlFile path="db/mysql/sub-tour.sql" />
+    </changeSet> -->
+    <include file="db/changelog/tour-changelog-create.xml" author="Aresky" />
+    <include file="db/changelog/subtour-changelog-create.xml" author="Aresky" />
+</databaseChangeLog>
