@@ -1,5 +1,7 @@
 package com.aresky.accountservice.dto.response;
 
+import java.util.Date;
+
 import com.aresky.accountservice.model.Account;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +28,7 @@ public class AccountResponse {
                 .email(account.getEmail())
                 .role(account.getRole().name())
                 .status(account.getActivationStatus().name())
-                .createdTime(account.getCreatedTime().toString())
+                .createdTime(Date.from(account.getCreatedTime().toInstant()).toString())
                 .build();
     }
 }
