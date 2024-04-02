@@ -18,6 +18,8 @@ spring:
 # Euraka config
 # ---------------
 eureka:
+  instance:
+    hostname: localhost
   server:
     host: discovery-server
     port: 8761
