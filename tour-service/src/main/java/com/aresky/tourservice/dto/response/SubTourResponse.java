@@ -1,8 +1,9 @@
 package com.aresky.tourservice.dto.response;
 
+import java.util.Date;
+
 import com.aresky.tourservice.model.SubTour;
 import com.aresky.tourservice.model.Tour;
-import com.aresky.tourservice.utils.TourUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +52,7 @@ public class SubTourResponse {
                 .image4(tour.getImage4())
                 .destinations(tour.getDestinations())
                 .duration(tour.getDuration())
-                .departureTime(subTour.getDepartureTime().format(TourUtils.getDateTimeFormatter("yyyy-MM-dd HH:mm:ss")))
+                .departureTime(Date.from(subTour.getDepartureTime().toInstant()).toString())
                 .departureLocation(tour.getDepartureLocation())
                 .schedules(tour.getSchedules())
                 .vehicle(tour.getVehicle())
@@ -62,7 +63,7 @@ public class SubTourResponse {
                 .childrenPrice(tour.getChildrenPrice())
                 .babyPrice(tour.getBabyPrice())
                 .tourGuideId(subTour.getTourGuideId())
-                .createdTime(subTour.getCreatedTime().toString())
+                .createdTime(Date.from(subTour.getCreatedTime().toInstant()).toString())
                 .build();
     }
 }
