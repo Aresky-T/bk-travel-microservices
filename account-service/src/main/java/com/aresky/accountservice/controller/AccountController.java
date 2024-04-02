@@ -63,6 +63,11 @@ public class AccountController {
                 .map(ResponseEntity::ok);
     }
 
+    @GetMapping("/validate")
+    public Mono<ResponseEntity<?>> validateAccount(@RequestParam(name = "id") int accountId) {
+        return accountService.isExistsById(accountId).map(ResponseEntity::ok);
+    }
+
     @PostMapping
     public Mono<ResponseEntity<?>> onSignUpAccount(@RequestBody SignupForm form) {
         return accountService.handleSignup(form).thenReturn(ResponseEntity.ok("success"));
