@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table booking" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table booking already exist!">
+            <not>
+                <tableExists tableName="booking" />
+            </not>
+        </preConditions>
+        <createTable tableName="booking" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="full_name" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="phone" type="VARCHAR(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="address" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="adult_number" type="INT">
+                <constraints nullable="false" checkConstraint="adult_number > 0" />
+            </column>
+            <column name="children_number" type="INT" defaultValue="0">
+                <constraints nullable="false" checkConstraint="children_number >= 0" />
+            </column>
+            <column name="baby_number" type="INT" defaultValue="0">
+                <constraints nullable="false" checkConstraint="baby_number >= 0" />
+            </column>
+            <column name="note" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="amount" type="INT">
+                <constraints nullable="false" checkConstraint="amount > 0" />
+            </column>
+            <column name="booked_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="ENUM('NOT_PAY','PAY_UP','REJECTED')" defaultValue="NOT_PAY">
+                <constraints nullable="false" />
+            </column>
+            <column name="form_of_payment" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_form_of_payment"
+                    referencedColumnNames="id"
+                    referencedTableName="form_of_payment"
+                />
+            </column>
+            <column name="account_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="tour_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <addUniqueConstraint
+            tableName="booking"
+            columnNames="account_id, sub_tour_id"
+            constraintName="uk_account_id_sub_tour_id"
+        />
+    </changeSet>
+</databaseChangeLog>

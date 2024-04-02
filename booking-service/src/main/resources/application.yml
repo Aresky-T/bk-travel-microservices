@@ -1,0 +1,23 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: booking-service
+  liquibase:
+    url: jdbc:mysql://localhost:3306/bk_travel_booking
+    user: root
+    password: root
+    change-log: classpath:db/changelog/changelog-master.xml
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+bk-travel:
+  config:
+    database:
+      server:
+        url: r2dbc:mysql://localhost:3306/bk_travel_booking
+        username: root
+        password: root

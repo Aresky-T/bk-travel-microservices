@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table booking_statistic" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table booking_statistic already exist!">
+            <not>
+                <tableExists tableName="booking_statistic" />
+            </not>
+        </preConditions>
+        <createTable tableName="booking_statistic" ifNotExists="true">
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="tour_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="number_of_booking" type="INT" defaultValue="0">
+                <constraints nullable="false" checkConstraint="number_of_booking >= 0" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
