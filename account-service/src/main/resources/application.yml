@@ -24,6 +24,8 @@ spring:
     password: ${mysql-server.password}
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
+  instance:
+    hostname: localhost
   server:
     hostname: discovery-server
     port: 8761
