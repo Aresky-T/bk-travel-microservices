@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table tourist" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table tourist already exist!">
+            <not>
+                <tableExists tableName="tourist" />
+            </not>
+        </preConditions>
+        <createTable tableName="tourist" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="booking_id" type="INT">
+                <constraints nullable="false"
+                    foreignKeyName="bk_booking_id"
+                    referencedColumnNames="id"
+                    referencedTableName="booking"
+                />
+            </column>
+            <column name="full_name" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="birth_date" type="DATE">
+                <constraints nullable="false" />
+            </column>
+            <column name="gender" type="ENUM('MALE','FEMALE','OTHER')">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="ENUM('ADULT','CHILDREN','BABY')">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

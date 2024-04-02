@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <include file="db/changelog/form-of-payment/changelog.xml" author="Aresky" />
+    <include file="db/changelog/booking/changelog.xml" author="Aresky" />
+    <include file="db/changelog/tourist/changelog.xml" author="Aresky" />
+    <include file="db/changelog/booking-statistic/changelog.xml" author="Aresky" />
+    <include file="db/changelog/request-cancel-booking/changelog.xml" author="Aresky" />
+</databaseChangeLog>

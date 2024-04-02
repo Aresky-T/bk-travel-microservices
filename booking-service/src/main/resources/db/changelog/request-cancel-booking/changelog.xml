@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table request_cancel_booking" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table request_cancel_booking already exist!">
+            <not>
+                <tableExists tableName="request_cancel_booking" />
+            </not>
+        </preConditions>
+        <createTable tableName="request_cancel_booking" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="booking_id" type="INT">
+                <constraints
+                    nullable="false"
+                    foreignKeyName="fk_booking_id"
+                    referencedTableName="booking"
+                    referencedColumnNames="id"
+                />
+            </column>
+            <column name="reason" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column
+                name="status"
+                type="ENUM('WAITING','APPROVED','REJECTED')"
+                defaultValue="WAITING">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
