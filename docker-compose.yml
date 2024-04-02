@@ -97,7 +97,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
-
+  booking-service:
+    image: booking-service-image:v1.0.0
+    container_name: booking-service
+    depends_on:
+      - mysql-server
+    build:
+      context: ./booking-service
+      dockerfile: Dockerfile
+    ports:
+      - 8084:8084
+    networks:
+      - bk-travel-ms-network
+    volumes:
+      - type: bind
+        source: ./booking-service
+        target: /app
 volumes:
   mysql-server-volume:
   mysql-spring-boot-config-daemon:
