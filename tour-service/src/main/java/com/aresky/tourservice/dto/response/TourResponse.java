@@ -1,6 +1,7 @@
 package com.aresky.tourservice.dto.response;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.aresky.tourservice.model.SubTour;
@@ -52,7 +53,7 @@ public class TourResponse {
                 .image2(tour.getImage2())
                 .image3(tour.getImage3())
                 .image4(tour.getImage4())
-                .createdTime(tour.getCreatedTime().toString())
+                .createdTime(Date.from(tour.getCreatedTime().toInstant()).toString())
                 .build();
     }
 

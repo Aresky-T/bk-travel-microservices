@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.ReactivePageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
@@ -38,9 +39,14 @@ public class ApplicationConfig implements WebFluxConfigurer {
         }
 
         if (!StringUtil.isNullOrEmpty(server.getPassword())) {
-            builder = builder.option(ConnectionFactoryOptions.PASSWORD, server.getUsername());
+            builder = builder.option(ConnectionFactoryOptions.PASSWORD, server.getPassword());
         }
 
         return ConnectionFactories.get(builder.build());
+    }
+
+    @Bean
+    DatabaseClient getDatabaseClient(ConnectionFactory connectionFactory) {
+        return DatabaseClient.create(connectionFactory);
     }
 }

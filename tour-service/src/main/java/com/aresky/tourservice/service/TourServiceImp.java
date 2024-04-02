@@ -46,6 +46,7 @@ public class TourServiceImp implements ITourService {
     @Autowired
     private DatabaseClient databaseClient;
 
+    @Transactional
     @Override
     public Mono<Void> createTour(TourCreateForm form) {
         return existsTourByTitle(form.getTitle())
@@ -58,6 +59,7 @@ public class TourServiceImp implements ITourService {
                 });
     }
 
+    @Transactional
     @Override
     public Mono<Void> createSubTour(SubTourCreateForm form) {
         Mono<Tour> tourMono = tourRepository.findById(form.getTourId());
@@ -80,7 +82,10 @@ public class TourServiceImp implements ITourService {
                     subTour.setAvailableSeats(tour.getTotalSeats());
 
                     return subTourRepository.save(subTour)
-                            .then();
+                            .flatMap(createdSubTour -> {
+                                tour.setTotalSubTours(tour.getTotalSubTours() + 1);
+                                return tourRepository.save(tour).then();
+                            });
                 });
     }
 
