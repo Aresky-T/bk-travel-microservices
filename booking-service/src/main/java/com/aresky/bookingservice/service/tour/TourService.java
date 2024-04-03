@@ -1,31 +1,36 @@
 package com.aresky.bookingservice.service.tour;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.aresky.bookingservice.dto.response.SubTourResponse;
 import com.aresky.bookingservice.exception.BookingException;
+import com.aresky.bookingservice.exception.MessageResponse;
 
-import lombok.Data;
+import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
 
-@Data
+@Service
 public class TourService {
 
-    private final String tourURL = "http://localhost:8083/api/v1/tours";
+    private final String tourURL = "http://tour-service:8083/api/v1/tours";
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private WebClient webClient;
+
+    @PostConstruct
+    private void initWebClient() {
+        this.webClient = WebClient.builder().baseUrl(tourURL).build();
+    }
 
     public Mono<SubTourResponse> findSubTour(int subTourId) {
-        String url = tourURL.concat("/sub-tour/id").concat("/" + subTourId);
+        String endpoint = "/sub-tour/id/{id}";
 
-        return Mono.fromCallable(() -> restTemplate.getForEntity(url, SubTourResponse.class))
-                .map(res -> {
-                    if (!res.getStatusCode().is2xxSuccessful()) {
-                        throw new BookingException("Failed connect to tour-service!");
-                    }
-                    return res.getBody();
-                });
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path(endpoint).build(subTourId))
+                .retrieve()
+                .onStatus(HttpStatus.BAD_REQUEST::equals, response -> response.bodyToMono(MessageResponse.class)
+                        .flatMap(msgRsp -> Mono.error(new BookingException(msgRsp.getMessage()))))
+                .bodyToMono(SubTourResponse.class);
     }
 }
