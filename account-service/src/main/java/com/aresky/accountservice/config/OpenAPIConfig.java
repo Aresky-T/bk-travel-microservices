@@ -41,8 +41,8 @@ public class OpenAPIConfig {
         devServer.setUrl("http://localhost:8082");
 
         Server productServer = new Server();
-        productServer.setDescription("Discovery Server in Production environment");
-        productServer.setUrl("https://localhost:8761");
+        productServer.setDescription("Server URL in Production environment");
+        productServer.setUrl("http://localhost:8080");
 
         Info info = new Info();
         info.contact(contact);
