@@ -4,12 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aresky.bookingservice.dto.request.CreateBookingForm;
 import com.aresky.bookingservice.dto.response.FormOfPaymentResponse;
 import com.aresky.bookingservice.service.FOP.IFormOfPaymentService;
+import com.aresky.bookingservice.service.booking.IBookingService;
 
 import reactor.core.publisher.Mono;
 
@@ -23,12 +27,15 @@ public class BookingController {
     @Autowired
     private IFormOfPaymentService formOfPaymentService;
 
-    // POST - createBooking(CreateBookingForm form)
-    // @PostMapping
-    // public Mono<ResponseEntity<?>> createBooking(@RequestBody CreateBookingForm
-    // form){
+    @Autowired
+    private IBookingService bookingService;
 
-    // }
+    // POST - createBooking(CreateBookingForm form)
+    @PostMapping
+    public Mono<ResponseEntity<?>> createBooking(
+            @RequestBody CreateBookingForm form) {
+        return bookingService.handleBooking(form).thenReturn(ResponseEntity.ok("success"));
+    }
 
     // POST - createBookingWithPayment(CreateBookingForm form)
     // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)

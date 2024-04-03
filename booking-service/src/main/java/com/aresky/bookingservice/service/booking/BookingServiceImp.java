@@ -14,11 +14,10 @@ import com.aresky.bookingservice.dto.response.BookingResponse;
 import com.aresky.bookingservice.dto.response.SubTourResponse;
 import com.aresky.bookingservice.exception.BookingException;
 import com.aresky.bookingservice.model.Booking;
+import com.aresky.bookingservice.model.BookingStatistic;
 import com.aresky.bookingservice.model.EBookingStatus;
-import com.aresky.bookingservice.model.EFormOfPayment;
-import com.aresky.bookingservice.model.FormOfPayment;
 import com.aresky.bookingservice.repository.BookingRepository;
-import com.aresky.bookingservice.repository.FormOfPaymentRepository;
+import com.aresky.bookingservice.repository.BookingStatisticRepository;
 import com.aresky.bookingservice.service.account.AccountService;
 import com.aresky.bookingservice.service.tour.TourService;
 
@@ -31,7 +30,7 @@ public class BookingServiceImp implements IBookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
-    private FormOfPaymentRepository formOfPaymentRepository;
+    private BookingStatisticRepository bookingStatisticRepository;
 
     @Autowired
     private TourService tourService;
@@ -43,8 +42,10 @@ public class BookingServiceImp implements IBookingService {
     public Mono<Void> handleBooking(CreateBookingForm form) {
         int accountId = form.getAccountId();
         int subTourId = form.getSubTourId();
+        int tourId = form.getTourId();
         Mono<SubTourResponse> tourMono = tourService.findSubTour(subTourId);
         Mono<Boolean> isValidAccountMono = accountService.validateAccount(accountId);
+        Mono<BookingStatistic> bookingStatisticMono = bookingStatisticRepository.findById(subTourId);
 
         return Mono.zip(tourMono, isValidAccountMono)
                 .flatMap(tuple -> {
@@ -55,14 +56,28 @@ public class BookingServiceImp implements IBookingService {
                         throw new BookingException("Invalid accountId");
                     }
 
-                    if (subTour == null || subTour.getTourId() != form.getTourId()) {
-                        throw new BookingException("Invalid tour");
+                    if (subTour != null && subTour.getTourId() != tourId) {
+                        throw new BookingException("Invalid tourId");
                     }
 
-                    Booking booking = CreateBookingForm.buildBooking(form);
-                    booking.setStatus(EBookingStatus.NOT_PAY);
+                    return bookingStatisticMono
+                            .switchIfEmpty(bookingStatisticRepository.save(new BookingStatistic(subTourId, tourId, 0)))
+                            .flatMap(savedBookingStatistic -> {
+                                System.out.println(savedBookingStatistic);
+                                Booking booking = CreateBookingForm.buildBooking(form);
+                                booking.setStatus(EBookingStatus.NOT_PAY);
 
-                    return bookingRepository.save(booking).then();
+                                return bookingRepository.save(booking)
+                                        .flatMap(savedBooking -> {
+
+                                            savedBookingStatistic
+                                                    .setNumberOfBooking(savedBookingStatistic.getNumberOfBooking() + 1);
+
+                                            return bookingStatisticRepository.save(savedBookingStatistic)
+                                                    .then();
+                                        })
+                                        .then();
+                            });
                 });
     }
 
