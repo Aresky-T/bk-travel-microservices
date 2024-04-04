@@ -1,15 +1,23 @@
+# ---------------
+# Custom config
+# ---------------
+bk-travel:
+  config:
+    database:
+      server:
+        url: r2dbc:mysql://mysql-server:3306/bk_travel_auth
+        username: root
+        password: root
+# ---------------
+# Other config
+# ---------------
 server:
   port: 8081
 spring:
   application:
     name: auth-service
-  r2dbc:
-    url: r2dbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_auth?serverTimeZone=UTC
-    username: root
-    password: root
   liquibase:
-    enabled: true
-    url: jdbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_auth?serverTimeZone=UTC
+    url: jdbc:mysql://mysql-server:3306/bk_travel_auth
     user: root
     password: root
     change-log: classpath:db/changelog/changelog-master.xml
@@ -26,7 +34,7 @@ springdoc:
   packages-to-scan: com.aresky.authservice.controller
   swagger-ui:
     enabled: true
-    path: "/swagger-ui.html"
+    path: "/swagger-ui.auth.html"
   api-docs:
     path: /api-docs
 auth:
@@ -35,12 +43,9 @@ auth:
     prefix: Bearer
     secret: aresky_sercret_ast5ld3mdkisbaoyqmtnx7casdkycgajgf334twi5y35_124qwirweaser234
     expiration: 86400000
-mysql-server:
-  hostname: mysql-server
-  port: 3306
-kafka:
-  bootstrap-servers:
-    url: http://localhost:9092
-  consumer:
-    auto-offset-reset: latest
-    group-id: bk-travel-group
+#kafka:
+#  bootstrap-servers:
+#    url: http://localhost:9092
+#  consumer:
+#    auto-offset-reset: latest
+#    group-id: bk-travel-group

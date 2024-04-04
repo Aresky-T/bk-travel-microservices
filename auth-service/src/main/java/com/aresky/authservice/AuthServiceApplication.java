@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
-// @ComponentScan({ "com.aresky.common-service" })
 @EnableR2dbcRepositories
 @EnableDiscoveryClient
 @SpringBootApplication
