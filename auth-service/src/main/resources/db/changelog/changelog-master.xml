@@ -4,5 +4,22 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
 >
-    <include file="db/changelog/auth-changelog-create.xml" />
+    <changeSet id="Create table auth" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table auth already exist!">
+            <not>
+                <tableExists tableName="auth"/>
+            </not>
+        </preConditions>
+        <createTable tableName="auth" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="account_id" type="INT">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="access_token" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
