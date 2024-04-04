@@ -1,7 +1,5 @@
 package com.aresky.authservice.entity;
 
-import java.time.ZonedDateTime;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -13,36 +11,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "auth")
 public class Auth {
-
-    public Auth(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = ERole.USER;
-        this.status = EStatus.ACTIVE;
-    }
-
     @Id
-    private Long id;
+    @Column("id")
+    private Integer id;
 
-    @Column("username")
-    private String username;
+    @Column("account_id")
+    private Integer accountId;
 
-    @Column("email")
-    private String email;
+    @Column("access_token")
+    private String accessToken;
 
-    @Column("password")
-    private String password;
-
-    @Column("role")
-    private ERole role;
-
-    @Column("status")
-    private EStatus status;
-
-    @Column(value = "created_time")
-    private ZonedDateTime createdTime;
-
-    @Column(value = "updated_time")
-    private ZonedDateTime updatedTime;
+    public Auth(Integer accountId, String accessToken) {
+        this.accountId = accountId;
+        this.accessToken = accessToken;
+    }
 }
