@@ -1,5 +1,7 @@
 package com.aresky.authservice.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -52,7 +54,7 @@ public class SwaggerConfig {
 
                 Server productServer = new Server();
                 productServer.setDescription("Server URL in Production environment");
-                productServer.setUrl("https://localhost:8080");
+                productServer.setUrl("http://localhost:8080");
 
                 Info info = new Info();
                 info.contact(contact);
@@ -64,6 +66,7 @@ public class SwaggerConfig {
 
                 return new OpenAPI()
                                 .info(info)
+                                .servers(List.of(devServer, productServer))
                                 .addSecurityItem(securityRequirement)
                                 .components(components);
         }
