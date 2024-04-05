@@ -21,6 +21,7 @@ import com.aresky.tourservice.dto.request.SubTourCreateForm;
 import com.aresky.tourservice.dto.request.TourCreateForm;
 import com.aresky.tourservice.dto.request.TourFilter;
 import com.aresky.tourservice.dto.request.TourUpdateForm;
+import com.aresky.tourservice.dto.response.SubTour2Response;
 import com.aresky.tourservice.dto.response.SubTourResponse;
 import com.aresky.tourservice.dto.response.TourResponse;
 import com.aresky.tourservice.exception.TourException;
@@ -219,8 +220,14 @@ public class TourServiceImp implements ITourService {
     }
 
     @Override
-    public Mono<List<SubTourResponse>> findAllSubTours(int tourId) {
-        throw new UnsupportedOperationException("Unimplemented method 'findAllSubTours'");
+    public Mono<List<SubTour2Response>> findAllSubTours(int tourId) {
+        String query = "SELECT * from sub_tour WHERE tour_id = :tourId";
+        return databaseClient.sql(query)
+                .bind("tourId", tourId)
+                .map((row, metadata) -> mapRowToSubTour(row))
+                .all()
+                .map(SubTour2Response::toDTO)
+                .collectList();
     }
 
     @Override
@@ -465,5 +472,20 @@ public class TourServiceImp implements ITourService {
         }
 
         return query;
+    }
+
+    private SubTour mapRowToSubTour(Row row) {
+        System.out.println("status: " + row.get("status"));
+        return SubTour.builder()
+                .id(row.get("id", Integer.class))
+                .tourId(row.get("tour_id", Integer.class))
+                .tourCode(row.get("tour_code", String.class))
+                .title(row.get("title", String.class))
+                .status(row.get("status", ETourStatus.class))
+                .availableSeats(row.get("available_seats", Integer.class))
+                .tourGuideId(row.get("tour_guide_id", Integer.class))
+                .departureTime(row.get("departure_time", ZonedDateTime.class))
+                .createdTime(row.get("created_time", ZonedDateTime.class))
+                .build();
     }
 }

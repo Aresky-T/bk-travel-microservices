@@ -10,6 +10,7 @@ import com.aresky.tourservice.dto.request.SubTourCreateForm;
 import com.aresky.tourservice.dto.request.TourCreateForm;
 import com.aresky.tourservice.dto.request.TourFilter;
 import com.aresky.tourservice.dto.request.TourUpdateForm;
+import com.aresky.tourservice.dto.response.SubTour2Response;
 import com.aresky.tourservice.dto.response.SubTourResponse;
 import com.aresky.tourservice.dto.response.TourResponse;
 
@@ -42,7 +43,7 @@ public interface ITourService {
 
     Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable, TourFilter tourFilter);
 
-    Mono<List<SubTourResponse>> findAllSubTours(int tourId);
+    Mono<List<SubTour2Response>> findAllSubTours(int tourId);
 
     Mono<List<SubTourResponse>> findLatestSubTours(int count);
 
