@@ -34,6 +34,11 @@ public class TourUtils {
         return formatter;
     }
 
+    public static DateTimeFormatter getDateTimeFormatter() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return formatter;
+    }
+
     @Data
     @NoArgsConstructor
     public static class TourParams {

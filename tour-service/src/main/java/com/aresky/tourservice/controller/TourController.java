@@ -84,6 +84,11 @@ public class TourController {
         return tourService.findSubTourById(subTourId).map(ResponseEntity::ok);
     }
 
+    @GetMapping("/sub-tour/tour-id/{id}")
+    public Mono<ResponseEntity<?>> getAllSubToursByTourId(@PathVariable(name = "id") Integer tourId) {
+        return tourService.findAllSubTours(tourId).map(ResponseEntity::ok);
+    }
+
     // GET "/tour-code/{tourCode}" - getTourByTourCode - tourCode
     @GetMapping("/sub-tour/tour-code/{tourCode}")
     public Mono<ResponseEntity<?>> getTourByTourCode(@PathVariable String tourCode) {
