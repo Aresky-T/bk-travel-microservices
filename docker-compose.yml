@@ -113,6 +113,22 @@ services:
       - type: bind
         source: ./booking-service
         target: /app
+  staff-service:
+    container_name: staff-service
+    image: staff-service-image:v1.0.0
+    ports:
+      - 8085:8085
+    depends_on:
+      - mysql-server
+    build:
+      context: ./staff-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./staff-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
   mysql-spring-boot-config-daemon:
