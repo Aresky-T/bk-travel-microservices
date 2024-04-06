@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table position" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table position already exist!">
+            <not>
+                <tableExists tableName="position" />
+            </not>
+        </preConditions>
+        <createTable tableName="position" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="department_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="description" type="VARCHAR(1000)">
+                <constraints nullable="false" />
+            </column>
+            <column name="headcount" type="INT">
+                <constraints nullable="false" checkConstraint="headcount > 0" />
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+            baseTableName="position"
+            baseColumnNames="department_id"
+            constraintName="position_fk_department_id"
+            referencedTableName="department"
+            referencedColumnNames="id"
+            onDelete="CASCADE"
+        />
+    </changeSet>
+</databaseChangeLog>
