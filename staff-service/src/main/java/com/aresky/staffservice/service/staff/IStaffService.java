@@ -23,7 +23,7 @@ public interface IStaffService {
 
     Mono<Page<StaffResponse>> getAllStaffResponses(Pageable pageable, StaffFilter filter);
 
-    Mono<Page<StaffResponse>> getAllStaffResponses(Integer departmentId);
+    Mono<List<StaffResponse>> getAllStaffResponses(Integer departmentId);
 
     Mono<List<StaffResponse>> getAllStaffResponses(Integer departmentId, Integer positionId);
 
@@ -36,6 +36,8 @@ public interface IStaffService {
     Mono<Void> createStaff(StaffCreateForm form);
 
     Mono<StaffResponse> updateStaff(Integer staffId, StaffUpdateForm form);
+
+    Mono<StaffResponse> updateStaff(Integer staffId, String key, Object value);
 
     Mono<StaffResponse> updateStaff(Integer staffId, Map<String, Object> fields);
 
