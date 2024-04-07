@@ -7,12 +7,6 @@ spring:
     web-application-type: reactive
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          "[/**]":
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
       discovery:
         locator:
           enabled: true
