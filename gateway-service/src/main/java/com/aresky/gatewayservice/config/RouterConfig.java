@@ -17,11 +17,12 @@ public class RouterConfig {
         @Bean
         public RouteLocator routeLocator(RouteLocatorBuilder builder) {
 
-                Routes.Route authRoute = routes.getRoute("auth-service");
-                Routes.Route accountRoute = routes.getRoute("account-service");
-                Routes.Route tourRoute = routes.getRoute("tour-service");
-                Routes.Route bookingService = routes.getRoute("booking-service");
+                Route authRoute = routes.getRoute("auth-service");
+                Route accountRoute = routes.getRoute("account-service");
+                Route tourRoute = routes.getRoute("tour-service");
+                Route bookingService = routes.getRoute("booking-service");
                 Route touristAttractionService = routes.getRoute("tourist-attraction-service");
+                Route staffService = routes.getRoute("staff-service");
 
                 return builder.routes()
                                 .route(authRoute.getId(), r -> r
@@ -39,6 +40,9 @@ public class RouterConfig {
                                 .route(touristAttractionService.getId(), r -> r
                                                 .path(touristAttractionService.getPaths())
                                                 .uri(touristAttractionService.getUri()))
+                                .route(staffService.getId(), r -> r
+                                                .path(staffService.getPaths())
+                                                .uri(staffService.getUri()))
                                 .build();
         }
 }
