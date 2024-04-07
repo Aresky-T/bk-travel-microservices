@@ -34,11 +34,36 @@ public class Routes {
                 "/api/v1/bookings/**"
         };
 
-        this.registerRoute("auth-service", "lb://auth-service", authPaths);
-        this.registerRoute("account-service", "lb://account-service", accountPaths);
-        this.registerRoute("tour-service", "lb://tour-service", tourPaths);
-        this.registerRoute("tourist-attraction-service", "lb://tourist-attraction-service", touristAttractionPaths);
-        this.registerRoute("booking-service", "lb://booking-service", bookingPaths);
+        String[] staffPaths = {
+                "/api/v1/staffs/**",
+                "/api/v1/departments/**",
+                "/api/v1/positions/**"
+        };
+
+        this.registerRoute(
+                "auth-service",
+                "http://auth-service:8081",
+                authPaths);
+        this.registerRoute(
+                "account-service",
+                "http://account-service:8082",
+                accountPaths);
+        this.registerRoute(
+                "tour-service",
+                "http://tour-service:8083",
+                tourPaths);
+        this.registerRoute(
+                "booking-service",
+                "http://booking-service:8084",
+                bookingPaths);
+        this.registerRoute(
+                "staff-service",
+                "http://staff-service:8085",
+                staffPaths);
+        this.registerRoute(
+                "tourist-attraction-service",
+                "http://tourist-attraction-service:8086",
+                touristAttractionPaths);
     }
 
     public Route getRoute(String id) {
