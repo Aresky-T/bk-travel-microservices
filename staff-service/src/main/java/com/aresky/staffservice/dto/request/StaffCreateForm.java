@@ -32,13 +32,13 @@ public class StaffCreateForm {
                 .lastName(dto.lastName)
                 .avatarUrl(dto.avatarUrl)
                 .gender(dto.gender)
-                .dateOfBirth(dto.dateOfBirth.toInstant().atZone(ZoneId.systemDefault()))
+                .dateOfBirth(dto.dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .email(dto.email)
                 .phone(dto.phone)
                 .address(dto.address)
                 .description(dto.description)
                 .basicSalary(dto.basicSalary)
-                .startedDate(dto.startedDate.toInstant().atZone(ZoneId.systemDefault()))
+                .startedDate(dto.startedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .contractUrl(dto.contractUrl)
                 .build();
     }
