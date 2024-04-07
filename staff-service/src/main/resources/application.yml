@@ -1,0 +1,24 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: staff-service
+  liquibase:
+    url: jdbc:mysql://mysql-server:3306/bk_travel_staff
+    user: root
+    password: root
+    change-log: classpath:/db/changelog/changelog-master.xml
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+bk-travel:
+  database:
+    config:
+      server:
+        url: r2dbc:mysql://mysql-server:3306/bk_travel_staff
+        username: root
+        password: root

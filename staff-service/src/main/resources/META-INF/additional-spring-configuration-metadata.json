@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "bk-travel.database.config.server.url",
+      "type": "java.lang.String",
+      "description": "URL for connect to mysql-server with R2DBC"
+    },
+    {
+      "name": "bk-travel.database.config.server.username",
+      "type": "java.lang.String",
+      "description": "Username for connect to mysql-server with R2DBC"
+    },
+    {
+      "name": "bk-travel.database.config.server.password",
+      "type": "java.lang.String",
+      "description": "Password for connect to mysql-server with R2DBC"
+    }
+  ]
+}

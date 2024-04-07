@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table staff" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table staff already exist!">
+            <not>
+                <tableExists tableName="staff" />
+            </not>
+        </preConditions>
+        <createTable tableName="staff" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="first_name" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_name" type="VARCHAR(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="avatar_url" type="VARCHAR(255)" />
+            <column name="gender" type="ENUM('MALE','FEMALE','OTHER')">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_of_birth" type="DATE">
+                <constraints nullable="false" />
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="phone" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="address" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="VARCHAR(255)" />
+            <column name="basic_salary" type="DECIMAL(18,2)">
+                <constraints nullable="false" checkConstraint="basic_salary > 0" />
+            </column>
+            <column name="started_date" type="DATE">
+                <constraints nullable="false" />
+            </column>
+            <column name="contract_url" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="account_id" type="INT">
+                <constraints unique="true" />
+            </column>
+            <column name="status"
+                type="ENUM('ACTIVE', 'ON_LEAVE', 'EXPIRED_CONTRACT', 'TERMINATED_CONTRACT')"
+                defaultValue="ACTIVE">
+                <constraints nullable="false" />
+            </column>
+            <column name="department_id" type="INT" />
+            <column name="position_id" type="INT" />
+        </createTable>
+        <addForeignKeyConstraint
+            baseTableName="staff"
+            baseColumnNames="department_id"
+            constraintName="staff_fk_department_id"
+            referencedTableName="department"
+            referencedColumnNames="id"
+            onDelete="SET NULL"
+        />
+        <addForeignKeyConstraint
+            baseTableName="staff"
+            baseColumnNames="position_id"
+            constraintName="staff_fk_position_id"
+            referencedTableName="position"
+            referencedColumnNames="id"
+            onDelete="SET NULL"
+        />
+    </changeSet>
+</databaseChangeLog>
