@@ -1,7 +1,7 @@
 package com.aresky.staffservice.model;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -35,7 +35,7 @@ public class Staff {
     private EGender gender;
 
     @Column("date_of_birth")
-    private ZonedDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column("email")
     private String email;
@@ -53,7 +53,7 @@ public class Staff {
     private BigDecimal basicSalary;
 
     @Column("started_date")
-    private ZonedDateTime startedDate;
+    private LocalDate startedDate;
 
     @Column("contract_url")
     private String contractUrl;
@@ -67,6 +67,6 @@ public class Staff {
     @Column("position_id")
     private Integer positionId;
 
-    @Column("status_id")
-    private Integer statusId;
+    @Column("status")
+    private EStatus status;
 }
