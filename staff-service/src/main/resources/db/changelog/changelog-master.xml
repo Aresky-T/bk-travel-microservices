@@ -6,6 +6,5 @@
 >
     <include file="db/changelog/department/changelog.xml"/>
     <include file="db/changelog/position/changelog.xml"/>
-    <include file="db/changelog/status/changelog.xml"/>
     <include file="db/changelog/staff/changelog.xml"/>
 </databaseChangeLog>
