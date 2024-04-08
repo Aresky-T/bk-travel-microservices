@@ -2,6 +2,7 @@ package com.aresky.authservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.aresky.authservice.service.auth.IAuthService;
 import reactor.core.publisher.Mono;
 import org.springframework.web.bind.annotation.RequestParam;
 
+// @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -24,7 +26,7 @@ public class AuthController {
     private IAuthService authService;
 
     @GetMapping("/validate-token")
-    public Mono<ResponseEntity<?>> validateAccessToken(@RequestParam String accessToken){
+    public Mono<ResponseEntity<?>> validateAccessToken(@RequestParam String accessToken) {
         return authService.isValidAccessToken(accessToken).map(ResponseEntity::ok);
     };
 
@@ -39,9 +41,9 @@ public class AuthController {
         return authService.handleSignup(form).thenReturn(ResponseEntity.ok("success"));
     }
 
-     @PostMapping("/forgot-password")
-     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
         return ResponseEntity.ok("success");
-     }
+    }
 
 }
