@@ -131,7 +131,9 @@ services:
       - bk-travel-ms-network
 volumes:
   mysql-server-volume:
+    name: mysql-server-volume
   mysql-spring-boot-config-daemon:
+    name: mysql-spring-boot-config-daemon
 
 networks:
   bk-travel-ms-network:
