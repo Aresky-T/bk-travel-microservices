@@ -2,8 +2,12 @@ package com.aresky.tourservice.service;
 
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 import com.aresky.tourservice.utils.TourUtils;
 import com.aresky.tourservice.utils.TourUtils.TourParams.Param;
@@ -32,9 +36,11 @@ import com.aresky.tourservice.repository.SubTourRepository;
 import com.aresky.tourservice.repository.TourRepository;
 
 import io.r2dbc.spi.Row;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Service
 public class TourServiceImp implements ITourService {
 
@@ -46,6 +52,8 @@ public class TourServiceImp implements ITourService {
 
     @Autowired
     private DatabaseClient databaseClient;
+
+    private static final String[] BLACKLIST_TOUR_KEYS = { "id", "tourCode", "tourId" };
 
     @Transactional
     @Override
@@ -398,28 +406,32 @@ public class TourServiceImp implements ITourService {
     }
 
     private SubTour updateSubTourByFields(SubTour subTour, Map<String, Object> fields) {
-        String[] blackListKeys = {
-                "id", "tourCode", "tourId"
-        };
-
         for (Entry<String, Object> entry : fields.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            if (List.of(blackListKeys).contains(key.trim())) {
+            if (isBlacklisted(key)) {
                 continue;
             }
 
-            Field field = ReflectionUtils.findField(SubTour.class, key);
+            Field field = findSubTourField(subTour, key);
             if (field != null) {
                 field.setAccessible(true);
-                System.out.println("Type of field: " + field.getType().getName());
 
-                if (field.getType().equals(ETourStatus.class)) {
-                    ReflectionUtils.setField(field, subTour, ETourStatus.valueOf(String.valueOf(value)));
-                } else {
-                    ReflectionUtils.setField(field, subTour, field.getType().cast(value));
+                try {
+                    value = convertValue(field, value);
+                } catch (Exception e) {
+                    log.error("Error converting value for field: {}", key);
+                    continue;
                 }
+
+                try {
+                    field.set(subTour, value);
+                } catch (IllegalAccessException e) {
+                    log.error("Error setting value for field: {}", key);
+                }
+
+                ReflectionUtils.setField(field, subTour, value);
             }
         }
 
@@ -475,7 +487,6 @@ public class TourServiceImp implements ITourService {
     }
 
     private SubTour mapRowToSubTour(Row row) {
-        System.out.println("status: " + row.get("status"));
         return SubTour.builder()
                 .id(row.get("id", Integer.class))
                 .tourId(row.get("tour_id", Integer.class))
@@ -487,5 +498,42 @@ public class TourServiceImp implements ITourService {
                 .departureTime(row.get("departure_time", ZonedDateTime.class))
                 .createdTime(row.get("created_time", ZonedDateTime.class))
                 .build();
+    }
+
+    private boolean isBlacklisted(String key) {
+        for (String blacklistedKey : BLACKLIST_TOUR_KEYS) {
+            if (blacklistedKey.equals(key.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Field findSubTourField(SubTour subTour, String fieldName) {
+        try {
+            return SubTour.class.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            System.err.println("Field not found: " + fieldName);
+            return null;
+        }
+    }
+
+    private static Object convertValue(Field field, Object value) throws ParseException {
+        Class<?> fieldType = field.getType();
+
+        if (fieldType.equals(Date.class) && value instanceof String) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return dateFormat.parse((String) value);
+        }
+
+        if (fieldType.equals(ZonedDateTime.class)) {
+            return Instant.parse((String) value).atZone(ZoneId.systemDefault());
+        }
+
+        if (fieldType.isEnum()) {
+            return Enum.valueOf((Class<? extends Enum>) fieldType, String.valueOf(value));
+        }
+
+        return field.getType().cast(value); // No conversion needed for other types
     }
 }
