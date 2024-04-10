@@ -12,7 +12,6 @@ public class TourFilter {
     public static final String MIN_PRICE = "minPrice";
     public static final String MAX_PRICE = "maxPrice";
 
-
     private String departureLocation;
     private String destination;
     private String vehicle;

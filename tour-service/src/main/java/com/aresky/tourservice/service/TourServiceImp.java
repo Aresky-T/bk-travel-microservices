@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.text.SimpleDateFormat;
@@ -15,17 +16,20 @@ import com.aresky.tourservice.utils.TourUtils.TourParams.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
+import com.aresky.tourservice.dto.request.MyPageable;
 import com.aresky.tourservice.dto.request.SubTourCreateForm;
 import com.aresky.tourservice.dto.request.TourCreateForm;
 import com.aresky.tourservice.dto.request.TourFilter;
 import com.aresky.tourservice.dto.request.TourUpdateForm;
 import com.aresky.tourservice.dto.response.SubTour2Response;
+import com.aresky.tourservice.dto.response.SubTourDetails;
 import com.aresky.tourservice.dto.response.SubTourResponse;
 import com.aresky.tourservice.dto.response.TourResponse;
 import com.aresky.tourservice.exception.TourException;
@@ -37,7 +41,6 @@ import com.aresky.tourservice.repository.TourRepository;
 
 import io.r2dbc.spi.Row;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -91,10 +94,8 @@ public class TourServiceImp implements ITourService {
                     subTour.setAvailableSeats(tour.getTotalSeats());
 
                     return subTourRepository.save(subTour)
-                            .flatMap(createdSubTour -> {
-                                tour.setTotalSubTours(tour.getTotalSubTours() + 1);
-                                return tourRepository.save(tour).then();
-                            });
+                            .then(updateTotalSubToursForTour(tour.getId())
+                                    .then());
                 });
     }
 
@@ -154,7 +155,7 @@ public class TourServiceImp implements ITourService {
                 .bind(TourFilter.MIN_PRICE, tourFilter.getMinPrice())
                 .bind(TourFilter.MAX_PRICE, tourFilter.getMaxPrice());
 
-        String query = generateQuery(tourFilter).concat(" LIMIT :limit OFFSET :offset");
+        String query = generateFilterTourQuery(tourFilter).concat(" LIMIT :limit OFFSET :offset");
 
         DatabaseClient.GenericExecuteSpec executeSpec = databaseClient.sql(query);
         for (Param param : tourParams.getParams()) {
@@ -183,7 +184,7 @@ public class TourServiceImp implements ITourService {
     public Mono<TourResponse> findTourById(int id) {
         return tourRepository.findById(id)
                 .map(TourResponse::toDTO)
-                .switchIfEmpty(Mono.error(new TourException("Invalid id")));
+                .switchIfEmpty(Mono.error(new TourException("Invalid tourId")));
     }
 
     @Override
@@ -198,7 +199,7 @@ public class TourServiceImp implements ITourService {
     }
 
     @Override
-    public Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable, TourFilter tourFilter) {
+    public Mono<Page<SubTourResponse>> findAllSubTours(MyPageable pageable, TourFilter tourFilter) {
         TourUtils.TourParams tourParams = TourUtils.buildTourParams()
                 .bind(TourFilter.DEPARTURE_LOCATION, tourFilter.getDepartureLocation())
                 .bind(TourFilter.DESTINATION, tourFilter.getDestination())
@@ -206,25 +207,44 @@ public class TourServiceImp implements ITourService {
                 .bind(TourFilter.MIN_PRICE, tourFilter.getMinPrice())
                 .bind(TourFilter.MAX_PRICE, tourFilter.getMaxPrice());
 
-        String query = generateQuery(tourFilter);
+        String query = generateFilterSubTourQuery(tourFilter) + " ORDER BY s.created_time DESC ";
+
+        int page = pageable.getPage();
+        int limit = pageable.getSize();
+        long offset = page * limit;
+
+        if (limit > 0) {
+            query += " LIMIT " + limit;
+        }
+
+        if (offset > 0) {
+            query += " OFFSET " + offset;
+        }
+
+        System.out.println("Query: " + query);
+
         DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(query);
 
         for (Param param : tourParams.getParams()) {
             spec = spec.bind(param.getName(), param.getValue());
         }
 
-        return spec.map((row, metadata) -> mapRowToTour(row))
+        return spec.map((row, metadata) -> SubTourResponse
+                .builder()
+                .id(row.get("id", Integer.class))
+                .title(row.get("title", String.class))
+                .tourCode(row.get("tour_code", String.class))
+                .availableSeats(row.get("available_seats", Integer.class))
+                .duration(row.get("duration", String.class))
+                .departureLocation(row.get("departure_location", String.class))
+                .departureTime(DateTimeFormatter.ISO_INSTANT.format(row.get("departure_time", ZonedDateTime.class)))
+                .vehicle(row.get("vehicle", String.class))
+                .adultPrice(row.get("adult_price", Integer.class))
+                .image1(row.get("image1", String.class))
+                .build())
                 .all()
-                .flatMap(tour -> {
-                    if (tour.getTotalSubTours() == 0) {
-                        return Flux.empty();
-                    }
-
-                    return subTourRepository.findAllByTourId(tour.getId())
-                            .map(subTour -> SubTourResponse.toDTO(subTour, tour));
-                })
                 .collectList()
-                .map(dtos -> new PageImpl<>(dtos, pageable, dtos.size()));
+                .map(dtos -> new PageImpl<>(dtos, PageRequest.of(page, limit), dtos.size()));
     }
 
     @Override
@@ -244,21 +264,21 @@ public class TourServiceImp implements ITourService {
     }
 
     @Override
-    public Mono<SubTourResponse> findSubTourByTourCode(String tourCode) {
+    public Mono<SubTourDetails> findSubTourByTourCode(String tourCode) {
         return subTourRepository.findByTourCode(tourCode)
                 .flatMap(subTour -> {
                     return tourRepository.findById(subTour.getTourId())
-                            .map(tour -> SubTourResponse.toDTO(subTour, tour));
+                            .map(tour -> SubTourDetails.toDTO(subTour, tour));
                 })
                 .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
     }
 
     @Override
-    public Mono<SubTourResponse> findSubTourById(int subTourId) {
+    public Mono<SubTourDetails> findSubTourById(int subTourId) {
         return subTourRepository.findById(subTourId)
                 .flatMap(subTour -> {
                     return tourRepository.findById(subTour.getTourId())
-                            .map(tour -> SubTourResponse.toDTO(subTour, tour));
+                            .map(tour -> SubTourDetails.toDTO(subTour, tour));
                 })
                 .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")));
     }
@@ -275,14 +295,12 @@ public class TourServiceImp implements ITourService {
     @Transactional
     @Override
     public Mono<Void> deleteSubTourById(int id) {
-        System.out.println(id);
-        return subTourRepository.existsById(id)
-                .filter(Boolean.TRUE::equals)
+        return subTourRepository.findById(id)
+                .filter(Objects::nonNull)
                 .switchIfEmpty(Mono.error(new TourException("This sub tour doesn't exist!")))
-                .flatMap(isExists -> {
-                    System.out.println(isExists);
-                    return subTourRepository.deleteById(id).then();
-                });
+                .flatMap(subTour -> subTourRepository.delete(subTour)
+                        .then(updateTotalSubToursForTour(subTour.getTourId()))
+                        .then());
     }
 
     @Transactional
@@ -340,6 +358,17 @@ public class TourServiceImp implements ITourService {
         return subTourRepository.existsByTourCode(tourCode);
     }
 
+    private Mono<Boolean> updateTotalSubToursForTour(Integer tourId) {
+        return tourRepository.findById(tourId)
+                .switchIfEmpty(Mono.empty())
+                .flatMap(tour -> subTourRepository.findCountSubTourByTourId(tourId)
+                        .flatMap(count -> {
+                            tour.setTotalSubTours(count);
+                            return tourRepository.save(tour)
+                                    .thenReturn(true);
+                        }));
+    }
+
     @Transactional
     private Mono<Void> updateTourWithSubTour(Mono<Tour> tourMono, Mono<SubTour> subTourMono,
             Map<String, Object> fields) {
@@ -385,13 +414,11 @@ public class TourServiceImp implements ITourService {
     }
 
     private Tour updateTourByFields(Tour tour, Map<String, Object> fields) {
-        String[] blackListKeys = { "id" };
-
         for (Entry<String, Object> entry : fields.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            if (List.of(blackListKeys).contains(key.trim())) {
+            if (isBlacklisted(key)) {
                 continue;
             }
 
@@ -460,8 +487,40 @@ public class TourServiceImp implements ITourService {
                 .build();
     }
 
-    private static String generateQuery(TourFilter tourFilter) {
+    private static String generateFilterTourQuery(TourFilter tourFilter) {
         String query = "SELECT * FROM tour WHERE 1=1";
+
+        if (tourFilter.getDepartureLocation() != null) {
+            query += " AND departure_location = :" + TourFilter.DEPARTURE_LOCATION;
+        }
+
+        if (tourFilter.getDestination() != null) {
+            query += " AND destinations LIKE CONCAT('%', :" + TourFilter.DESTINATION + ", '%')";
+        }
+
+        if (tourFilter.getVehicle() != null) {
+            query += " AND vehicle LIKE CONCAT ('%', :" + TourFilter.VEHICLE + ", '%')";
+        }
+
+        if (tourFilter.getMinPrice() != null) {
+            query += " AND adult_price >= :" + TourFilter.MIN_PRICE;
+        }
+
+        if (tourFilter.getMaxPrice() != null) {
+            query += " AND adult_price <= :" + TourFilter.MAX_PRICE;
+        }
+
+        return query;
+    }
+
+    private static String generateFilterSubTourQuery(TourFilter tourFilter) {
+        String query = "SELECT "
+                + "s.id, s.title, s.tour_code, s.available_seats,  s.departure_time, "
+                + "t.duration, t.departure_location, t.vehicle, t.adult_price, t.image1 "
+                + "FROM sub_tour s "
+                + "INNER JOIN tour t "
+                + "ON s.tour_id = t.id "
+                + "WHERE s.status = 'NOT_STARTED' ";
 
         if (tourFilter.getDepartureLocation() != null) {
             query += " AND departure_location = :" + TourFilter.DEPARTURE_LOCATION;
@@ -535,5 +594,9 @@ public class TourServiceImp implements ITourService {
         }
 
         return field.getType().cast(value); // No conversion needed for other types
+    }
+
+    private static Boolean isNotStatedSubTour(SubTour subTour) {
+        return subTour.getStatus().equals(ETourStatus.NOT_STARTED);
     }
 }

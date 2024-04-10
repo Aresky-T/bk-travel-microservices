@@ -6,11 +6,13 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.aresky.tourservice.dto.request.MyPageable;
 import com.aresky.tourservice.dto.request.SubTourCreateForm;
 import com.aresky.tourservice.dto.request.TourCreateForm;
 import com.aresky.tourservice.dto.request.TourFilter;
 import com.aresky.tourservice.dto.request.TourUpdateForm;
 import com.aresky.tourservice.dto.response.SubTour2Response;
+import com.aresky.tourservice.dto.response.SubTourDetails;
 import com.aresky.tourservice.dto.response.SubTourResponse;
 import com.aresky.tourservice.dto.response.TourResponse;
 
@@ -41,15 +43,15 @@ public interface ITourService {
 
     Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable);
 
-    Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable, TourFilter tourFilter);
+    Mono<Page<SubTourResponse>> findAllSubTours(MyPageable pageable, TourFilter tourFilter);
 
     Mono<List<SubTour2Response>> findAllSubTours(int tourId);
 
     Mono<List<SubTourResponse>> findLatestSubTours(int count);
 
-    Mono<SubTourResponse> findSubTourByTourCode(String tourCode);
+    Mono<SubTourDetails> findSubTourByTourCode(String tourCode);
 
-    Mono<SubTourResponse> findSubTourById(int subTourId);
+    Mono<SubTourDetails> findSubTourById(int subTourId);
 
     Mono<Void> deleteTourById(int id);
 
