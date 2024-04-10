@@ -1,6 +1,7 @@
 package com.aresky.tourservice.repository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 
 import com.aresky.tourservice.model.SubTour;
@@ -18,6 +19,9 @@ public interface SubTourRepository extends R2dbcRepository<SubTour, Integer> {
     Flux<SubTour> findAllByTourId(Integer tourId);
 
     Flux<SubTour> findAllByTitleLike(String title);
+
+    @Query("SELECT COUNT(*) AS count FROM sub_tour s GROUP BY tour_id HAVING s.tour_id = :tourId")
+    Mono<Integer> findCountSubTourByTourId(Integer tourId);
 
     Mono<Boolean> existsByTitle(String title);
 

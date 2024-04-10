@@ -7,13 +7,13 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
 >
     <changeSet id="Create table tour" author="Aresky" runAlways="true">
-        <preConditions onFail="CONTINUE" onFailMessage="Table tour already exist">
+        <preConditions onFail="CONTINUE" onFailMessage="Table tour already exist!">
             <not>
                 <tableExists tableName="tour" />
             </not>
         </preConditions>
         <createTable tableName="tour">
-            <column name="id" type="INT">
+            <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
             <column name="title" type="VARCHAR(255)">
@@ -62,13 +62,6 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <addAutoIncrement
-            tableName="tour"
-            columnName="id"
-            columnDataType="INT"
-            defaultOnNull="false"
-            startWith="1"
-        />
     </changeSet>
     <changeSet id="add column total_sub_tours" author="Aresky">
         <preConditions onFail="CONTINUE" onFailMessage="Table tour doesn't exist">

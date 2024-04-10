@@ -1,8 +1,10 @@
 package com.aresky.tourservice.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,10 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aresky.tourservice.dto.request.MyPageable;
 import com.aresky.tourservice.dto.request.SubTourCreateForm;
 import com.aresky.tourservice.dto.request.TourCreateForm;
 import com.aresky.tourservice.dto.request.TourFilter;
 import com.aresky.tourservice.dto.request.TourUpdateForm;
+import com.aresky.tourservice.dto.response.SubTour2Response;
+import com.aresky.tourservice.dto.response.SubTourDetails;
+import com.aresky.tourservice.dto.response.SubTourResponse;
+import com.aresky.tourservice.dto.response.TourResponse;
 import com.aresky.tourservice.service.ITourService;
 
 import reactor.core.publisher.Mono;
@@ -61,37 +68,38 @@ public class TourController {
 
     // GET "/sub-tour" - getAllSubTours - Pageable
     @GetMapping("/sub-tour")
-    public Mono<ResponseEntity<?>> getAllSubTours(Pageable pageable) {
+    public Mono<ResponseEntity<Page<SubTourResponse>>> getAllSubTours(Pageable pageable) {
         return tourService.findAllSubTours(pageable).map(ResponseEntity::ok);
     }
 
     // GET "/sub-tour" - getAllSubTours - Pageable + Filter
     @GetMapping("/sub-tour/filter")
-    public Mono<ResponseEntity<?>> getAllSubTours(Pageable pageable, TourFilter filter) {
+    public Mono<ResponseEntity<Page<SubTourResponse>>> getAllSubTours(MyPageable pageable, TourFilter filter) {
         return tourService.findAllSubTours(pageable, filter).map(ResponseEntity::ok);
     }
 
     // GET "/id/{id}" - getTourById - id
     @GetMapping("/id/{id}")
-    public Mono<ResponseEntity<?>> getTourById(@PathVariable(name = "id") Integer tourId) {
+    public Mono<ResponseEntity<TourResponse>> getTourById(@PathVariable(name = "id") Integer tourId) {
         return tourService.findTourById(tourId)
                 .map(ResponseEntity::ok);
     }
 
     // GET "/sub-tour/id/{id}" - getSubTourById - subTourId
     @GetMapping("/sub-tour/id/{id}")
-    public Mono<ResponseEntity<?>> getSubTourById(@PathVariable(name = "id") Integer subTourId) {
+    public Mono<ResponseEntity<SubTourDetails>> getSubTourById(@PathVariable(name = "id") Integer subTourId) {
         return tourService.findSubTourById(subTourId).map(ResponseEntity::ok);
     }
 
     @GetMapping("/sub-tour/tour-id/{id}")
-    public Mono<ResponseEntity<?>> getAllSubToursByTourId(@PathVariable(name = "id") Integer tourId) {
+    public Mono<ResponseEntity<List<SubTour2Response>>> getAllSubToursByTourId(
+            @PathVariable(name = "id") Integer tourId) {
         return tourService.findAllSubTours(tourId).map(ResponseEntity::ok);
     }
 
     // GET "/tour-code/{tourCode}" - getTourByTourCode - tourCode
     @GetMapping("/sub-tour/tour-code/{tourCode}")
-    public Mono<ResponseEntity<?>> getTourByTourCode(@PathVariable String tourCode) {
+    public Mono<ResponseEntity<SubTourDetails>> getTourByTourCode(@PathVariable String tourCode) {
         return tourService.findSubTourByTourCode(tourCode).map(ResponseEntity::ok);
     }
 

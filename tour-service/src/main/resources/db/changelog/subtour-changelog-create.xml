@@ -6,9 +6,14 @@
     xmlns:pro="http://www.liquibase.org/xml/ns/pro"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
 >
-    <changeSet id="Create table sub_tour" author="Aresky">
-        <createTable tableName="sub_tour">
-            <column name="id" type="INT">
+    <changeSet id="Create table sub_tour" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table sub_tour already exist!">
+            <not>
+                <tableExists tableName="sub_tour" />
+            </not>
+        </preConditions>
+        <createTable tableName="sub_tour" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="title" type="VARCHAR(255)">
@@ -31,12 +36,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="tour_id" type="INT">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_tour_id"
-                    referencedColumnNames="id"
-                    referencedTableName="tour"
-                />
+                <constraints nullable="false" />
             </column>
             <column name="tour_guide_id" type="INT">
                 <constraints nullable="true" />
@@ -45,12 +45,23 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <addAutoIncrement
-            tableName="sub_tour"
-            columnName="id"
-            columnDataType="INT"
-            defaultOnNull="false"
-            startWith="1"
+    </changeSet>
+    <changeSet id="Add constraint for table sub_tour" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE"
+            onFailMessage="Failed add foreign key constraint for table sub_tour!">
+            <and>
+                <tableExists tableName="sub_tour" />
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="sub_tour_fk_tour_id" />
+                </not>
+            </and>
+        </preConditions>
+        <addForeignKeyConstraint
+            baseTableName="sub_tour"
+            baseColumnNames="tour_id"
+            constraintName="sub_tour_fk_tour_id"
+            referencedTableName="tour" referencedColumnNames="id"
+            onDelete="CASCADE"
         />
     </changeSet>
 </databaseChangeLog>
