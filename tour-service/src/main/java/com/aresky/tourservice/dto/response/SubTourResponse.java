@@ -2,8 +2,8 @@ package com.aresky.tourservice.dto.response;
 
 import java.time.format.DateTimeFormatter;
 
-import com.aresky.tourservice.model.SubTour;
-import com.aresky.tourservice.model.Tour;
+import com.aresky.tourservice.entity.SubTour;
+import com.aresky.tourservice.entity.Tour;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
