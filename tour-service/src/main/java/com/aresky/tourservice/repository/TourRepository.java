@@ -1,18 +1,20 @@
 package com.aresky.tourservice.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
-import com.aresky.tourservice.model.Tour;
+import com.aresky.tourservice.entity.Tour;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+@Repository
+public interface TourRepository extends JpaRepository<Tour, Integer>, JpaSpecificationExecutor<Tour> {
 
-public interface TourRepository extends R2dbcRepository<Tour, Integer> {
+    List<Tour> findAllBy(Pageable pageable);
 
-    Flux<Tour> findAllBy(Pageable pageable);
+    Tour findByTitle(String title);
 
-    Mono<Tour> findByTitle(String title);
-
-    Mono<Boolean> existsByTitle(String title);
+    Boolean existsByTitle(String title);
 }
