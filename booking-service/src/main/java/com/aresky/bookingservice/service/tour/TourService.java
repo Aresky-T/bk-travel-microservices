@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class TourService {
 
-    private final String tourURL = "http://tour-service:8083/api/v1/tours";
+    private final String tourURL = "http://localhost:8083/api/v1/tours";
 
     private WebClient webClient;
 

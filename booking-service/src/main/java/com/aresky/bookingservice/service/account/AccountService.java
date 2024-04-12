@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class AccountService {
 
-    private final String accountURL = "http://account-service:8082/api/v1/accounts";
+    private final String accountURL = "http://localhost:8082/api/v1/accounts";
 
     private WebClient webClient;
 
