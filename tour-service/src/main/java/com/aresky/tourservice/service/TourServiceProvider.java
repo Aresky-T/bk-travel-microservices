@@ -353,6 +353,7 @@ public class TourServiceProvider implements ITourService {
         }
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static Object convertValue(Field field, Object value) throws ParseException {
         Class<?> fieldType = field.getType();
 
