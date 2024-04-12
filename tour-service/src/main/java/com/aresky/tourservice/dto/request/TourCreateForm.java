@@ -1,6 +1,6 @@
 package com.aresky.tourservice.dto.request;
 
-import com.aresky.tourservice.model.Tour;
+import com.aresky.tourservice.entity.Tour;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

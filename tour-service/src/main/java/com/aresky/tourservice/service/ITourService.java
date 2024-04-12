@@ -6,68 +6,57 @@ import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.aresky.tourservice.dto.request.MyPageable;
 import com.aresky.tourservice.dto.request.SubTourCreateForm;
 import com.aresky.tourservice.dto.request.TourCreateForm;
 import com.aresky.tourservice.dto.request.TourFilter;
-import com.aresky.tourservice.dto.request.TourUpdateForm;
-import com.aresky.tourservice.dto.response.SubTour2Response;
+import com.aresky.tourservice.dto.response.SubTourAdminResponse;
 import com.aresky.tourservice.dto.response.SubTourDetails;
 import com.aresky.tourservice.dto.response.SubTourResponse;
+import com.aresky.tourservice.dto.response.TourDetails;
 import com.aresky.tourservice.dto.response.TourResponse;
 
-import reactor.core.publisher.Mono;
-
 public interface ITourService {
-    Mono<Void> createTour(TourCreateForm form);
+    void createTour(TourCreateForm form);
 
-    Mono<Void> createSubTour(SubTourCreateForm form);
+    void createSubTour(SubTourCreateForm form);
 
-    Mono<Void> updateTourWithSubTour(TourUpdateForm form);
+    void updateTour(Integer tourId, Map<String, Object> fields);
 
-    Mono<Void> updateTourWithSubTour(int tourId, int subTourId, Map<String, Object> fields);
+    void updateSubTour(Integer subTourId, Map<String, Object> fields);
 
-    Mono<Void> updateTourWithSubTour(int tourId, String tourCode, Map<String, Object> fields);
+    Page<TourResponse> findAllTourResponses(Pageable pageable);
 
-    Mono<Void> updateOnlyTour(int tourId, Map<String, Object> fields);
+    Page<TourResponse> findAllTourResponses(Pageable pageable, TourFilter tourFilter);
 
-    Mono<Void> updateOnlySubTour(int subTourId, Map<String, Object> fields);
+    TourDetails findTourDetailsById(Integer id);
 
-    Mono<Page<TourResponse>> findAllTours(Pageable pageable);
+    Page<SubTourResponse> findAllSubTourResponses(Pageable pageable);
 
-    Mono<Page<TourResponse>> findAllTours(Pageable pageable, TourFilter tourFilter);
+    Page<SubTourResponse> findAllSubTourResponses(Pageable pageable, TourFilter tourFilter);
 
-    Mono<List<TourResponse>> findLatestTours(int count);
+    List<SubTourAdminResponse> findAllSubTourResponses(Integer tourId);
 
-    Mono<TourResponse> findTourById(int id);
+    List<SubTourResponse> findLatestSubTours(Integer count);
 
-    Mono<Page<SubTourResponse>> findAllSubTours(Pageable pageable);
+    SubTourDetails findSubTourDetailsByTourCode(String tourCode);
 
-    Mono<Page<SubTourResponse>> findAllSubTours(MyPageable pageable, TourFilter tourFilter);
+    SubTourDetails findSubTourDetailsById(Integer subTourId);
 
-    Mono<List<SubTour2Response>> findAllSubTours(int tourId);
+    void deleteTourById(Integer id);
 
-    Mono<List<SubTourResponse>> findLatestSubTours(int count);
+    void deleteSubTourById(Integer id);
 
-    Mono<SubTourDetails> findSubTourByTourCode(String tourCode);
+    void deleteSubTourByTourCode(String tourCode);
 
-    Mono<SubTourDetails> findSubTourById(int subTourId);
+    void deleteAllSubToursByTourId(Integer tourId);
 
-    Mono<Void> deleteTourById(int id);
+    Boolean existsTourById(Integer id);
 
-    Mono<Void> deleteSubTourById(int id);
+    Boolean existsTourByTitle(String title);
 
-    Mono<Void> deleteSubTourByTourCode(String tourCode);
+    Boolean existsSubTourById(Integer id);
 
-    Mono<Void> deleteAllSubToursByTourId(int tourId);
+    Boolean existsSubTourByTitle(String title);
 
-    Mono<Boolean> existsTourById(int id);
-
-    Mono<Boolean> existsTourByTitle(String title);
-
-    Mono<Boolean> existsSubTourById(int id);
-
-    Mono<Boolean> existsSubTourByTitle(String title);
-
-    Mono<Boolean> existsSubTourByTourCode(String tourCode);
+    Boolean existsSubTourByTourCode(String tourCode);
 }

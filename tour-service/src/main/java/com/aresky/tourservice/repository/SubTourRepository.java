@@ -1,35 +1,39 @@
 package com.aresky.tourservice.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import com.aresky.tourservice.model.SubTour;
+import com.aresky.tourservice.entity.SubTour;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+@Repository
+public interface SubTourRepository extends JpaRepository<SubTour, Integer>, JpaSpecificationExecutor<SubTour> {
+    Optional<SubTour> findByTourCode(String tourCode);
 
-public interface SubTourRepository extends R2dbcRepository<SubTour, Integer> {
-    Mono<SubTour> findByTourCode(String tourCode);
+    Optional<SubTour> findByTitle(String title);
 
-    Mono<SubTour> findByTitle(String title);
+    List<SubTour> findAllBy(Pageable pageable);
 
-    Flux<SubTour> findAllBy(Pageable pageable);
+    List<SubTour> findAllByTourId(Integer tourId);
 
-    Flux<SubTour> findAllByTourId(Integer tourId);
+    List<SubTour> findAllByTitleLike(String title);
 
-    Flux<SubTour> findAllByTitleLike(String title);
+    @Query("SELECT s FROM SubTour AS s WHERE s.status = 'NOT_STARTED' ORDER BY s.createdTime DESC LIMIT :count")
+    List<SubTour> findAllOrderByCreatedTime(@Param("count") int count);
 
-    @Query("SELECT COUNT(*) AS count FROM sub_tour s GROUP BY tour_id HAVING s.tour_id = :tourId")
-    Mono<Integer> findCountSubTourByTourId(Integer tourId);
+    Boolean existsByTitle(String title);
 
-    Mono<Boolean> existsByTitle(String title);
+    Boolean existsByTourId(Integer tourId);
 
-    Mono<Boolean> existsByTourId(Integer tourId);
+    Boolean existsByTourCode(String tourCode);
 
-    Mono<Boolean> existsByTourCode(String tourCode);
+    void deleteAllByTourId(Integer tourId);
 
-    Mono<Void> deleteAllByTourId(Integer tourId);
-
-    Mono<Void> deleteByTourCode(String tourCode);
+    void deleteByTourCode(String tourCode);
 }

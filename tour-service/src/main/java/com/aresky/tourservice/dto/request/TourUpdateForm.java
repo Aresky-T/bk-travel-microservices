@@ -1,11 +1,10 @@
 package com.aresky.tourservice.dto.request;
 
-import java.time.ZoneId;
 import java.util.Date;
 
-import com.aresky.tourservice.model.ETourStatus;
-import com.aresky.tourservice.model.SubTour;
-import com.aresky.tourservice.model.Tour;
+import com.aresky.tourservice.entity.ETourStatus;
+import com.aresky.tourservice.entity.SubTour;
+import com.aresky.tourservice.entity.Tour;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,7 +32,6 @@ public class TourUpdateForm {
     private Integer adultPrice;
     private Integer childrenPrice;
     private Integer babyPrice;
-    private String createdTime;
     private Integer tourGuideId;
 
     public static Tour buildTour(TourUpdateForm form) {
@@ -61,7 +59,7 @@ public class TourUpdateForm {
                 .id(form.subTourId)
                 .title(form.subTourTitle)
                 .availableSeats(form.availableSeats)
-                .departureTime(form.departureTime.toInstant().atZone(ZoneId.systemDefault()))
+                .departureTime(form.departureTime)
                 .status(form.status)
                 .tourGuideId(form.tourGuideId)
                 .build();

@@ -1,8 +1,6 @@
 package com.aresky.tourservice.dto.response;
 
-import java.time.format.DateTimeFormatter;
-
-import com.aresky.tourservice.model.SubTour;
+import com.aresky.tourservice.entity.SubTour;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubTour2Response {
+public class SubTourAdminResponse {
     private Integer id;
-    private Integer tourId;
     private String title;
     private String tourCode;
     private String departureTime;
@@ -24,18 +21,16 @@ public class SubTour2Response {
     private Integer tourGuideId;
     private String createdTime;
 
-    public static SubTour2Response toDTO(SubTour subTour) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-        return SubTour2Response.builder()
+    public static SubTourAdminResponse toDTO(SubTour subTour) {
+        return SubTourAdminResponse.builder()
                 .id(subTour.getId())
-                .tourId(subTour.getTourId())
                 .title(subTour.getTitle())
                 .tourCode(subTour.getTourCode())
-                .departureTime(formatter.format(subTour.getDepartureTime()))
+                .departureTime(subTour.getDepartureTime().toString())
                 .availableSeats(subTour.getAvailableSeats())
-                .status(subTour.getStatus() != null ? subTour.getStatus().name() : null)
+                .status(subTour.getStatus().name())
                 .tourGuideId(subTour.getTourGuideId())
-                .createdTime(formatter.format(subTour.getCreatedTime()))
+                .createdTime(subTour.getCreatedTime().toString())
                 .build();
     }
 }

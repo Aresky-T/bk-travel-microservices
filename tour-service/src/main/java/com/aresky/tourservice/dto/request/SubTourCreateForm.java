@@ -1,11 +1,9 @@
 package com.aresky.tourservice.dto.request;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
-import com.aresky.tourservice.model.ETourStatus;
-import com.aresky.tourservice.model.SubTour;
+import com.aresky.tourservice.entity.ETourStatus;
+import com.aresky.tourservice.entity.SubTour;
 import com.aresky.tourservice.utils.TourUtils;
 
 import jakarta.validation.constraints.NotNull;
@@ -27,10 +25,9 @@ public class SubTourCreateForm {
 
     public static SubTour toEntity(SubTourCreateForm form) {
         return SubTour.builder()
-                .tourId(form.tourId)
                 .title(form.title)
                 .tourCode(TourUtils.generateTourCode())
-                .departureTime(ZonedDateTime.ofInstant(form.departureTime.toInstant(), ZoneId.systemDefault()))
+                .departureTime(form.departureTime)
                 .status(ETourStatus.HIDDEN)
                 .build();
     }
