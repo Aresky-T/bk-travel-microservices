@@ -52,6 +52,7 @@ public class TourDetails {
                 .image2(tour.getImage2())
                 .image3(tour.getImage3())
                 .image4(tour.getImage4())
+                .totalSubTours(tour.getTotalSubTours())
                 .createdTime(tour.getCreatedTime().toString())
                 .build();
     }
