@@ -1,6 +1,7 @@
 package com.aresky.bookingservice.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -53,7 +54,7 @@ public class Booking {
     @Column("baby_number")
     private Integer babyNumber;
 
-    @Column("not")
+    @Column("note")
     private String note;
 
     @Column("amount")
@@ -66,7 +67,8 @@ public class Booking {
     private EBookingStatus status;
 
     @Column("form_of_payment")
-    private Integer formOfPayment;
+    private EFormOfPayment formOfPayment;
 
+    @Transient
     private final List<Tourist> touristList = new ArrayList<>();
 }

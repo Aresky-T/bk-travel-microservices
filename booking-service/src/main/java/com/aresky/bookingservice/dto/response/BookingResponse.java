@@ -1,7 +1,7 @@
 package com.aresky.bookingservice.dto.response;
 
 import com.aresky.bookingservice.model.Booking;
-import com.aresky.bookingservice.model.FormOfPayment;
+import com.aresky.bookingservice.model.EFormOfPayment;
 import com.aresky.bookingservice.util.BookingUtils;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class BookingResponse {
     private Integer babyNumber;
     private String note;
     private Integer amount;
-    private FormOfPaymentResponse formOfPayment;
+    private EFormOfPayment formOfPayment;
     private String bookedTime;
     private TourInfo tourInfo;
     private List<TouristResponse> touristList;
@@ -49,7 +49,7 @@ public class BookingResponse {
                 .build();
     }
 
-    public static BookingResponse toDTO(Booking booking, FormOfPayment formOfPayment, SubTourResponse subTour) {
+    public static BookingResponse toDTO(Booking booking, SubTourResponse subTour,  List<TouristResponse> touristList) {
         return BookingResponse.builder()
                 .id(booking.getId())
                 .fullName(booking.getFullName())
@@ -63,8 +63,9 @@ public class BookingResponse {
                 .note(booking.getNote())
                 .amount(booking.getAmount())
                 .bookedTime(BookingUtils.convertToDate(booking.getBookedTime()).toString())
-                .formOfPayment(FormOfPaymentResponse.toDTO(formOfPayment))
+                .formOfPayment(booking.getFormOfPayment())
                 .tourInfo(new TourInfo(subTour))
+                .touristList(touristList)
                 .build();
     }
 

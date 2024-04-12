@@ -21,6 +21,9 @@ public class Tourist {
     @Id
     private Integer id;
 
+    @Column("booking_id")
+    private Integer bookingId;
+
     @Column("full_name")
     private String fullName;
 

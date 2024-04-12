@@ -19,7 +19,6 @@ public class CreateBookingForm {
     private Integer babyNumber;
     private String note;
     private Integer accountId;
-    private Integer tourId;
     private Integer subTourId;
     private Integer amount;
     private List<TouristRequest> touristList;
@@ -35,7 +34,6 @@ public class CreateBookingForm {
                 .babyNumber(dto.babyNumber)
                 .note(dto.note)
                 .accountId(dto.accountId)
-                .tourId(dto.tourId)
                 .subTourId(dto.subTourId)
                 .amount(dto.amount)
                 .build();

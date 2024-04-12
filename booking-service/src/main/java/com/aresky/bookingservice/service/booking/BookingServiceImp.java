@@ -3,6 +3,9 @@ package com.aresky.bookingservice.service.booking;
 import java.util.List;
 import java.util.Map;
 
+import com.aresky.bookingservice.dto.request.TouristRequest;
+import com.aresky.bookingservice.model.Tourist;
+import com.aresky.bookingservice.repository.TouristRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,13 +17,13 @@ import com.aresky.bookingservice.dto.response.BookingResponse;
 import com.aresky.bookingservice.dto.response.SubTourResponse;
 import com.aresky.bookingservice.exception.BookingException;
 import com.aresky.bookingservice.model.Booking;
-import com.aresky.bookingservice.model.BookingStatistic;
 import com.aresky.bookingservice.model.EBookingStatus;
 import com.aresky.bookingservice.repository.BookingRepository;
 import com.aresky.bookingservice.repository.BookingStatisticRepository;
 import com.aresky.bookingservice.service.account.AccountService;
 import com.aresky.bookingservice.service.tour.TourService;
 
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -33,21 +36,24 @@ public class BookingServiceImp implements IBookingService {
     private BookingStatisticRepository bookingStatisticRepository;
 
     @Autowired
+    private TouristRepository touristRepository;
+
+    @Autowired
     private TourService tourService;
 
     @Autowired
     private AccountService accountService;
 
+    @Transactional
     @Override
     public Mono<Void> handleBooking(CreateBookingForm form) {
         int accountId = form.getAccountId();
         int subTourId = form.getSubTourId();
-        int tourId = form.getTourId();
-        Mono<SubTourResponse> tourMono = tourService.findSubTour(subTourId);
-        Mono<Boolean> isValidAccountMono = accountService.validateAccount(accountId);
-        Mono<BookingStatistic> bookingStatisticMono = bookingStatisticRepository.findById(subTourId);
 
-        return Mono.zip(tourMono, isValidAccountMono)
+        Mono<SubTourResponse> subTourMono = tourService.findSubTour(subTourId);
+        Mono<Boolean> isValidAccountMono = accountService.validateAccount(accountId);
+
+        return Mono.zip(subTourMono, isValidAccountMono)
                 .flatMap(tuple -> {
                     SubTourResponse subTour = tuple.getT1();
                     boolean isValidAccount = tuple.getT2();
@@ -56,28 +62,22 @@ public class BookingServiceImp implements IBookingService {
                         throw new BookingException("Invalid accountId");
                     }
 
-                    if (subTour != null && subTour.getTourId() != tourId) {
-                        throw new BookingException("Invalid tourId");
-                    }
+                    Booking booking = CreateBookingForm.buildBooking(form);
+                    booking.setTourId(subTour.getTourId());
+                    booking.setStatus(EBookingStatus.NOT_PAY);
 
-                    return bookingStatisticMono
-                            .switchIfEmpty(bookingStatisticRepository.save(new BookingStatistic(subTourId, tourId, 0)))
-                            .flatMap(savedBookingStatistic -> {
-                                System.out.println(savedBookingStatistic);
-                                Booking booking = CreateBookingForm.buildBooking(form);
-                                booking.setStatus(EBookingStatus.NOT_PAY);
+                    return bookingRepository.save(booking).flatMap(
+                            savedBooking -> {
+                                List<Tourist> tourists = form.getTouristList().stream().map(dto -> {
+                                    Tourist tourist = TouristRequest.buildTourist(dto);
+                                    tourist.setBookingId(savedBooking.getId());
+                                    return tourist;
+                                }).toList();
 
-                                return bookingRepository.save(booking)
-                                        .flatMap(savedBooking -> {
-
-                                            savedBookingStatistic
-                                                    .setNumberOfBooking(savedBookingStatistic.getNumberOfBooking() + 1);
-
-                                            return bookingStatisticRepository.save(savedBookingStatistic)
-                                                    .then();
-                                        })
+                                return touristRepository.saveAll(tourists)
                                         .then();
-                            });
+                            }
+                    );
                 });
     }
 
@@ -134,5 +134,9 @@ public class BookingServiceImp implements IBookingService {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
+
+//    private Mono<Boolean> checkExistsAccountAndSubTour(Integer accountId, Integer subTourId){
+//
+//    }
 
 }
