@@ -19,11 +19,8 @@ public class VnPayPaymentInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "account_id", nullable = false)
-    private Integer accountId;
-
-    @Column(name = "sub_tour_id", nullable = false)
-    private Integer subTourId;
+    @Column(name = "booking_id", nullable = false, unique = true)
+    private Integer bookingId;
 
     @Column(name = "order_info", nullable = false)
     private String orderInfo;
@@ -36,4 +33,12 @@ public class VnPayPaymentInfo {
 
     @Column(name = "amount", nullable = false)
     private String amount;
+
+    public VnPayPaymentInfo(Integer bookingId, String orderInfo, String transactionNo, String txnRef, String amount) {
+        this.bookingId = bookingId;
+        this.orderInfo = orderInfo;
+        this.transactionNo = transactionNo;
+        this.txnRef = txnRef;
+        this.amount = amount;
+    }
 }
