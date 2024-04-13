@@ -129,6 +129,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  payment-service:
+    image: payment-service-image:v1.0.0
+    container_name: payment-service
+    depends_on:
+      - mysql-server
+    ports:
+      - 8090:8090
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./payment-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
