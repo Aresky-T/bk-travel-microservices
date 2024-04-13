@@ -17,12 +17,7 @@
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="booking_id" type="INT">
-                <constraints
-                    nullable="false"
-                    foreignKeyName="fk_booking_id"
-                    referencedTableName="booking"
-                    referencedColumnNames="id"
-                />
+                <constraints nullable="false" />
             </column>
             <column name="reason" type="VARCHAR(255)">
                 <constraints nullable="false" />
@@ -37,5 +32,7 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
+        <sql> ALTER TABLE request_cancel_booking ADD CONSTRAINT fk_booking_id FOREIGN KEY
+            (booking_id) REFERENCES `booking`(id) ON DELETE CASCADE; </sql>
     </changeSet>
 </databaseChangeLog>

@@ -17,7 +17,7 @@
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="booking_id" type="INT">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="full_name" type="VARCHAR(100)">
                 <constraints nullable="false" />
@@ -32,9 +32,7 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <sql>
-            ALTER TABLE tourist
-            ADD CONSTRAINT FOREIGN KEY (booking_id) REFERENCES `booking`(id);
-        </sql>
+        <sql> ALTER TABLE tourist ADD CONSTRAINT FOREIGN KEY (booking_id) REFERENCES `booking`(id)
+            ON DELETE CASCADE; </sql>
     </changeSet>
 </databaseChangeLog>

@@ -32,22 +32,24 @@
                 <constraints nullable="false" />
             </column>
             <column name="children_number" type="INT" defaultValue="0">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="baby_number" type="INT" defaultValue="0">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
-            <column name="note" type="VARCHAR(255)"/>
+            <column name="note" type="VARCHAR(255)" />
             <column name="amount" type="INT">
                 <constraints nullable="false" checkConstraint="amount > 0" />
             </column>
             <column name="booked_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false" />
             </column>
-            <column name="status" type="ENUM('NOT_PAY','PAY_UP','REJECTED')" defaultValue="NOT_PAY">
+            <column name="status" type="ENUM('NOT_PAY','PAY_UP','PAY_FAILED','REJECTED')"
+                defaultValue="NOT_PAY">
                 <constraints nullable="false" />
             </column>
-            <column name="form_of_payment" type="ENUM('BANK_TRANSFER', 'CASH_PAYMENT', 'VNPAY_ON_WEBSITE')"/>
+            <column name="form_of_payment"
+                type="ENUM('BANK_TRANSFER', 'CASH_PAYMENT', 'VNPAY_ON_WEBSITE')" />
             <column name="account_id" type="INT">
                 <constraints nullable="false" />
             </column>
@@ -58,21 +60,11 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <sql>
-            ALTER TABLE booking
-            ADD CONSTRAINT uk_account_id_sub_tour_id UNIQUE (account_id, sub_tour_id);
-
-            ALTER TABLE booking
-            ADD CONSTRAINT ck_adult_number CHECK (adult_number > 0);
-
-            ALTER TABLE booking
-            ADD CONSTRAINT ck_children_number CHECK (children_number >= 0);
-
-            ALTER TABLE booking
-            ADD CONSTRAINT ck_baby_number CHECK (baby_number >= 0);
-
-            ALTER TABLE booking
-            ADD CONSTRAINT ck_amount CHECK (amount > 0);
-        </sql>
+        <sql> ALTER TABLE booking ADD CONSTRAINT uk_account_id_sub_tour_id UNIQUE (account_id,
+            sub_tour_id); </sql>
+        <sql> ALTER TABLE booking ADD CONSTRAINT ck_adult_number CHECK (adult_number > 0); </sql>
+        <sql> ALTER TABLE booking ADD CONSTRAINT ck_children_number CHECK (children_number >= 0); </sql>
+        <sql>ALTER TABLE booking ADD CONSTRAINT ck_baby_number CHECK (baby_number >= 0); ALTER TABLE
+            booking ADD CONSTRAINT ck_amount CHECK (amount > 0);</sql>
     </changeSet>
 </databaseChangeLog>

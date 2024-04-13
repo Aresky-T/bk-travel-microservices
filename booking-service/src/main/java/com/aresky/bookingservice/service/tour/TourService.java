@@ -1,12 +1,13 @@
 package com.aresky.bookingservice.service.tour;
 
-import org.springframework.http.HttpStatus;
+import java.time.Duration;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import com.aresky.bookingservice.dto.response.SubTourResponse;
 import com.aresky.bookingservice.exception.BookingException;
-import com.aresky.bookingservice.exception.MessageResponse;
 
 import jakarta.annotation.PostConstruct;
 import reactor.core.publisher.Mono;
@@ -14,7 +15,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class TourService {
 
-    private final String tourURL = "http://localhost:8083/api/v1/tours";
+    private final String tourURL = "http://tour-service:8083/api/v1/tours";
+    private final Duration requestTimeout = Duration.ofSeconds(5);
 
     private WebClient webClient;
 
@@ -29,8 +31,16 @@ public class TourService {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path(endpoint).build(subTourId))
                 .retrieve()
-                .onStatus(HttpStatus.BAD_REQUEST::equals, response -> response.bodyToMono(MessageResponse.class)
-                        .flatMap(msgRsp -> Mono.error(new BookingException(msgRsp.getMessage()))))
-                .bodyToMono(SubTourResponse.class);
+                .toEntity(SubTourResponse.class)
+                .timeout(requestTimeout)
+                .filter(response -> response.getStatusCode().is2xxSuccessful())
+                .map(response -> response.getBody())
+                .onErrorResume(ex -> {
+                    if (ex instanceof WebClientException) {
+                        throw new BookingException("Invalid subTourId");
+                    }
+
+                    return Mono.error(new BookingException(ex.getMessage()));
+                });
     }
 }
