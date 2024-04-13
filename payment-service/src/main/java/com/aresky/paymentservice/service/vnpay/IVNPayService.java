@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface IVNPayService {
 
-    String createOrder(PaymentRequest info, HttpServletRequest request);
+    String createOrder(PaymentRequest info);
 
     EPaymentStatus orderReturn(HttpServletRequest request);
 }

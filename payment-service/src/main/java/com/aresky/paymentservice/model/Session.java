@@ -10,14 +10,12 @@ import lombok.Setter;
 public class Session {
 
     private String title;
-    private Integer accountId;
-    private Integer subTourId;
+    private Integer bookingId;
     private Instant expiration;
     private Object paymentInfo;
 
-    public Session(Integer accountId, Integer subTourId) {
-        this.accountId = accountId;
-        this.subTourId = subTourId;
+    public Session(Integer bookingId) {
+        this.bookingId = bookingId;
         this.expiration = Instant.now().plusMillis(15 * 60 * 1000);
     }
 
@@ -28,9 +26,7 @@ public class Session {
         }
 
         if (obj instanceof Session) {
-            boolean isSameAccount = this.accountId.equals(((Session) obj).accountId);
-            boolean isSameTour = this.subTourId.equals(((Session) obj).subTourId);
-            return isSameAccount && isSameTour;
+            return this.bookingId.equals(((Session) obj).getBookingId());
         }
 
         return false;
@@ -38,6 +34,6 @@ public class Session {
 
     @Override
     public String toString() {
-        return "Session: [title = " + title + ", account = " + accountId + ", subTour = " + subTourId + " ]";
+        return "Session: [title = " + title + ", bookingId = " + bookingId + " ]";
     }
 }

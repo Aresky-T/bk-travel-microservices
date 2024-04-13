@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PaymentRequest {
-    private Integer accountId;
-    private Integer subTourId;
+    private Integer bookingId;
     private String tourCode;
     private Integer amount;
 }

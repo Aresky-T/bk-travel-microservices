@@ -13,9 +13,9 @@ public class SessionManager {
 
     private final Set<Session> sessionStorage = new HashSet<>();
 
-    public Session openPaymentSession(Integer accountId, Integer subTourId) {
-        if (Boolean.TRUE.equals(isExistSession(accountId, subTourId))) {
-            Session session = getSession(accountId, subTourId);
+    public Session openPaymentSession(Integer bookingId) {
+        if (Boolean.TRUE.equals(isExistSession(bookingId))) {
+            Session session = getSession(bookingId);
 
             if (isExpiredSession(session)) {
                 // Update new expiration time for current session if session has expired!
@@ -36,16 +36,15 @@ public class SessionManager {
                 throw new PaymentException(stringBuilder.toString());
             }
         } else {
-            addNewSession(accountId, subTourId);
+            addNewSession(bookingId);
         }
 
-        return getSession(accountId, subTourId);
+        return getSession(bookingId);
     }
 
-    public Session getSession(Integer accountId, Integer subTourId) {
+    public Session getSession(Integer bookingId) {
         return sessionStorage.stream()
-                .filter(e -> (Objects.equals(e.getAccountId(), accountId)
-                        && Objects.equals(e.getSubTourId(), subTourId)))
+                .filter(e -> (Objects.equals(e.getBookingId(), bookingId)))
                 .findFirst()
                 .orElse(null);
     }
@@ -56,9 +55,8 @@ public class SessionManager {
                 .findFirst().orElse(null);
     }
 
-    public boolean isExistSession(Integer accountId, Integer subTourId) {
-        return sessionStorage.stream().anyMatch(session -> (Objects.equals(session.getAccountId(), accountId)
-                && Objects.equals(session.getSubTourId(), subTourId)));
+    public boolean isExistSession(Integer bookingId) {
+        return sessionStorage.stream().anyMatch(session -> (Objects.equals(session.getBookingId(), bookingId)));
     }
 
     public boolean isExistSession(Session session) {
@@ -69,9 +67,9 @@ public class SessionManager {
         return Instant.now().isAfter(session.getExpiration());
     }
 
-    public void addNewSession(Integer accountId, Integer subTourId) {
-        if (Boolean.FALSE.equals(isExistSession(accountId, subTourId))) {
-            sessionStorage.add(new Session(accountId, subTourId));
+    public void addNewSession(Integer bookingId) {
+        if (Boolean.FALSE.equals(isExistSession(bookingId))) {
+            sessionStorage.add(new Session(bookingId));
         }
     }
 

@@ -14,11 +14,8 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
-            <column name="account_id" type="INT">
-                <constraints nullable="false" />
-            </column>
-            <column name="sub_tour_id" type="INT">
-                <constraints nullable="false" />
+            <column name="booking_id" type="INT">
+                <constraints nullable="false" unique="true" />
             </column>
             <column name="order_info" type="VARCHAR(100)">
                 <constraints nullable="false" />
@@ -33,7 +30,5 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <sql> ALTER TABLE vnpay_payment_info ADD CONSTRAINT uk_account_id_sub_tour_id UNIQUE
-            (account_id, sub_tour_id); </sql>
     </changeSet>
 </databaseChangeLog>

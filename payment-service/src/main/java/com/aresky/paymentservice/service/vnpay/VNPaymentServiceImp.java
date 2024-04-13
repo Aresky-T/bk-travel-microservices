@@ -41,8 +41,9 @@ public class VNPaymentServiceImp implements IVNPayService {
     private VnPayRepository vnPayRepository;
 
     @Override
-    public String createOrder(PaymentRequest info, HttpServletRequest request) {
-        Session session = sessionManager.openPaymentSession(info.getAccountId(), info.getSubTourId());
+    public String createOrder(PaymentRequest info) {
+        Session session = sessionManager.openPaymentSession(info.getBookingId());
+        System.out.println(info);
 
         if (session == null) {
             throw new PaymentException("Không thể tạo phiên thanh toán!");
@@ -64,10 +65,8 @@ public class VNPaymentServiceImp implements IVNPayService {
 
         // String baseUrl = request.getScheme() + "://" + request.getServerName() + ":"
         // + request.getServerPort();
-        int accountId = info.getAccountId();
-        int subTourId = info.getAccountId();
-        String urlReturn = "http://localhost:3000/payment" + "?vnp_AccountId=" + accountId + "&vnp_subTourId="
-                + subTourId;
+        Integer bookingId = info.getBookingId();
+        String urlReturn = "http://localhost:3000/payment" + "?bookingId=" + bookingId;
 
         String content = "THANH TOAN TOUR " + info.getTourCode();
 
