@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd">
+    <changeSet id="Create table vnpay_payment_info" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table vnpay_payment_info already exist!">
+            <not>
+                <tableExists tableName="vnpay_payment_info" />
+            </not>
+        </preConditions>
+        <createTable tableName="vnpay_payment_info" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="account_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="order_info" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_no" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="txn_ref" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="amount" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql> ALTER TABLE vnpay_payment_info ADD CONSTRAINT uk_account_id_sub_tour_id UNIQUE
+            (account_id, sub_tour_id); </sql>
+    </changeSet>
+</databaseChangeLog>
