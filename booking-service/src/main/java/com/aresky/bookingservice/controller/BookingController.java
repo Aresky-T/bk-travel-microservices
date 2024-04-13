@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
+import com.aresky.bookingservice.dto.request.VnPayRequest;
+import com.aresky.bookingservice.model.EFormOfPayment;
 import com.aresky.bookingservice.service.booking.IBookingService;
 
 import reactor.core.publisher.Mono;
@@ -29,6 +32,19 @@ public class BookingController {
     }
 
     // POST - createBookingWithPayment(CreateBookingForm form)
+    @PostMapping("/payment")
+    public Mono<ResponseEntity<?>> createBookingWithPayment(
+            @RequestParam EFormOfPayment formOfPayment,
+            @RequestBody CreateBookingForm form) {
+        return bookingService.handleBookingWithPayment(form, formOfPayment)
+                .map(ResponseEntity::ok);
+    }
+
+    @PostMapping("/payment/vnpay-result")
+    public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayRequest vnPayRequest) {
+        return bookingService.handleBookingAfterPaymentWithVnPay(vnPayRequest).map(ResponseEntity::ok);
+    }
+
     // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)
     // GET - getAllBookings(Pageable pageable)
     // GET - getAllBookings(Pageable pageable, BookingFilter filter)
