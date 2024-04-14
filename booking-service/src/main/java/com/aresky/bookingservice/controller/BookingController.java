@@ -1,13 +1,10 @@
 package com.aresky.bookingservice.controller;
 
+import com.aresky.bookingservice.dto.request.BookingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
 import com.aresky.bookingservice.dto.request.VnPayRequest;
@@ -46,15 +43,48 @@ public class BookingController {
     }
 
     // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)
+
     // GET - getAllBookings(Pageable pageable)
+    @GetMapping
+    public Mono<ResponseEntity<?>> getAllBookings(Pageable pageable){
+        return bookingService.findAll(pageable).map(ResponseEntity::ok);
+    }
+
     // GET - getAllBookings(Pageable pageable, BookingFilter filter)
+    @GetMapping("/filter")
+    public Mono<ResponseEntity<?>> getAllBookings(Pageable pageable, BookingFilter filter){
+        return bookingService.findAll(pageable, filter).map(ResponseEntity::ok);
+    }
+
     // GET - getAllBookingsByAccountId(int accountId)
+    @GetMapping("/account")
+    public Mono<ResponseEntity<?>> getDetailsBookingByAccountId(@RequestParam Integer accountId){
+        return bookingService.findAll(accountId).map(ResponseEntity::ok);
+    }
+
     // GET - getDetailsBooking(int bookingId)
+    @GetMapping("/id/{id}")
+    public Mono<ResponseEntity<?>> getDetailsBooking(@PathVariable("id") Integer bookingId){
+        return bookingService.findOne(bookingId).map(ResponseEntity::ok);
+    }
+
     // GET - getDetailsBooking(int accountId, subTourId)
+    @GetMapping("/account-and-tour")
+    public Mono<ResponseEntity<?>> getDetailsBooking(
+            @RequestParam Integer accountId,
+            @RequestParam Integer subTourId
+    ){
+        return bookingService.findOne(accountId, subTourId).map(ResponseEntity::ok);
+    }
 
     // PUT - updateBooking(int bookingId, UpdateBookingForm form)
     // PATCH - updateBooking(int bookingId, EFormOfPayment formOfPayment)
     // PATCH - updateBooking(int bookingId, EStatus status)
     // PATCH - updateRequestCancelBookedTour(int requestId, ERequestStatus status);
+
     // DELETE - deleteBooking(int bookingId)
+    @DeleteMapping
+    public Mono<ResponseEntity<?>> deleteBooking(@RequestParam("id") Integer bookingId){
+        return bookingService.delete(bookingId).thenReturn(ResponseEntity.ok("success"));
+    }
 }
