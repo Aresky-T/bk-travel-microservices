@@ -13,8 +13,8 @@ public class SessionManager {
 
     private final Set<Session> sessionStorage = new HashSet<>();
 
-    public Session openPaymentSession(Integer bookingId) {
-        if (Boolean.TRUE.equals(isExistSession(bookingId))) {
+    public Session openSession(Integer bookingId) {
+        if (isExistSession(bookingId)) {
             Session session = getSession(bookingId);
 
             if (isExpiredSession(session)) {
@@ -40,6 +40,12 @@ public class SessionManager {
         }
 
         return getSession(bookingId);
+    }
+
+    public void closeSession(Integer bookingId) {
+        if (isExistSession(bookingId)) {
+            sessionStorage.remove(getSession(bookingId));
+        }
     }
 
     public Session getSession(Integer bookingId) {
