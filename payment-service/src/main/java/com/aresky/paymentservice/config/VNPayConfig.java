@@ -51,6 +51,7 @@ public class VNPayConfig {
     }
 
     // Util for VNPAY
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static String hashAllFields(Map fields) {
         List fieldNames = new ArrayList(fields.keySet());
         Collections.sort(fieldNames);
