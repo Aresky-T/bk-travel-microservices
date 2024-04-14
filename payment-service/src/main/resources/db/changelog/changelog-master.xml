@@ -17,7 +17,16 @@
             <column name="booking_id" type="INT">
                 <constraints nullable="false" unique="true" />
             </column>
+            <column name="bank" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="card_type" type="VARCHAR(100)">
+                <constraints nullable="true" />
+            </column>
             <column name="order_info" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="pay_date" type="VARCHAR(100)">
                 <constraints nullable="false" />
             </column>
             <column name="transaction_no" type="VARCHAR(100)">
