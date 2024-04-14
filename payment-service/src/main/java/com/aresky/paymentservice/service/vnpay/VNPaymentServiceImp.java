@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.aresky.paymentservice.config.VNPayConfig;
 import com.aresky.paymentservice.dto.PaymentRequest;
+import com.aresky.paymentservice.dto.VnPayReturn;
 import com.aresky.paymentservice.exception.PaymentException;
 import com.aresky.paymentservice.model.EPaymentStatus;
 import com.aresky.paymentservice.model.Session;
@@ -42,8 +43,7 @@ public class VNPaymentServiceImp implements IVNPayService {
 
     @Override
     public String createOrder(PaymentRequest info) {
-        Session session = sessionManager.openPaymentSession(info.getBookingId());
-        System.out.println(info);
+        Session session = openSession(info.getBookingId());
 
         if (session == null) {
             throw new PaymentException("Không thể tạo phiên thanh toán!");
@@ -74,33 +74,49 @@ public class VNPaymentServiceImp implements IVNPayService {
     }
 
     @Override
-    public EPaymentStatus orderReturn(HttpServletRequest request) {
-        String vnp_OrderInfo = request.getParameter("vnp_OrderInfo");
-        String vnp_TxnRef = request.getParameter("vnp_TxnRef");
-        String title = vnp_OrderInfo + "_" + vnp_TxnRef;
-        Session session = sessionManager.getSession(title);
-        int paymentStatus = getPaymentStatus(request);
+    public EPaymentStatus orderReturn(VnPayReturn vnPayReturn) {
+        String vnp_ResponseCode = vnPayReturn.getResponseCode();
+        Integer bookingId = vnPayReturn.getBookingId();
+        closeSession(bookingId);
 
-        if (paymentStatus == 24) {
-            sessionManager.removeSession(session);
+        if ("24".equals(vnp_ResponseCode)) {
             return EPaymentStatus.CANCELED;
         }
 
-        if (paymentStatus != 1) {
-            sessionManager.removeSession(session);
-            return EPaymentStatus.FAILED;
+        if ("00".equals(vnp_ResponseCode)) {
+            String vnp_BankCode = vnPayReturn.getBank();
+            String vnp_CardType = vnPayReturn.getCardType();
+            String vnp_OrderInfo = vnPayReturn.getOrderInfo();
+            String vnp_PayDate = vnPayReturn.getPayDate();
+            String vnp_TxnRef = vnPayReturn.getTxnRef();
+            String vnp_Amount = vnPayReturn.getAmount();
+            String vnp_TransactionNo = vnPayReturn.getTransactionNo();
+
+            VnPayPaymentInfo vnPayPaymentInfo = new VnPayPaymentInfo();
+            vnPayPaymentInfo.setBookingId(bookingId);
+            vnPayPaymentInfo.setBank(vnp_BankCode);
+            vnPayPaymentInfo.setCardType(vnp_CardType);
+            vnPayPaymentInfo.setOrderInfo(vnp_OrderInfo);
+            vnPayPaymentInfo.setPayDate(vnp_PayDate);
+            vnPayPaymentInfo.setTransactionNo(vnp_TransactionNo);
+            vnPayPaymentInfo.setTxnRef(vnp_TxnRef);
+            vnPayPaymentInfo.setAmount(vnp_Amount);
+
+            vnPayRepository.save(vnPayPaymentInfo);
+            return EPaymentStatus.SUCCESS;
         }
 
-        VnPayPaymentInfo vnPayPaymentInfo = new VnPayPaymentInfo();
-        vnPayPaymentInfo.setAmount(request.getParameter("vnp_Amount"));
-        vnPayPaymentInfo.setOrderInfo(request.getParameter("vnp_OrderInfo"));
-        vnPayPaymentInfo.setTxnRef(request.getParameter("vnp_TxnRef"));
-        vnPayPaymentInfo.setTransactionNo(request.getParameter("vnp_TransactionNo"));
+        return EPaymentStatus.FAILED;
+    }
 
-        vnPayRepository.save(vnPayPaymentInfo);
-        sessionManager.removeSession(session);
+    @Override
+    public Session openSession(Integer bookingId) {
+        return sessionManager.openSession(bookingId);
+    }
 
-        return EPaymentStatus.SUCCESS;
+    @Override
+    public void closeSession(Integer bookingId) {
+        sessionManager.closeSession(bookingId);
     }
 
     /**
@@ -134,6 +150,7 @@ public class VNPaymentServiceImp implements IVNPayService {
      *         secure hash for verification.
      *         This URL is used to initiate a payment process through VNPay.
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private String generateVnPayUrl(Session session, int amount, String content, String urlReturn) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
@@ -215,6 +232,7 @@ public class VNPaymentServiceImp implements IVNPayService {
      * @return The method `getPaymentStatus` returns an Integer value representing
      *         the payment status.
      */
+    @SuppressWarnings({ "rawtypes", "unused" })
     private Integer getPaymentStatus(HttpServletRequest request) {
         AtomicInteger paymentStatus = new AtomicInteger(0);
         Map<String, String> fields = new HashMap<>();
