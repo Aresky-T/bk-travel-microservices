@@ -1,7 +1,6 @@
 package com.aresky.bookingservice.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -10,8 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.time.ZonedDateTime;
 
 @Data
@@ -68,7 +65,4 @@ public class Booking {
 
     @Column("form_of_payment")
     private EFormOfPayment formOfPayment;
-
-    @Transient
-    private final List<Tourist> touristList = new ArrayList<>();
 }
