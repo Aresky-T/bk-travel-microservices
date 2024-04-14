@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -28,7 +28,7 @@ public class Tourist {
     private String fullName;
 
     @Column("birth_date")
-    private ZonedDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column("gender")
     private EGender gender;

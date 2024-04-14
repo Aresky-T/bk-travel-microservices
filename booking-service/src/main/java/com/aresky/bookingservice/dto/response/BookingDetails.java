@@ -2,18 +2,20 @@ package com.aresky.bookingservice.dto.response;
 
 import com.aresky.bookingservice.model.Booking;
 import com.aresky.bookingservice.model.EFormOfPayment;
-import com.aresky.bookingservice.util.BookingUtils;
-
+import com.aresky.bookingservice.model.Tourist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingResponse {
+public class BookingDetails {
     private Integer id;
     private Integer accountId;
     private Integer tourId;
@@ -31,9 +33,11 @@ public class BookingResponse {
     private String status;
     private EFormOfPayment formOfPayment;
     private String bookedTime;
+    private TourInfo tourInfo;
+    private List<TouristResponse> touristList;
 
-    public static BookingResponse toDTO(Booking booking) {
-        return BookingResponse.builder()
+    public static BookingDetails toDTO(Booking booking) {
+        return BookingDetails.builder()
                 .id(booking.getId())
                 .accountId(booking.getAccountId())
                 .tourId(booking.getTourId())
@@ -50,7 +54,40 @@ public class BookingResponse {
                 .amount(booking.getAmount())
                 .status(booking.getStatus().name())
                 .formOfPayment(booking.getFormOfPayment())
-                .bookedTime(BookingUtils.convertToDate(booking.getBookedTime()).toString())
+                .bookedTime(DateTimeFormatter.ISO_INSTANT.format(booking.getBookedTime()))
                 .build();
+    }
+
+    public static BookingDetails toDTO(Booking booking, List<Tourist> touristList) {
+        BookingDetails bookingDetails = BookingDetails.toDTO(booking);
+        bookingDetails.setTouristList(touristList.stream().map(TouristResponse::toDTO).toList());
+        return bookingDetails;
+    }
+
+    public static BookingDetails toDTO(Booking booking, SubTourResponse subTour, List<Tourist> touristList) {
+        BookingDetails bookingDetails = BookingDetails.toDTO(booking);
+        bookingDetails.setTourInfo(new TourInfo(subTour));
+        bookingDetails.setTouristList(touristList.stream().map(TouristResponse::toDTO).toList());
+        return bookingDetails;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class TourInfo {
+        private Integer tourId;
+        private Integer subTourId;
+        private String title;
+        private String image;
+        private String code;
+        private String status;
+
+        public TourInfo(SubTourResponse subTour) {
+            this.tourId = subTour.getTourId();
+            this.subTourId = subTour.getId();
+            this.code = subTour.getTourCode();
+            this.title = subTour.getTitle();
+            this.image = subTour.getImage1();
+            this.status = subTour.getStatus();
+        }
     }
 }

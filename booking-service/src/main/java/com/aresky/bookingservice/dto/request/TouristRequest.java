@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.time.ZoneId;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +20,7 @@ public class TouristRequest {
     public static Tourist buildTourist(TouristRequest dto) {
         return Tourist.builder()
                 .fullName(dto.fullName)
-                .birthDate(dto.birthDate.toInstant().atZone(ZoneId.systemDefault()))
+                .birthDate(new java.sql.Date(dto.birthDate.getTime()).toLocalDate())
                 .gender(dto.gender)
                 .type(dto.type)
                 .build();
