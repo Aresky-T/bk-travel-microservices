@@ -2,25 +2,26 @@ package com.aresky.bookingservice.service.account;
 
 import java.time.Duration;
 
+import com.aresky.bookingservice.exception.MessageResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
 
 import com.aresky.bookingservice.exception.BookingException;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 @Service
 public class AccountService {
 
-    private final String accountURL = "http://account-service:8082/api/v1/accounts";
     private final Duration requestTimeout = Duration.ofSeconds(5);
 
     private WebClient webClient;
 
     @PostConstruct
     private void initWebClient() {
+        String accountURL = "http://localhost:8082/api/v1/accounts";
         this.webClient = WebClient.builder().baseUrl(accountURL).build();
     }
 
@@ -35,12 +36,14 @@ public class AccountService {
                 .filter(response -> response.getStatusCode().is2xxSuccessful()
                         && Boolean.TRUE.equals(response.getBody()))
                 .switchIfEmpty(Mono.error(new BookingException("Invalid accountId!")))
-                .flatMap(response -> Mono.just(response.getBody()))
+                .flatMap(response -> Mono.just(true))
                 .onErrorResume(ex -> {
-                    if (ex instanceof WebClientException) {
-                        return Mono.error(new BookingException("Unable to request validate account!"));
+                    if (ex instanceof WebClientResponseException) {
+                        MessageResponse messageResponse = ((WebClientResponseException) ex)
+                                .getResponseBodyAs(MessageResponse.class);
+                        assert messageResponse != null;
+                        return Mono.error(new BookingException(messageResponse.getMessage()));
                     }
-
                     return Mono.error(new BookingException(ex.getMessage()));
                 });
     }

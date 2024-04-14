@@ -4,10 +4,13 @@ import com.aresky.bookingservice.dto.request.BookingFilter;
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
 import com.aresky.bookingservice.dto.request.UpdateBookingForm;
 import com.aresky.bookingservice.dto.request.VnPayRequest;
+import com.aresky.bookingservice.dto.response.BookingDetails;
 import com.aresky.bookingservice.dto.response.BookingResponse;
 import com.aresky.bookingservice.model.EFormOfPayment;
 
+import org.springframework.data.domain.Page;
 import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,17 +23,21 @@ public interface IBookingService {
 
     Mono<String> handleBookingAfterPaymentWithVnPay(VnPayRequest vnPayRequest);
 
-    Mono<List<BookingResponse>> findAll(Pageable pageable);
+    Mono<String> handlePaymentAfterBooking(Integer bookingId, EFormOfPayment formOfPayment);
 
-    Mono<List<BookingResponse>> findAll(Pageable pageable, BookingFilter filter);
+    Mono<Page<BookingResponse>> findAll(Pageable pageable);
 
-    Mono<BookingResponse> findOne(int bookingId);
+    Mono<List<BookingResponse>> findAll(Integer accountId);
 
-    Mono<BookingResponse> findOne(int accountId, int subTourId);
+    Mono<Page<BookingResponse>> findAll(Pageable pageable, BookingFilter filter);
+
+    Mono<BookingDetails> findOne(Integer bookingId);
+
+    Mono<BookingDetails> findOne(Integer accountId, Integer subTourId);
 
     Mono<BookingResponse> update(UpdateBookingForm form);
 
-    Mono<BookingResponse> update(int bookingId, Map<String, Object> fields);
+    Mono<BookingResponse> update(Integer bookingId, Map<String, Object> fields);
 
-    Mono<Void> delete(int bookingId);
+    Mono<Void> delete(Integer bookingId);
 }
