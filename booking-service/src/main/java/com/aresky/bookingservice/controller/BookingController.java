@@ -1,14 +1,14 @@
 package com.aresky.bookingservice.controller;
 
 import com.aresky.bookingservice.dto.request.BookingFilter;
+import com.aresky.bookingservice.dto.request.VnPayReturn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
-import com.aresky.bookingservice.dto.request.VnPayRequest;
-import com.aresky.bookingservice.model.EFormOfPayment;
+import com.aresky.bookingservice.model.EPaymentType;
 import com.aresky.bookingservice.service.booking.IBookingService;
 
 import reactor.core.publisher.Mono;
@@ -24,47 +24,52 @@ public class BookingController {
     // POST - createBooking(CreateBookingForm form)
     @PostMapping
     public Mono<ResponseEntity<?>> createBooking(
-            @RequestBody CreateBookingForm form) {
-        return bookingService.handleBooking(form).thenReturn(ResponseEntity.ok("success"));
+            @RequestBody CreateBookingForm form, @RequestParam EPaymentType type) {
+        return bookingService.handleBooking(form, type).map(ResponseEntity::ok);
     }
 
     // POST - createBookingWithPayment(CreateBookingForm form)
-    @PostMapping("/payment")
+    @PostMapping("/payment/vnpay")
     public Mono<ResponseEntity<?>> createBookingWithPayment(
-            @RequestParam EFormOfPayment formOfPayment,
-            @RequestBody CreateBookingForm form) {
-        return bookingService.handleBookingWithPayment(form, formOfPayment)
+            @RequestParam Integer bookingId) {
+        return bookingService.handlePaymentWithVnPayAfterBooking(bookingId)
                 .map(ResponseEntity::ok);
     }
 
     @PostMapping("/payment/vnpay-result")
-    public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayRequest vnPayRequest) {
-        return bookingService.handleBookingAfterPaymentWithVnPay(vnPayRequest).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn vnPayReturn) {
+        return bookingService.handleBookingAfterPaymentWithVnPay(vnPayReturn).map(ResponseEntity::ok);
     }
 
     // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)
 
+    // GET - getVnPayTransactionInfo(Integer bookingId)
+    @GetMapping("/payment/vnpay-transaction-info")
+    public Mono<ResponseEntity<?>> getVnPayTransactionInfo(@RequestParam Integer bookingId) {
+        return bookingService.findVnPayTransactionInfo(bookingId).map(ResponseEntity::ok);
+    }
+
     // GET - getAllBookings(Pageable pageable)
     @GetMapping
-    public Mono<ResponseEntity<?>> getAllBookings(Pageable pageable){
+    public Mono<ResponseEntity<?>> getAllBookings(Pageable pageable) {
         return bookingService.findAll(pageable).map(ResponseEntity::ok);
     }
 
     // GET - getAllBookings(Pageable pageable, BookingFilter filter)
     @GetMapping("/filter")
-    public Mono<ResponseEntity<?>> getAllBookings(Pageable pageable, BookingFilter filter){
+    public Mono<ResponseEntity<?>> getAllBookings(Pageable pageable, BookingFilter filter) {
         return bookingService.findAll(pageable, filter).map(ResponseEntity::ok);
     }
 
     // GET - getAllBookingsByAccountId(int accountId)
     @GetMapping("/account")
-    public Mono<ResponseEntity<?>> getDetailsBookingByAccountId(@RequestParam Integer accountId){
+    public Mono<ResponseEntity<?>> getDetailsBookingByAccountId(@RequestParam Integer accountId) {
         return bookingService.findAll(accountId).map(ResponseEntity::ok);
     }
 
     // GET - getDetailsBooking(int bookingId)
     @GetMapping("/id/{id}")
-    public Mono<ResponseEntity<?>> getDetailsBooking(@PathVariable("id") Integer bookingId){
+    public Mono<ResponseEntity<?>> getDetailsBooking(@PathVariable("id") Integer bookingId) {
         return bookingService.findOne(bookingId).map(ResponseEntity::ok);
     }
 
@@ -72,8 +77,7 @@ public class BookingController {
     @GetMapping("/account-and-tour")
     public Mono<ResponseEntity<?>> getDetailsBooking(
             @RequestParam Integer accountId,
-            @RequestParam Integer subTourId
-    ){
+            @RequestParam Integer subTourId) {
         return bookingService.findOne(accountId, subTourId).map(ResponseEntity::ok);
     }
 
@@ -84,7 +88,7 @@ public class BookingController {
 
     // DELETE - deleteBooking(int bookingId)
     @DeleteMapping
-    public Mono<ResponseEntity<?>> deleteBooking(@RequestParam("id") Integer bookingId){
+    public Mono<ResponseEntity<?>> deleteBooking(@RequestParam("id") Integer bookingId) {
         return bookingService.delete(bookingId).thenReturn(ResponseEntity.ok("success"));
     }
 }

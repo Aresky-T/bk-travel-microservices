@@ -3,7 +3,7 @@ package com.aresky.bookingservice.service.booking;
 import java.util.List;
 import java.util.Map;
 
-import com.aresky.bookingservice.dto.request.TouristRequest;
+import com.aresky.bookingservice.dto.request.*;
 import com.aresky.bookingservice.dto.response.BookingDetails;
 import com.aresky.bookingservice.model.Tourist;
 import com.aresky.bookingservice.repository.TouristRepository;
@@ -13,17 +13,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.aresky.bookingservice.dto.request.BookingFilter;
-import com.aresky.bookingservice.dto.request.CreateBookingForm;
-import com.aresky.bookingservice.dto.request.PaymentRequest;
-import com.aresky.bookingservice.dto.request.UpdateBookingForm;
-import com.aresky.bookingservice.dto.request.VnPayRequest;
 import com.aresky.bookingservice.dto.response.BookingResponse;
 import com.aresky.bookingservice.dto.response.SubTourResponse;
+import com.aresky.bookingservice.dto.response.VnPayTransactionInfo;
 import com.aresky.bookingservice.exception.BookingException;
 import com.aresky.bookingservice.model.Booking;
 import com.aresky.bookingservice.model.EBookingStatus;
 import com.aresky.bookingservice.model.EFormOfPayment;
+import com.aresky.bookingservice.model.EPaymentType;
 import com.aresky.bookingservice.repository.BookingRepository;
 import com.aresky.bookingservice.service.account.AccountService;
 import com.aresky.bookingservice.service.payment.PaymentService;
@@ -53,7 +50,7 @@ public class BookingServiceImp implements IBookingService {
 
     @Transactional
     @Override
-    public Mono<Void> handleBooking(CreateBookingForm form) {
+    public Mono<String> handleBooking(CreateBookingForm form, EPaymentType type) {
         int accountId = form.getAccountId();
         int subTourId = form.getSubTourId();
 
@@ -61,64 +58,73 @@ public class BookingServiceImp implements IBookingService {
                 .filter(Boolean.FALSE::equals)
                 .switchIfEmpty(Mono.error(
                         new BookingException("Bạn đã đặt tour này rồi, vui lòng kiểm tra trong hồ sơ của bạn!")))
-                .then(Mono.zip(findSubTour(subTourId), validateAccount(accountId))
-                        .flatMap(tuple -> this.create(tuple.getT1(), accountId, form).then()));
-    }
+                .flatMap(value -> {
+                    if (type == EPaymentType.PAY_LATER) {
+                        return Mono.zip(findSubTour(subTourId), validateAccount(accountId))
+                                .flatMap(tuple -> this.create(tuple.getT1(), accountId, form)
+                                        .thenReturn(
+                                                "Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!"));
+                    }
 
-    @Transactional
-    @Override
-    public Mono<String> handleBookingWithPayment(CreateBookingForm form, EFormOfPayment formOfPayment) {
-        int accountId = form.getAccountId();
-        int subTourId = form.getSubTourId();
+                    if (type == EPaymentType.VNPAY_ON_WEBSITE) {
+                        return paymentService.connect()
+                                .filter(Boolean.TRUE::equals)
+                                .flatMap(isConnected -> Mono.zip(findSubTour(subTourId), validateAccount(accountId))
+                                        .flatMap(tuple -> {
+                                            SubTourResponse subTour = tuple.getT1();
 
-        return bookingRepository.existsByAccountIdAndSubTourId(accountId, subTourId)
-                .filter(Boolean.FALSE::equals)
-                .switchIfEmpty(Mono.error(
-                        new BookingException("Bạn đã đặt tour này rồi, vui lòng kiểm tra trong hồ sơ của bạn!")))
-                .then(paymentService.connect())
-                .then(Mono.zip(findSubTour(subTourId), validateAccount(accountId))
-                        .flatMap(tuple -> {
-                            SubTourResponse subTour = tuple.getT1();
+                                            return this.create(subTour, accountId, form)
+                                                    .flatMap(booking -> paymentService
+                                                            .getVnPayPaymentURL(
+                                                                    PaymentRequest.createDTO(booking, subTour))
+                                                            .onErrorResume(ex -> bookingRepository.delete(booking)
+                                                                    .then(Mono.error(ex))));
+                                        }));
+                    }
 
-                            if (formOfPayment.equals(EFormOfPayment.VNPAY_ON_WEBSITE)) {
-                                return this.create(subTour, accountId, form)
-                                        .flatMap(booking -> paymentService
-                                                .getVnPayPaymentURL(PaymentRequest.createDTO(booking, subTour))
-                                                .onErrorResume(ex -> bookingRepository.delete(booking)
-                                                        .then(Mono.error(ex))));
-                            }
-
-                            return Mono.error(new BookingException("Hiện chỉ hỗ trợ thanh toán trực tuyến với VNPAY!"));
-                        }));
+                    return Mono.error(new BookingException("Hiện không hỗ trợ hình thức thanh toán này!"));
+                });
     }
 
     @Override
-    public Mono<String> handleBookingAfterPaymentWithVnPay(VnPayRequest vnPayRequest) {
-        String responseCode = vnPayRequest.getResponseCode();
+    public Mono<String> handleBookingAfterPaymentWithVnPay(VnPayReturn vnPayReturn) {
+        String responseCode = vnPayReturn.getResponseCode();
 
-        return bookingRepository.findById(vnPayRequest.getBookingId())
+        return bookingRepository.findById(vnPayReturn.getBookingId())
                 .flatMap(booking -> {
                     if (responseCode.equals("00") || Integer.parseInt(responseCode) == 0) {
                         booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
                         booking.setStatus(EBookingStatus.PAY_UP);
-                        paymentService.requestCloseVnPayPaymentSession(vnPayRequest);
-                        return bookingRepository.save(booking)
-                                .thenReturn("SUCCESS");
+                        return paymentService.requestCloseVnPayPaymentSession(vnPayReturn)
+                                .flatMap(message -> {
+                                    return bookingRepository.save(booking)
+                                            .thenReturn("SUCCESS");
+                                });
                     }
 
                     if (responseCode.equals("24") || Integer.parseInt(responseCode) == 24) {
                         booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
-                        paymentService.requestCloseVnPayPaymentSession(vnPayRequest);
+                        paymentService.requestCloseSession(vnPayReturn.getBookingId());
                         return bookingRepository.delete(booking)
                                 .thenReturn("CANCELED");
                     }
 
                     booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
                     booking.setStatus(EBookingStatus.PAY_FAILED);
-                    paymentService.requestCloseVnPayPaymentSession(vnPayRequest);
+                    paymentService.requestCloseSession(vnPayReturn.getBookingId());
                     return bookingRepository.save(booking)
                             .thenReturn("FAILED");
                 });
+    }
+
+    @Override
+    public Mono<String> handlePaymentWithVnPayAfterBooking(Integer bookingId) {
+        return bookingRepository.findById(bookingId)
+                .switchIfEmpty(Mono.error(
+                        new BookingException("Invalid bookingId!")))
+                .flatMap(booking -> tourService.findSubTour(booking.getSubTourId())
+                        .flatMap(subTour -> paymentService
+                                .getVnPayPaymentURL(PaymentRequest.createDTO(booking, subTour))));
     }
 
     @Override
@@ -154,6 +160,14 @@ public class BookingServiceImp implements IBookingService {
     }
 
     @Override
+    public Mono<VnPayTransactionInfo> findVnPayTransactionInfo(Integer bookingId) {
+        return bookingRepository.existsById(bookingId)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId!")))
+                .flatMap(validBooking -> paymentService.getVnPayTransactionInfo(bookingId).map(value -> value));
+    }
+
+    @Override
     public Mono<BookingDetails> findOne(Integer bookingId) {
         return bookingRepository.findById(bookingId)
                 .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId")))
@@ -178,16 +192,19 @@ public class BookingServiceImp implements IBookingService {
                                 .map(tourist -> BookingDetails.toDTO(booking, tuple.getT2(), tourist))));
     }
 
+    @Transactional
     @Override
     public Mono<BookingResponse> update(UpdateBookingForm form) {
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
+    @Transactional
     @Override
     public Mono<BookingResponse> update(Integer bookingId, Map<String, Object> fields) {
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
+    @Transactional
     @Override
     public Mono<Void> delete(Integer bookingId) {
         return bookingRepository.existsById(bookingId)
