@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.aresky.paymentservice.config.VNPayConfig;
 import com.aresky.paymentservice.dto.PaymentRequest;
 import com.aresky.paymentservice.dto.VnPayReturn;
+import com.aresky.paymentservice.dto.VnPayTransactionInfo;
 import com.aresky.paymentservice.exception.PaymentException;
 import com.aresky.paymentservice.model.EPaymentStatus;
 import com.aresky.paymentservice.model.Session;
@@ -86,7 +87,7 @@ public class VNPaymentServiceImp implements IVNPayService {
         if ("00".equals(vnp_ResponseCode)) {
             String vnp_BankCode = vnPayReturn.getBank();
             String vnp_CardType = vnPayReturn.getCardType();
-            String vnp_OrderInfo = vnPayReturn.getOrderInfo();
+            String vnp_OrderInfo = vnPayReturn.getOrderInfo().replace("+", " ");
             String vnp_PayDate = vnPayReturn.getPayDate();
             String vnp_TxnRef = vnPayReturn.getTxnRef();
             String vnp_Amount = vnPayReturn.getAmount();
@@ -107,6 +108,16 @@ public class VNPaymentServiceImp implements IVNPayService {
         }
 
         return EPaymentStatus.FAILED;
+    }
+
+    @Override
+    public VnPayTransactionInfo getVnPayTransactionInfo(Integer bookingId) {
+        Optional<VnPayPaymentInfo> optional = vnPayRepository.findByBookingId(bookingId);
+        if (optional.isEmpty()) {
+            throw new PaymentException("VNPAY Payment Transaction Info doesn't exist!");
+        }
+
+        return VnPayTransactionInfo.toDTO(optional.get());
     }
 
     @Override
