@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.aresky.paymentservice.dto.PaymentRequest;
 import com.aresky.paymentservice.dto.VnPayReturn;
+import com.aresky.paymentservice.dto.VnPayTransactionInfo;
 import com.aresky.paymentservice.model.Session;
 import com.aresky.paymentservice.service.vnpay.IVNPayService;
 
@@ -25,6 +26,11 @@ public class PaymentController {
     @GetMapping("/connect")
     public ResponseEntity<?> connect() {
         return ResponseEntity.ok("Welcome to payment-service");
+    }
+
+    @GetMapping("/vnpay")
+    public ResponseEntity<VnPayTransactionInfo> paymentWithVNPay(@RequestParam Integer bookingId) {
+        return ResponseEntity.ok(vnPayService.getVnPayTransactionInfo(bookingId));
     }
 
     @PostMapping("/vnpay")
