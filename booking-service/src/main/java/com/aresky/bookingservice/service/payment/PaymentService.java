@@ -64,7 +64,7 @@ public class PaymentService {
 
     public Mono<VnPayTransactionInfo> getVnPayTransactionInfo(Integer bookingId) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/vnpay").queryParam("bookingId").build(bookingId))
+                .uri(uriBuilder -> uriBuilder.path("/vnpay").queryParam("bookingId", bookingId).build())
                 .retrieve()
                 .toEntity(VnPayTransactionInfo.class)
                 .map(HttpEntity::getBody)
