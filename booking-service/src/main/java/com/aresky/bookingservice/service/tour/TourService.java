@@ -23,7 +23,7 @@ public class TourService {
 
     @PostConstruct
     private void initWebClient() {
-        String tourURL = "http://localhost:8083/api/v1/tours";
+        String tourURL = "http://tour-service:8083/api/v1/tours";
         this.webClient = WebClient.builder().baseUrl(tourURL).build();
     }
 

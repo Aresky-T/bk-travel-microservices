@@ -21,7 +21,7 @@ public class AccountService {
 
     @PostConstruct
     private void initWebClient() {
-        String accountURL = "http://localhost:8082/api/v1/accounts";
+        String accountURL = "http://account-service:8082/api/v1/accounts";
         this.webClient = WebClient.builder().baseUrl(accountURL).build();
     }
 
