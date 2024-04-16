@@ -21,7 +21,8 @@ public class RouterConfig {
                 Route accountRoute = routes.getRoute("account-service");
                 Route tourRoute = routes.getRoute("tour-service");
                 Route bookingService = routes.getRoute("booking-service");
-                Route touristAttractionService = routes.getRoute("tourist-attraction-service");
+                // Route touristAttractionService =
+                // routes.getRoute("tourist-attraction-service");
                 Route staffService = routes.getRoute("staff-service");
 
                 return builder.routes()
@@ -37,9 +38,9 @@ public class RouterConfig {
                                 .route(bookingService.getId(), r -> r
                                                 .path(bookingService.getPaths())
                                                 .uri(bookingService.getUri()))
-                                .route(touristAttractionService.getId(), r -> r
-                                                .path(touristAttractionService.getPaths())
-                                                .uri(touristAttractionService.getUri()))
+                                // .route(touristAttractionService.getId(), r -> r
+                                // .path(touristAttractionService.getPaths())
+                                // .uri(touristAttractionService.getUri()))
                                 .route(staffService.getId(), r -> r
                                                 .path(staffService.getPaths())
                                                 .uri(staffService.getUri()))
