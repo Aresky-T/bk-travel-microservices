@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table blog" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table blog already exist!">
+            <not>
+                <tableExists tableName="blog" />
+            </not>
+        </preConditions>
+        <createTable tableName="blog" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="tourist_attraction_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="image_url" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="intro" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="author" type="VARCHAR(50)" defaultValue="BK TRAVEL">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql> ALTER TABLE `blog` ADD CONSTRAINT fk_tourist_attraction_id FOREIGN KEY
+            (tourist_attraction_id) REFERENCES `tourist_attraction`(id) ON DELETE CASCADE; </sql>
+    </changeSet>
+    <changeSet id="Create table blog_item" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table blog_item already exist!">
+            <not>
+                <tableExists tableName="blog_item" />
+            </not>
+        </preConditions>
+        <createTable tableName="blog_item" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="blog_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sub_title" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="image_url" type="VARCHAR(255)" />
+        </createTable>
+        <sql> ALTER TABLE `blog_item` ADD CONSTRAINT fk_blog_id FOREIGN KEY (blog_id) REFERENCES
+            `blog`(id) ON DELETE CASCADE;</sql>
+    </changeSet>
+</databaseChangeLog>
