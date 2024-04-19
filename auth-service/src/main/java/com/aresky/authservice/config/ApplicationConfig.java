@@ -13,7 +13,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
 
@@ -24,16 +23,6 @@ public class ApplicationConfig implements WebFluxConfigurer {
     @Override
     public void configureArgumentResolvers(@NonNull ArgumentResolverConfigurer configurer) {
         configurer.addCustomResolver(new ReactivePageableHandlerMethodArgumentResolver());
-    }
-
-    @Override
-    public void addCorsMappings(@NonNull CorsRegistry registry) {
-        registry
-                .addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("POST", "PUT", "PATCH", "GET", "OPTIONS", "DELETE")
-                .allowedHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Key", "Authorization")
-                .maxAge(3600L);
     }
 
     @Bean
