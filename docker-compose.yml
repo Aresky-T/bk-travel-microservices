@@ -145,6 +145,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  tourist-attraction-service:
+    image: tourist-attraction-service-image:v1.0.0
+    container_name: tourist-attraction-service
+    depends_on:
+      - mysql-server
+    ports:
+      - 8086:8086
+    build:
+      context: ./tourist-attraction-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./tourist-attraction-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
