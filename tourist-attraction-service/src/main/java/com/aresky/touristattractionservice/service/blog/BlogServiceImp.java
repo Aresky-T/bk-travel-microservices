@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -100,8 +99,7 @@ public class BlogServiceImp implements IBlogService {
     @Override
     public Page<BlogResponse> findAllBlogResponses(Pageable pageable) {
         Page<Blog> blogs = blogRepository.findAll(pageable);
-        List<BlogResponse> dtos = blogs.stream().map(BlogResponse::toDto).toList();
-        return new PageImpl<>(dtos, pageable, dtos.size());
+        return blogs.map(BlogResponse::toDto);
     }
 
     @Override
