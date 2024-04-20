@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +38,7 @@ public class TouristAttractionServiceImp implements ITouristAttractionService {
     @Override
     public Page<TouristAttractionResponse> findAll(Pageable pageable) {
         Page<TouristAttraction> entities = touristAttractionRepository.findAll(pageable);
-        List<TouristAttractionResponse> dtos = entities.stream().map(TouristAttractionResponse::toDto).toList();
-        return new PageImpl<>(dtos, pageable, dtos.size());
+        return entities.map(TouristAttractionResponse::toDto);
     }
 
     @Override
