@@ -14,6 +14,7 @@ import com.aresky.touristattractionservice.dto.request.FieldRequest;
 import com.aresky.touristattractionservice.dto.request.SearchRequest;
 import com.aresky.touristattractionservice.dto.request.TouristAttractionCreateForm;
 import com.aresky.touristattractionservice.dto.request.TouristAttractionUpdateForm;
+import com.aresky.touristattractionservice.dto.response.TouristAttractionDetails;
 import com.aresky.touristattractionservice.dto.response.TouristAttractionResponse;
 import com.aresky.touristattractionservice.entity.TouristAttraction;
 import com.aresky.touristattractionservice.exception.TouristAttractionException;
@@ -56,13 +57,13 @@ public class TouristAttractionServiceImp implements ITouristAttractionService {
     }
 
     @Override
-    public TouristAttractionResponse findById(Integer id) {
-        return touristAttractionRepository.findById(id).map(TouristAttractionResponse::toDto).orElse(null);
+    public TouristAttractionDetails findById(Integer id) {
+        return touristAttractionRepository.findById(id).map(TouristAttractionDetails::toDto).orElse(null);
     }
 
     @Override
-    public TouristAttractionResponse findByName(String name) {
-        return touristAttractionRepository.findByName(name).map(TouristAttractionResponse::toDto).orElse(null);
+    public TouristAttractionDetails findByName(String name) {
+        return touristAttractionRepository.findByName(name).map(TouristAttractionDetails::toDto).orElse(null);
     }
 
     @Transactional
@@ -71,6 +72,7 @@ public class TouristAttractionServiceImp implements ITouristAttractionService {
         checkIsExist(id);
         String newName = form.getName().trim();
         String newImageUrl = form.getImageUrl().trim();
+        String newIntroduction = form.getIntroduction();
 
         Optional<TouristAttraction> optional1 = touristAttractionRepository.findById(id);
 
@@ -80,7 +82,7 @@ public class TouristAttractionServiceImp implements ITouristAttractionService {
 
         TouristAttraction ta1 = optional1.get();
 
-        if (ta1.getName().equals(newName) && ta1.getImageUrl().equals(newImageUrl)) {
+        if (ta1.getName().equals(newName) && ta1.getImageUrl().equals(newImageUrl) && ta1.getIntroduction().equals(newIntroduction)) {
             throw new TouristAttractionException("Không có giá trị nào bị thay đổi!");
         }
 
@@ -92,6 +94,7 @@ public class TouristAttractionServiceImp implements ITouristAttractionService {
 
         ta1.setName(newName);
         ta1.setImageUrl(newImageUrl);
+        ta1.setIntroduction(newIntroduction);
         return TouristAttractionResponse.toDto(touristAttractionRepository.save(ta1));
     }
 
