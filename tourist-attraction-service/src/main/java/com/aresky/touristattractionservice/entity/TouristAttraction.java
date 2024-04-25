@@ -31,11 +31,20 @@ public class TouristAttraction implements Serializable {
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
+    @Column(name = "introduction", nullable = false)
+    private String introduction;
+
     @OneToMany(mappedBy = "touristAttraction", fetch = FetchType.LAZY)
     private List<Blog> blogs;
 
     public TouristAttraction(String name, String imageUrl) {
         this.name = name;
         this.imageUrl = imageUrl;
+    }
+
+    public TouristAttraction(String name, String imageUrl, String introduction) {
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.introduction = introduction;
     }
 }

@@ -42,4 +42,11 @@ public class BlogItem implements Serializable {
         this.imageUrl = imageUrl;
         this.content = content;
     }
+
+    public BlogItem(Integer id, String subTitle, String imageUrl, String content) {
+        this.id = id;
+        this.subTitle = subTitle;
+        this.imageUrl = imageUrl;
+        this.content = content;
+    }
 }

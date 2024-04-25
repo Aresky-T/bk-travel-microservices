@@ -9,6 +9,7 @@ import com.aresky.touristattractionservice.dto.request.FieldRequest;
 import com.aresky.touristattractionservice.dto.request.SearchRequest;
 import com.aresky.touristattractionservice.dto.request.TouristAttractionCreateForm;
 import com.aresky.touristattractionservice.dto.request.TouristAttractionUpdateForm;
+import com.aresky.touristattractionservice.dto.response.TouristAttractionDetails;
 import com.aresky.touristattractionservice.dto.response.TouristAttractionResponse;
 
 public interface ITouristAttractionService {
@@ -18,9 +19,9 @@ public interface ITouristAttractionService {
 
     List<TouristAttractionResponse> findAll(SearchRequest searchRequest);
 
-    TouristAttractionResponse findById(Integer id);
+    TouristAttractionDetails findById(Integer id);
 
-    TouristAttractionResponse findByName(String name);
+    TouristAttractionDetails findByName(String name);
 
     TouristAttractionResponse update(Integer id, TouristAttractionUpdateForm form);
 

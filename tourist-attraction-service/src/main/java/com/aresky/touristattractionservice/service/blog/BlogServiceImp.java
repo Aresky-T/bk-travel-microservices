@@ -118,13 +118,25 @@ public class BlogServiceImp implements IBlogService {
     @Transactional
     @Override
     public BlogUpdatedResponse updateBlog(Integer blogId, BlogUpdateForm form) {
+
         Blog blog = findBlogEntity(blogId);
+        List<BlogItem> items = form.getItems().stream().map(dto -> {
+            BlogItem item = BlogUpdateForm.ItemDTO.toBlogItem(dto);
+            item.setBlog(blog);
+            return item;
+        }).toList();
+
         Field[] formFields = FieldUtils.findFields(form);
         FieldUtils.checkFieldsNotNullOrNotEmpty(formFields);
 
         for (Field dtoField : formFields) {
             dtoField.setAccessible(true);
             String fieldName = dtoField.getName();
+
+            if (fieldName == "items") {
+                continue;
+            }
+
             Object newValue = FieldUtils.findFieldValue(form, dtoField);
 
             // check field in Blog
@@ -139,6 +151,7 @@ public class BlogServiceImp implements IBlogService {
         }
 
         Blog updatedBlog = blogRepository.save(blog);
+        blogItemRepository.saveAll(items);
         return BlogUpdatedResponse.toDto(updatedBlog);
     }
 

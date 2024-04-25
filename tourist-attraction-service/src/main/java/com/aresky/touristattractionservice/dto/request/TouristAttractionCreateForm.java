@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 public class TouristAttractionCreateForm {
     private String name;
     private String imageUrl;
+    private String introduction;
 
     public TouristAttraction toEntity() {
-        return new TouristAttraction(this.name, this.imageUrl);
+        return new TouristAttraction(this.name, this.imageUrl, this.introduction);
     }
 }

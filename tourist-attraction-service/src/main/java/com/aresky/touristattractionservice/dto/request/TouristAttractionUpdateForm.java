@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class TouristAttractionUpdateForm {
     private String name;
     private String imageUrl;
+    private String introduction;
 }
