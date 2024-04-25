@@ -24,4 +24,18 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="Add column introduction to table tourist_attraction" author="Aresky"
+        runAlways="true">
+        <preConditions onFail="CONTINUE"
+            onFailMessage="Column introduction of table tourist_attraction already exist!">
+            <not>
+                <columnExists tableName="tourist_attraction" columnName="introduction" />
+            </not>
+        </preConditions>
+        <addColumn tableName="tourist_attraction">
+            <column name="introduction" type="VARCHAR(1000)" defaultValue="">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
