@@ -30,6 +30,9 @@ public class Booking {
     @Column("sub_tour_id")
     private Integer subTourId;
 
+    @Column("tour_code")
+    private String tourCode;
+
     @Column("full_name")
     private String fullName;
 

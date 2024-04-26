@@ -13,9 +13,8 @@ import com.aresky.bookingservice.service.booking.IBookingService;
 
 import reactor.core.publisher.Mono;
 
-@CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/booking")
+@RequestMapping("/api/v1/bookings")
 public class BookingController {
 
     @Autowired
