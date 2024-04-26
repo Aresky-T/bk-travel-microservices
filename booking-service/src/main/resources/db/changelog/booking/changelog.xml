@@ -67,4 +67,16 @@
         <sql>ALTER TABLE booking ADD CONSTRAINT ck_baby_number CHECK (baby_number >= 0); ALTER TABLE
             booking ADD CONSTRAINT ck_amount CHECK (amount > 0);</sql>
     </changeSet>
+    <changeSet id="Add column tour_code for table booking" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column tour_code already exist!">
+            <not>
+                <columnExists tableName="booking" columnName="tour_code" />
+            </not>
+        </preConditions>
+        <addColumn tableName="booking">
+            <column name="tour_code" type="VARCHAR(100)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

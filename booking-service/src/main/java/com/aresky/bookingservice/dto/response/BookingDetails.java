@@ -20,6 +20,7 @@ public class BookingDetails {
     private Integer accountId;
     private Integer tourId;
     private Integer subTourId;
+    private String tourCode;
     private String fullName;
     private String email;
     private String phone;
@@ -42,6 +43,7 @@ public class BookingDetails {
                 .accountId(booking.getAccountId())
                 .tourId(booking.getTourId())
                 .subTourId(booking.getSubTourId())
+                .tourCode(booking.getTourCode())
                 .fullName(booking.getFullName())
                 .email(booking.getEmail())
                 .address(booking.getAddress())
