@@ -1,7 +1,7 @@
 package com.aresky.accountservice.model;
 
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -34,7 +34,7 @@ public class Profile implements Serializable {
     private String phone;
 
     @Column("date_of_birth")
-    private ZonedDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column("gender")
     private EGender gender;
