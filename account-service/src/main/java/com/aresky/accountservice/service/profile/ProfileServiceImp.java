@@ -1,15 +1,14 @@
 package com.aresky.accountservice.service.profile;
 
 import java.lang.reflect.Field;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
 
 import com.aresky.accountservice.dto.request.ProfileUpdateForm;
 import com.aresky.accountservice.dto.response.ProfileResponse;
@@ -19,6 +18,7 @@ import com.aresky.accountservice.model.EGender;
 import com.aresky.accountservice.model.Profile;
 import com.aresky.accountservice.repository.AccountRepository;
 import com.aresky.accountservice.repository.ProfileRepository;
+import com.aresky.accountservice.utils.FieldUtils;
 
 import reactor.core.publisher.Mono;
 
@@ -68,7 +68,7 @@ public class ProfileServiceImp implements IProfileService {
                             profile.setGender(form.getGender());
 
                             Date dateOfBirth = form.getDateOfBirth();
-                            profile.setDateOfBirth(dateOfBirth.toInstant().atZone(ZoneId.systemDefault()));
+                            profile.setDateOfBirth(new java.sql.Date(dateOfBirth.getTime()).toLocalDate());
 
                             return profileRepository.save(profile)
                                     .map(updatedProfile -> ProfileResponse.toDTO(updatedProfile, account));
@@ -81,19 +81,13 @@ public class ProfileServiceImp implements IProfileService {
         return accountRepository.findById(accountId)
                 .flatMap(account -> profileRepository.findByAccountId(accountId)
                         .flatMap(profile -> {
-                            fields.forEach((key, value) -> {
-                                Field field = ReflectionUtils.findField(Profile.class, key);
-                                if (Objects.isNull(field)) {
-                                    throw new AccountException("Field not found: " + "[" + key + "]");
-                                }
+                            for (Entry<String, Object> entry : fields.entrySet()) {
+                                String fieldName = entry.getKey();
+                                Object fieldValue = entry.getValue();
 
-                                if (key.equalsIgnoreCase("gender")) {
-                                    value = convertToERole(String.valueOf(value));
-                                }
-
-                                ReflectionUtils.makeAccessible(field);
-                                ReflectionUtils.setField(field, profile, value);
-                            });
+                                Field field = FieldUtils.findField(profile, fieldName);
+                                FieldUtils.setFieldValue(profile, field, fieldValue);
+                            }
 
                             return profileRepository.save(profile)
                                     .map(updatedProfile -> ProfileResponse.toDTO(updatedProfile, account));
@@ -113,6 +107,7 @@ public class ProfileServiceImp implements IProfileService {
                 .switchIfEmpty(Mono.error(new AccountException("Account does not exist!")));
     }
 
+    @SuppressWarnings("unused")
     private EGender convertToERole(String gender) {
         switch (gender) {
             case "MALE":
