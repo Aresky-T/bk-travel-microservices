@@ -1,13 +1,13 @@
 package com.aresky.accountservice.delivery.grpc;
 
 import com.aresky.accountservice.exception.AccountGrpcException;
-import com.aresky.accountservice.grpc.account.*;
 import com.aresky.accountservice.interceptors.AccountGrpcInterceptor;
 import com.aresky.accountservice.mappers.AccountGrpcMapper;
 import com.aresky.accountservice.model.Account;
 import com.aresky.accountservice.model.Profile;
 import com.aresky.accountservice.repository.AccountRepository;
 import com.aresky.accountservice.repository.ProfileRepository;
+import grpc.account.*;
 import io.grpc.Status;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
