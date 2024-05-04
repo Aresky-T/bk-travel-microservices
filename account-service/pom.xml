@@ -19,8 +19,11 @@
 		<spring-cloud.version>2023.0.0</spring-cloud.version>
 		<liquibase-version>4.26.0</liquibase-version>
 		<jwt-version>0.11.1</jwt-version>
+		<grpc.version>1.63.0</grpc.version>
+		<reactive.grpc.version>1.2.4</reactive.grpc.version>
 	</properties>
 	<dependencies>
+		<!-- for spring web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
@@ -70,6 +73,8 @@
 			<artifactId>liquibase-maven-plugin</artifactId>
 			<version>${liquibase-version}</version>
 		</dependency>
+
+		<!-- for jwt -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -92,6 +97,8 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.1</version>
 		</dependency>
+
+		<!-- for swagger ui -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -102,6 +109,47 @@
 			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
 			<version>2.3.0</version>
 		</dependency>
+
+		<!-- For gRPC -->
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-server-spring-boot-starter</artifactId>
+			<version>3.1.0.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.salesforce.servicelibs</groupId>
+			<artifactId>reactor-grpc-stub</artifactId>
+			<version>${reactive.grpc.version}</version>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>io.grpc</groupId>-->
+<!--			<artifactId>grpc-netty</artifactId>-->
+<!--			<version>${grpc.version}</version>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-stub</artifactId>
+			<version>${grpc.version}</version>
+		</dependency>
+		<dependency> <!-- necessary for Java 9+ -->
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>annotations-api</artifactId>
+			<version>6.0.53</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java-util</artifactId>
+			<version>3.21.7</version>
+		</dependency>
+
+		<!-- for test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -126,6 +174,13 @@
 	</dependencyManagement>
 
 	<build>
+		<!--		<extensions>-->
+		<!--			<extension>-->
+		<!--				<groupId>kr.motd.maven</groupId>-->
+		<!--				<artifactId>os-maven-plugin</artifactId>-->
+		<!--				<version>1.7.1</version>-->
+		<!--			</extension>-->
+		<!--		</extensions>-->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -139,6 +194,44 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<!--			<plugin>-->
+			<!--				<groupId>org.xolstice.maven.plugins</groupId>-->
+			<!--				<artifactId>protobuf-maven-plugin</artifactId>-->
+			<!--				<version>0.6.1</version>-->
+			<!--				<configuration>-->
+			<!--
+			<protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>-->
+			<!--					<pluginId>grpc-java</pluginId>-->
+			<!--					<pluginArtifact>-->
+			<!--
+			io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>-->
+			<!--					<protoSourceRoot>-->
+			<!--						${basedir}/src/main/proto-->
+			<!--					</protoSourceRoot>-->
+			<!--					<additionalProtoPathElements>-->
+			<!--						${basedir}/src/main/resources-->
+			<!--					</additionalProtoPathElements>-->
+			<!--				</configuration>-->
+			<!--				<executions>-->
+			<!--					<execution>-->
+			<!--						<goals>-->
+			<!--							<goal>compile</goal>-->
+			<!--							<goal>compile-custom</goal>-->
+			<!--						</goals>-->
+			<!--						<configuration>-->
+			<!--							<protocPlugins>-->
+			<!--								<protocPlugin>-->
+			<!--									<id>reactor-grpc</id>-->
+			<!--									<groupId>com.salesforce.servicelibs</groupId>-->
+			<!--									<artifactId>reactor-grpc</artifactId>-->
+			<!--									<version>${reactive.grpc.version}</version>-->
+			<!--									<mainClass>com.salesforce.reactorgrpc.ReactorGrpcGenerator</mainClass>-->
+			<!--								</protocPlugin>-->
+			<!--							</protocPlugins>-->
+			<!--						</configuration>-->
+			<!--					</execution>-->
+			<!--				</executions>-->
+			<!--			</plugin>-->
 		</plugins>
 	</build>
 
