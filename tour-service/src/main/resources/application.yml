@@ -46,3 +46,9 @@ bk-travel:
         url: r2dbc:mysql://mysql-server:3306/bk_travel_tour
         username: root
         password: root
+# ---------------
+# gRPC config
+# ---------------
+grpc:
+  server:
+    port: 50083
