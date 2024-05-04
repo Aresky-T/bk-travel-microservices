@@ -26,6 +26,7 @@ spring:
 eureka:
   instance:
     hostname: localhost
+    appname: account-service
   server:
     hostname: discovery-server
     port: 8761
@@ -37,3 +38,6 @@ mysql-server:
   user: root
   password: root
   port: 3306
+grpc:
+  server:
+    port: 50082
