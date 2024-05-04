@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option java_multiple_files=true;
-option java_package="com.aresky.accountservice.grpc.account";
+option java_package="grpc.account";
 
 service AccountService {
     rpc createAccount(CreateAccountRequest) returns (CreateAccountResponse);

@@ -1,7 +1,7 @@
 package com.aresky.accountservice.mappers;
 
-import com.aresky.accountservice.grpc.account.AccountResponse;
-import com.aresky.accountservice.grpc.account.CreateAccountRequest;
+import grpc.account.AccountResponse;
+import grpc.account.CreateAccountRequest;
 import com.aresky.accountservice.model.Account;
 
 import java.time.format.DateTimeFormatter;

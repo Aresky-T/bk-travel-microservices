@@ -1,6 +1,5 @@
-package com.aresky.accountservice.grpc.account;
+package grpc.account;
 
-import static com.aresky.accountservice.grpc.account.AccountServiceGrpc.getServiceDescriptor;
 import static io.grpc.stub.ServerCalls.asyncUnaryCall;
 
 @javax.annotation.Generated(value = "by ReactorGrpc generator", comments = "Source: account-service.proto")
@@ -118,24 +117,24 @@ public final class ReactorAccountServiceGrpc {
 
         @Override
         public final io.grpc.ServerServiceDefinition bindService() {
-            return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
+            return io.grpc.ServerServiceDefinition.builder(AccountServiceGrpc.getServiceDescriptor())
                     .addMethod(
-                            com.aresky.accountservice.grpc.account.AccountServiceGrpc.getCreateAccountMethod(),
+                            AccountServiceGrpc.getCreateAccountMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<CreateAccountRequest, CreateAccountResponse>(
                                             this, METHODID_CREATE_ACCOUNT)))
                     .addMethod(
-                            com.aresky.accountservice.grpc.account.AccountServiceGrpc.getExistAccountByIdMethod(),
+                            AccountServiceGrpc.getExistAccountByIdMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<AccountIdRequest, ExistAccountResponse>(
                                             this, METHODID_EXIST_ACCOUNT_BY_ID)))
                     .addMethod(
-                            com.aresky.accountservice.grpc.account.AccountServiceGrpc.getGetAccountByIdMethod(),
+                            AccountServiceGrpc.getGetAccountByIdMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<AccountIdRequest, AccountResponse>(
                                             this, METHODID_GET_ACCOUNT_BY_ID)))
                     .addMethod(
-                            com.aresky.accountservice.grpc.account.AccountServiceGrpc.getGetAccountByUsernameMethod(),
+                            AccountServiceGrpc.getGetAccountByUsernameMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<AccountUsernameRequest, AccountResponse>(
                                             this, METHODID_GET_ACCOUNT_BY_USERNAME)))

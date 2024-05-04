@@ -2,7 +2,7 @@
 // source: account-service.proto
 
 // Protobuf Java Version: 3.25.1
-package com.aresky.accountservice.grpc.account;
+package grpc.account;
 
 public interface AccountResponseOrBuilder extends
     // @@protoc_insertion_point(interface_extends:AccountResponse)

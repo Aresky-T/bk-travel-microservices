@@ -1,4 +1,4 @@
-package com.aresky.accountservice.grpc.account;
+package grpc.account;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
 

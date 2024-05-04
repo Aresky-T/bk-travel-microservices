@@ -1,8 +1,8 @@
 package com.aresky.accountservice;
 
-import com.aresky.accountservice.grpc.account.CreateAccountRequest;
-import com.aresky.accountservice.grpc.account.CreateAccountResponse;
-import com.aresky.accountservice.grpc.account.ReactorAccountServiceGrpc;
+import grpc.account.CreateAccountRequest;
+import grpc.account.CreateAccountResponse;
+import grpc.account.ReactorAccountServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.junit.jupiter.api.BeforeAll;
