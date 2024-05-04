@@ -1,4 +1,4 @@
-package com.aresky.accountservice.controller;
+package com.aresky.accountservice.delivery.http;
 
 import com.aresky.accountservice.dto.request.ProfileUpdateForm;
 import com.aresky.accountservice.dto.request.SignupForm;
