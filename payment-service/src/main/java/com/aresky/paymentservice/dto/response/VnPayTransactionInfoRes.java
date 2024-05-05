@@ -1,7 +1,6 @@
-package com.aresky.paymentservice.dto;
+package com.aresky.paymentservice.dto.response;
 
-import com.aresky.paymentservice.model.VnPayPaymentInfo;
-
+import com.aresky.paymentservice.model.VnPayTransactionInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class VnPayTransactionInfo {
+public class VnPayTransactionInfoRes {
     private String bank;
     private String cardType;
     private String orderInfo;
@@ -20,8 +19,8 @@ public class VnPayTransactionInfo {
     private String txnRef;
     private String amount;
 
-    public static VnPayTransactionInfo toDTO(VnPayPaymentInfo info) {
-        return VnPayTransactionInfo.builder()
+    public static VnPayTransactionInfoRes toDTO(VnPayTransactionInfo info) {
+        return VnPayTransactionInfoRes.builder()
                 .bank(info.getBank())
                 .cardType(info.getCardType())
                 .orderInfo(info.getOrderInfo())
