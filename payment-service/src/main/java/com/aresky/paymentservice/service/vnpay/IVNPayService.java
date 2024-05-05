@@ -1,18 +1,18 @@
 package com.aresky.paymentservice.service.vnpay;
 
-import com.aresky.paymentservice.dto.PaymentRequest;
-import com.aresky.paymentservice.dto.VnPayReturn;
-import com.aresky.paymentservice.dto.VnPayTransactionInfo;
+import com.aresky.paymentservice.dto.request.BookingInfoReq;
+import com.aresky.paymentservice.dto.request.VnPayPaymentResult;
+import com.aresky.paymentservice.dto.response.VnPayTransactionInfoRes;
 import com.aresky.paymentservice.model.EPaymentStatus;
 import com.aresky.paymentservice.model.Session;
 
 public interface IVNPayService {
 
-    String createOrder(PaymentRequest info);
+    String createOrder(BookingInfoReq info);
 
-    EPaymentStatus orderReturn(VnPayReturn request);
+    EPaymentStatus orderReturn(VnPayPaymentResult request);
 
-    VnPayTransactionInfo getVnPayTransactionInfo(Integer bookingId);
+    VnPayTransactionInfoRes getVnPayTransactionInfo(Integer bookingId);
 
     Session openSession(Integer bookingId);
 
