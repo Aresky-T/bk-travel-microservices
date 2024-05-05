@@ -1,11 +1,15 @@
-package com.aresky.paymentservice.dto;
+package com.aresky.paymentservice.dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
-public class PaymentRequest {
+@AllArgsConstructor
+public class BookingInfoReq {
     private Integer bookingId;
     private String tourCode;
     private Integer amount;

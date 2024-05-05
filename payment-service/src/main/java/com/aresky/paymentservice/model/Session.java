@@ -12,7 +12,7 @@ public class Session {
     private String title;
     private Integer bookingId;
     private Instant expiration;
-    private Object paymentInfo;
+    private Object bookingInfo;
 
     public Session(Integer bookingId) {
         this.bookingId = bookingId;

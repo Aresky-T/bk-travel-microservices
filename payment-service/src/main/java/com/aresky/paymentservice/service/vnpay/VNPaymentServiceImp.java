@@ -17,18 +17,18 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.aresky.paymentservice.dto.request.BookingInfoReq;
+import com.aresky.paymentservice.dto.request.VnPayPaymentResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aresky.paymentservice.config.VNPayConfig;
-import com.aresky.paymentservice.dto.PaymentRequest;
-import com.aresky.paymentservice.dto.VnPayReturn;
-import com.aresky.paymentservice.dto.VnPayTransactionInfo;
+import com.aresky.paymentservice.dto.response.VnPayTransactionInfoRes;
 import com.aresky.paymentservice.exception.PaymentException;
 import com.aresky.paymentservice.model.EPaymentStatus;
 import com.aresky.paymentservice.model.Session;
 import com.aresky.paymentservice.model.SessionManager;
-import com.aresky.paymentservice.model.VnPayPaymentInfo;
+import com.aresky.paymentservice.model.VnPayTransactionInfo;
 import com.aresky.paymentservice.repository.VnPayRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,25 +43,25 @@ public class VNPaymentServiceImp implements IVNPayService {
     private VnPayRepository vnPayRepository;
 
     @Override
-    public String createOrder(PaymentRequest info) {
+    public String createOrder(BookingInfoReq info) {
         Session session = openSession(info.getBookingId());
 
         if (session == null) {
             throw new PaymentException("Không thể tạo phiên thanh toán!");
         }
 
-        session.setPaymentInfo(info);
+        session.setBookingInfo(info);
 
         Integer amount = Optional.ofNullable(info)
-                .map(PaymentRequest::getAmount)
+                .map(BookingInfoReq::getAmount)
                 .orElseGet(() -> {
-                    PaymentRequest paymentInfo = (PaymentRequest) session.getPaymentInfo();
+                    BookingInfoReq bookingInfo = (BookingInfoReq) session.getBookingInfo();
 
-                    if (Objects.isNull(paymentInfo)) {
+                    if (Objects.isNull(bookingInfo)) {
                         throw new PaymentException("Yêu cầu các thông tin về khách hàng trước khi tiếp tục!");
                     }
 
-                    return paymentInfo.getAmount();
+                    return bookingInfo.getAmount();
                 });
 
         // String baseUrl = request.getScheme() + "://" + request.getServerName() + ":"
@@ -75,9 +75,9 @@ public class VNPaymentServiceImp implements IVNPayService {
     }
 
     @Override
-    public EPaymentStatus orderReturn(VnPayReturn vnPayReturn) {
-        String vnp_ResponseCode = vnPayReturn.getResponseCode();
-        Integer bookingId = vnPayReturn.getBookingId();
+    public EPaymentStatus orderReturn(VnPayPaymentResult result) {
+        String vnp_ResponseCode = result.getResponseCode();
+        Integer bookingId = result.getBookingId();
         closeSession(bookingId);
 
         if ("24".equals(vnp_ResponseCode)) {
@@ -85,25 +85,25 @@ public class VNPaymentServiceImp implements IVNPayService {
         }
 
         if ("00".equals(vnp_ResponseCode)) {
-            String vnp_BankCode = vnPayReturn.getBank();
-            String vnp_CardType = vnPayReturn.getCardType();
-            String vnp_OrderInfo = vnPayReturn.getOrderInfo().replace("+", " ");
-            String vnp_PayDate = vnPayReturn.getPayDate();
-            String vnp_TxnRef = vnPayReturn.getTxnRef();
-            String vnp_Amount = vnPayReturn.getAmount();
-            String vnp_TransactionNo = vnPayReturn.getTransactionNo();
+            String vnp_BankCode = result.getBank();
+            String vnp_CardType = result.getCardType();
+            String vnp_OrderInfo = result.getOrderInfo().replace("+", " ");
+            String vnp_PayDate = result.getPayDate();
+            String vnp_TxnRef = result.getTxnRef();
+            String vnp_Amount = result.getAmount();
+            String vnp_TransactionNo = result.getTransactionNo();
 
-            VnPayPaymentInfo vnPayPaymentInfo = new VnPayPaymentInfo();
-            vnPayPaymentInfo.setBookingId(bookingId);
-            vnPayPaymentInfo.setBank(vnp_BankCode);
-            vnPayPaymentInfo.setCardType(vnp_CardType);
-            vnPayPaymentInfo.setOrderInfo(vnp_OrderInfo);
-            vnPayPaymentInfo.setPayDate(vnp_PayDate);
-            vnPayPaymentInfo.setTransactionNo(vnp_TransactionNo);
-            vnPayPaymentInfo.setTxnRef(vnp_TxnRef);
-            vnPayPaymentInfo.setAmount(vnp_Amount);
+            VnPayTransactionInfo info = new VnPayTransactionInfo();
+            info.setBookingId(bookingId);
+            info.setBank(vnp_BankCode);
+            info.setCardType(vnp_CardType);
+            info.setOrderInfo(vnp_OrderInfo);
+            info.setPayDate(vnp_PayDate);
+            info.setTransactionNo(vnp_TransactionNo);
+            info.setTxnRef(vnp_TxnRef);
+            info.setAmount(vnp_Amount);
 
-            vnPayRepository.save(vnPayPaymentInfo);
+            vnPayRepository.save(info);
             return EPaymentStatus.SUCCESS;
         }
 
@@ -111,13 +111,13 @@ public class VNPaymentServiceImp implements IVNPayService {
     }
 
     @Override
-    public VnPayTransactionInfo getVnPayTransactionInfo(Integer bookingId) {
-        Optional<VnPayPaymentInfo> optional = vnPayRepository.findByBookingId(bookingId);
+    public VnPayTransactionInfoRes getVnPayTransactionInfo(Integer bookingId) {
+        Optional<VnPayTransactionInfo> optional = vnPayRepository.findByBookingId(bookingId);
         if (optional.isEmpty()) {
             throw new PaymentException("VNPAY Payment Transaction Info doesn't exist!");
         }
 
-        return VnPayTransactionInfo.toDTO(optional.get());
+        return VnPayTransactionInfoRes.toDTO(optional.get());
     }
 
     @Override
@@ -254,9 +254,9 @@ public class VNPaymentServiceImp implements IVNPayService {
                 fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII.toString());
                 fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.err);
             }
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 fields.put(fieldName, fieldValue);
             }
         }
@@ -287,7 +287,7 @@ public class VNPaymentServiceImp implements IVNPayService {
             boolean checkBookingStatus = paymentStatus.get() == 0; // PaymentStatus = 0 (pending)
 
             if (isExistSession) {
-                PaymentRequest paymentInfo = (PaymentRequest) session.getPaymentInfo();
+                BookingInfoReq paymentInfo = (BookingInfoReq) session.getBookingInfo();
                 int amount = paymentInfo.getAmount();
                 boolean checkAmount = amount == vnp_Amount / 100;
 

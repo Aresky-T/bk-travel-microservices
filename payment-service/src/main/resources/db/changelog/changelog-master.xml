@@ -4,13 +4,13 @@
     xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:pro="http://www.liquibase.org/xml/ns/pro"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd">
-    <changeSet id="Create table vnpay_payment_info" author="Aresky" runAlways="true">
-        <preConditions onFail="CONTINUE" onFailMessage="Table vnpay_payment_info already exist!">
+    <changeSet id="Create table vnpay_transaction_info" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table vnpay_transaction_info already exist!">
             <not>
-                <tableExists tableName="vnpay_payment_info" />
+                <tableExists tableName="vnpay_transaction_info" />
             </not>
         </preConditions>
-        <createTable tableName="vnpay_payment_info" ifNotExists="true">
+        <createTable tableName="vnpay_transaction_info" ifNotExists="true">
             <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false" />
             </column>
