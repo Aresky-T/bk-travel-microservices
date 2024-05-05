@@ -1,5 +1,8 @@
-package com.aresky.paymentservice.controller;
+package com.aresky.paymentservice.delivery.http;
 
+import com.aresky.paymentservice.dto.request.BookingInfoReq;
+import com.aresky.paymentservice.dto.request.VnPayPaymentResult;
+import com.aresky.paymentservice.dto.response.VnPayTransactionInfoRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,9 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.aresky.paymentservice.dto.PaymentRequest;
-import com.aresky.paymentservice.dto.VnPayReturn;
-import com.aresky.paymentservice.dto.VnPayTransactionInfo;
 import com.aresky.paymentservice.model.Session;
 import com.aresky.paymentservice.service.vnpay.IVNPayService;
 
@@ -29,19 +29,19 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay")
-    public ResponseEntity<VnPayTransactionInfo> paymentWithVNPay(@RequestParam Integer bookingId) {
+    public ResponseEntity<VnPayTransactionInfoRes> paymentWithVNPay(@RequestParam Integer bookingId) {
         return ResponseEntity.ok(vnPayService.getVnPayTransactionInfo(bookingId));
     }
 
     @PostMapping("/vnpay")
     public ResponseEntity<String> paymentWithVNPay(
-            @RequestBody PaymentRequest paymentInfo) {
-        String vnpayURL = vnPayService.createOrder(paymentInfo);
+            @RequestBody BookingInfoReq request) {
+        String vnpayURL = vnPayService.createOrder(request);
         return ResponseEntity.ok(vnpayURL);
     }
 
     @PostMapping("/vnpay/return")
-    public ResponseEntity<?> vnPayPaymentReturn(@RequestBody VnPayReturn result) {
+    public ResponseEntity<?> vnPayPaymentReturn(@RequestBody VnPayPaymentResult result) {
         return ResponseEntity.ok(vnPayService.orderReturn(result));
     }
 
