@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.aresky.bookingservice.model.Booking;
 
+import com.aresky.bookingservice.model.Tourist;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,5 +38,9 @@ public class CreateBookingForm {
                 .subTourId(dto.subTourId)
                 .amount(dto.amount)
                 .build();
+    }
+
+    public static List<Tourist> buildTouristList(CreateBookingForm dto) {
+        return dto.touristList.stream().map(TouristRequest::buildTourist).toList();
     }
 }
