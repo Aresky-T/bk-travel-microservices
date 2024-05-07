@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package booking;
+
+import "booking/constants/type.proto";
+
+option java_multiple_files = true;
+option java_package = "grpc.booking";
+
+service BookingService {
+  rpc CheckExistBookingById(BookingIdRequest) returns (ExistBookingResponse){};
+  rpc UpdateBookingAfterPaymentSucceeded(UpdateBookingAfterPaymentRequest) returns (UpdateBookingResponse){};
+  rpc UpdateBookingAfterPaymentFailed(UpdateBookingAfterPaymentRequest) returns (UpdateBookingResponse){};
+  rpc UpdateBookingAfterPaymentCanceled(BookingIdRequest) returns (UpdateBookingResponse){};
+}
+
+message BookingIdRequest {
+  int32 id = 1;
+}
+
+message UpdateBookingAfterPaymentRequest {
+  int32 booking_id = 1;
+  constants.PaymentMethod payment_method = 2;
+}
+
+message ExistBookingResponse {
+  bool is_exists = 1;
+}
+
+message UpdateBookingResponse {
+  string message = 1;
+}

@@ -24,16 +24,6 @@ public class TourGrpcService {
     @PostConstruct
     public void init() {
         channel = ManagedChannelBuilder.forAddress("tour-service", 50083).usePlaintext().build();
-        stub = TourServiceGrpc.newBlockingStub(channel);
-        // System.out.println("************************ Test ***********************");
-        // this.getSubTourById(2)
-        // .filter(value -> value != null)
-        // .subscribe(value -> {
-        // System.out.println("Result: " + value);
-        // }, err -> {
-        // System.out.println("Result empty!");
-        // });
-        // System.out.println("************************ END ***********************");
     }
 
     @PreDestroy
@@ -44,10 +34,11 @@ public class TourGrpcService {
     }
 
     public Mono<SubTourResponse> getSubTourById(int subTourId) {
+        stub = TourServiceGrpc.newBlockingStub(channel);
         SubTourIdRequest request = SubTourIdRequest.newBuilder().setId(subTourId).build();
         Callable<SubTourDetailsResponse> callable = () -> stub.getSubTourById(request);
         return Mono.fromCallable(callable)
-                .onErrorResume(Mono::error)
+                .onErrorResume(err -> Mono.empty())
                 .map(this::convertToSubTourResponse);
     }
 

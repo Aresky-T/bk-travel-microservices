@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package vnpay;
+
+import "payment/constants/type.proto";
+
+option java_multiple_files=true;
+option java_package="grpc.payment.vnpay";
+
+service VnPayService {
+  rpc CreatePayment(BookingInfoRequest) returns (PaymentUrlResponse) {};
+  rpc GetTransactionInfo(BookingIdRequest) returns (TransactionInfoResponse) {};
+  rpc GetPaymentStatusAfterPayment(PaymentResultRequest) returns (PaymentStatusResponse){};
+  rpc OpenSession(BookingIdRequest) returns (OpenSessionResponse){};
+  rpc CloseSession(BookingIdRequest) returns (CloseSessionResponse){};
+}
+
+// Input gRPC message
+message BookingIdRequest {
+  int32 booking_id = 1;
+}
+
+// Input gRPC message
+message BookingInfoRequest {
+  int32 booking_id = 1;
+  string tour_code = 2;
+  int32 amount = 3;
+}
+
+// Input gRPC message
+message PaymentResultRequest {
+  int32 booking_id = 1;
+  string bank = 2;
+  string card_type = 3;
+  string order_info = 4;
+  string pay_date = 5;
+  string transaction_no = 6;
+  string response_code = 7;
+  string txn_ref = 8;
+  string amount = 9;
+}
+
+// Output gRPC message
+message PaymentUrlResponse {
+  string url = 1;
+}
+
+// Output gRPC message
+message PaymentStatusResponse {
+  constants.PaymentStatus status = 1;
+}
+
+// Output gRPC message
+message TransactionInfoResponse {
+  string bank = 1;
+  string card_type = 2;
+  string order_info = 3;
+  string pay_date = 4;
+  string transaction_no = 5;
+  string txn_ref = 6;
+  string amount = 7;
+}
+
+// Output gRPC message
+message SessionResponse {
+  string title = 1;
+  int32 booking_id = 2;
+  string expiration = 3;
+  BookingInfoRequest payment_info = 4;
+}
+
+// Output gRPC message
+message OpenSessionResponse {
+  SessionResponse session = 1;
+}
+
+// Output gRPC message
+message CloseSessionResponse {
+  string message = 1;
+}

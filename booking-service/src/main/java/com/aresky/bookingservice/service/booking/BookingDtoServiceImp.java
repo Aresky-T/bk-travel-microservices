@@ -8,6 +8,8 @@ import com.aresky.bookingservice.dto.response.BookingDetails;
 import com.aresky.bookingservice.model.Tourist;
 import com.aresky.bookingservice.repository.TouristRepository;
 import com.aresky.bookingservice.service.account.AccountGrpcService;
+import com.aresky.bookingservice.service.payment.IVnPayService;
+import grpc.payment.vnpay.BookingInfoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,10 +30,14 @@ import com.aresky.bookingservice.service.tour.TourGrpcService;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class BookingServiceImp implements IBookingService {
+public class BookingDtoServiceImp implements IBookingDtoService {
+
+    @Autowired
+    private IBookingService bookingService;
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -54,52 +60,50 @@ public class BookingServiceImp implements IBookingService {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private IVnPayService vnPayService;
+
     @Transactional
     @Override
     public Mono<String> handleBooking(CreateBookingForm form, EPaymentType type) {
         int accountId = form.getAccountId();
         int subTourId = form.getSubTourId();
 
-        return bookingRepository.existsByAccountIdAndSubTourId(accountId, subTourId)
-                .filter(Boolean.FALSE::equals)
-                .switchIfEmpty(Mono.error(
-                        new BookingException(
-                                "Bạn đã đặt tour này rồi, vui lòng kiểm tra trong hồ sơ của bạn!")))
-                .flatMap(value -> {
-                    if (type == EPaymentType.PAY_LATER) {
-                        return Mono.zip(findSubTour(subTourId), validateAccount(accountId))
-                                .flatMap(tuple -> this
-                                        .create(tuple.getT1(), accountId, form)
-                                        .thenReturn(
-                                                "Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!"));
+        return Mono.zip(existsBy(accountId, subTourId), validateAccount(accountId), findSubTour(subTourId))
+                .flatMap(tuple -> {
+                    boolean existBooking = tuple.getT1();
+
+                    if(existBooking){
+                        return Mono.error(new BookingException(BookingException.BOOKING_ALREADY_EXISTS));
                     }
 
-                    if (type == EPaymentType.VNPAY_ON_WEBSITE) {
-                        return paymentService.connect()
-                                .filter(Boolean.TRUE::equals)
-                                .flatMap(isConnected -> Mono.zip(findSubTour(subTourId),
-                                                validateAccount(accountId))
-                                        .flatMap(tuple -> {
-                                            SubTourResponse subTour = tuple
-                                                    .getT1();
+                    Mono<Booking> createBookingMono = bookingService.createBooking(tuple.getT3(), form)
+                            .switchIfEmpty(Mono.error(new BookingException(BookingException.BOOKING_FAILED)));
 
-                                            return this.create(subTour,
-                                                            accountId, form)
-                                                    .flatMap(booking -> paymentService
-                                                            .getVnPayPaymentURL(
-                                                                    PaymentRequest.createDTO(
-                                                                            booking,
-                                                                            subTour))
-                                                            .onErrorResume(ex -> bookingRepository
-                                                                    .delete(booking)
-                                                                    .then(Mono.error(
-                                                                            ex))));
-                                        }));
+                    if(type.equals(EPaymentType.PAY_LATER)){
+                        return createBookingMono
+                                .map(booking -> "Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!");
                     }
 
-                    return Mono.error(new BookingException(
-                            "Hiện không hỗ trợ hình thức thanh toán này!"));
-                });
+                    if (type.equals(EPaymentType.VNPAY_ON_WEBSITE)){
+                        SubTourResponse subTour = tuple.getT3();
+                        return createBookingMono
+                                .flatMap(booking -> {
+                                    BookingInfoRequest request = BookingInfoRequest.newBuilder()
+                                            .setBookingId(booking.getId())
+                                            .setTourCode(subTour.getTourCode())
+                                            .setAmount(booking.getAmount())
+                                            .build();
+
+                                    return vnPayService.getPaymentURL(request)
+                                            .onErrorResume(ex -> bookingService.delete(booking)
+                                                    .then(Mono.error(new BookingException(BookingException.CREATE_PAYMENT_SESSION_FAILED))));
+                                });
+                    }
+
+                    return Mono.error(new BookingException(BookingException.UNSUPPORTED_PAYMENT_TYPE));
+                })
+                .doOnError(Mono::error);
     }
 
     @Override
@@ -160,16 +164,18 @@ public class BookingServiceImp implements IBookingService {
 
     @Override
     public Mono<Page<BookingResponse>> findAll(Pageable pageable) {
-        return bookingRepository.findAllBy(pageable)
-                .map(BookingResponse::toDTO)
-                .collectList()
-                .map(dtos -> new PageImpl<>(dtos, pageable, dtos.size()));
+        return bookingService.findAllBookings(pageable)
+                .flatMap(bookingPage -> Mono.just(bookingPage.getContent())
+                        .flatMapMany(Flux::fromIterable)
+                        .map(BookingResponse::toDTO)
+                        .collectList()
+                        .map(content -> new PageImpl<>(content, bookingPage.getPageable(), bookingPage.getTotalElements())));
     }
 
     @Override
     public Mono<List<BookingResponse>> findAll(Integer accountId) {
-        return bookingRepository.findAllByAccountId(accountId)
-                .switchIfEmpty(Mono.empty())
+        return bookingService.findAllBookings(accountId)
+                .flatMapMany(Flux::fromIterable)
                 .map(BookingResponse::toDTO)
                 .collectList();
     }
@@ -190,7 +196,7 @@ public class BookingServiceImp implements IBookingService {
 
     @Override
     public Mono<BookingDetails> findOne(Integer bookingId) {
-        return bookingRepository.findById(bookingId)
+        return bookingService.findBookingBy(bookingId)
                 .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId")))
                 .flatMap(booking -> Mono.zip(
                         findSubTour(booking.getSubTourId()),
@@ -200,9 +206,7 @@ public class BookingServiceImp implements IBookingService {
                     return Mono.just(BookingDetails.toDTO(booking, subTour,
                             touristList));
                 }))
-                .onErrorResume(ex -> {
-                    return Mono.error(ex);
-                });
+                .onErrorResume(Mono::error);
     }
 
     @Override
@@ -213,6 +217,11 @@ public class BookingServiceImp implements IBookingService {
                         .flatMap(booking -> findAllTourist(booking.getId())
                                 .map(tourist -> BookingDetails.toDTO(booking,
                                         tuple.getT2(), tourist))));
+    }
+
+    @Override
+    public Mono<Boolean> existsBy(Integer accountId, Integer subTourId) {
+        return bookingService.existsBookingBy(accountId, subTourId);
     }
 
     @Transactional
@@ -230,7 +239,7 @@ public class BookingServiceImp implements IBookingService {
     @Transactional
     @Override
     public Mono<Void> delete(Integer bookingId) {
-        return bookingRepository.existsById(bookingId)
+        return bookingService.existsBookingBy(bookingId)
                 .filter(Boolean.TRUE::equals)
                 .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId!")))
                 .flatMap(isExists -> bookingRepository.deleteById(bookingId)
@@ -238,21 +247,23 @@ public class BookingServiceImp implements IBookingService {
     }
 
     private Mono<List<Tourist>> findAllTourist(Integer bookingId) {
-        return touristRepository.findAllByBookingId(bookingId).switchIfEmpty(Mono.empty()).collectList();
+        return bookingService.findAllTourists(bookingId);
     }
 
     private Mono<Booking> findByAccountIdAndSubTourId(Integer accountId, Integer subTourId) {
-        return bookingRepository.findByAccountIdAndSubTourId(accountId, subTourId)
+        return bookingService.findBookingBy(accountId, subTourId)
                 .switchIfEmpty(Mono.error(new BookingException("This Booking info does not exist!")));
     }
 
     private Mono<Boolean> validateAccount(Integer accountId) {
-        return accountGrpcService.validateAccount(accountId);
+        return accountGrpcService.validateAccount(accountId)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_ACCOUNT_ID)));
     }
 
     private Mono<SubTourResponse> findSubTour(Integer subTourId) {
         return tourGrpcService.getSubTourById(subTourId)
-                .onErrorResume(err -> Mono.error(new BookingException("Tour info was not found!")));
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_SUB_TOUR_ID)));
     }
 
     @Transactional

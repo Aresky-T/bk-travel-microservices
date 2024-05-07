@@ -1,7 +1,8 @@
-package com.aresky.bookingservice.controller;
+package com.aresky.bookingservice.delivery.http;
 
 import com.aresky.bookingservice.dto.request.BookingFilter;
 import com.aresky.bookingservice.dto.request.VnPayReturn;
+import com.aresky.bookingservice.service.booking.IBookingDtoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
 import com.aresky.bookingservice.model.EPaymentType;
-import com.aresky.bookingservice.service.booking.IBookingService;
 
 import reactor.core.publisher.Mono;
 
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 public class BookingController {
 
     @Autowired
-    private IBookingService bookingService;
+    private IBookingDtoService bookingService;
 
     // POST - createBooking(CreateBookingForm form)
     @PostMapping
@@ -28,12 +28,12 @@ public class BookingController {
     }
 
     // POST - createBookingWithPayment(CreateBookingForm form)
-    @PostMapping("/payment/vnpay")
-    public Mono<ResponseEntity<?>> createBookingWithPayment(
-            @RequestParam Integer bookingId) {
-        return bookingService.handlePaymentWithVnPayAfterBooking(bookingId)
-                .map(ResponseEntity::ok);
-    }
+    // @PostMapping("/payment/vnpay")
+    // public Mono<ResponseEntity<?>> createBookingWithPayment(
+    // @RequestParam Integer bookingId) {
+    // return bookingService.handlePaymentWithVnPayAfterBooking(bookingId)
+    // .map(ResponseEntity::ok);
+    // }
 
     @PostMapping("/payment/vnpay-result")
     public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn vnPayReturn) {
@@ -78,6 +78,13 @@ public class BookingController {
             @RequestParam Integer accountId,
             @RequestParam Integer subTourId) {
         return bookingService.findOne(accountId, subTourId).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/check-booked-tour")
+    public Mono<ResponseEntity<Boolean>> getResultOfCheckExistBookingByAccountAndTour(
+            @RequestParam Integer accountId,
+            @RequestParam Integer subTourId) {
+        return bookingService.existsBy(accountId, subTourId).map(ResponseEntity::ok);
     }
 
     // PUT - updateBooking(int bookingId, UpdateBookingForm form)

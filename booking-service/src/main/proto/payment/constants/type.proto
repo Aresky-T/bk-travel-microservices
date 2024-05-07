@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package constants;
+
+option java_multiple_files=true;
+option java_package="grpc.payment.type";
+
+enum PaymentStatus {
+    SUCCESS = 0;
+    FAILED = 1;
+    CANCELED = 2;
+}
