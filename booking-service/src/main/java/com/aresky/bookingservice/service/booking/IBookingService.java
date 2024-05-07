@@ -1,14 +1,8 @@
 package com.aresky.bookingservice.service.booking;
 
-import com.aresky.bookingservice.dto.request.BookingFilter;
-import com.aresky.bookingservice.dto.request.CreateBookingForm;
-import com.aresky.bookingservice.dto.request.UpdateBookingForm;
-import com.aresky.bookingservice.dto.request.VnPayReturn;
-import com.aresky.bookingservice.dto.response.BookingDetails;
-import com.aresky.bookingservice.dto.response.BookingResponse;
-import com.aresky.bookingservice.dto.response.VnPayTransactionInfo;
-import com.aresky.bookingservice.model.EFormOfPayment;
-import com.aresky.bookingservice.model.EPaymentType;
+import com.aresky.bookingservice.dto.request.*;
+import com.aresky.bookingservice.dto.response.SubTourResponse;
+import com.aresky.bookingservice.model.*;
 
 import org.springframework.data.domain.Page;
 import reactor.core.publisher.Mono;
@@ -19,29 +13,22 @@ import java.util.Map;
 import org.springframework.data.domain.Pageable;
 
 public interface IBookingService {
-    Mono<String> handleBooking(CreateBookingForm form, EPaymentType type);
-
-    Mono<String> handleBookingAfterPaymentWithVnPay(VnPayReturn vnPayReturn);
-
-    Mono<String> handlePaymentWithVnPayAfterBooking(Integer bookingId);
-
-    Mono<String> handlePaymentAfterBooking(Integer bookingId, EFormOfPayment formOfPayment);
-
-    Mono<Page<BookingResponse>> findAll(Pageable pageable);
-
-    Mono<List<BookingResponse>> findAll(Integer accountId);
-
-    Mono<Page<BookingResponse>> findAll(Pageable pageable, BookingFilter filter);
-
-    Mono<VnPayTransactionInfo> findVnPayTransactionInfo(Integer bookingId);
-
-    Mono<BookingDetails> findOne(Integer bookingId);
-
-    Mono<BookingDetails> findOne(Integer accountId, Integer subTourId);
-
-    Mono<BookingResponse> update(UpdateBookingForm form);
-
-    Mono<BookingResponse> update(Integer bookingId, Map<String, Object> fields);
-
+    Mono<Page<Booking>> findAllBookings(Pageable pageable);
+    Mono<List<Booking>> findAllBookings(Integer accountId);
+    Mono<Page<Booking>> findAllBookings(Pageable pageable, BookingFilter filter);
+    Mono<Booking> findBookingBy(Integer bookingId);
+    Mono<Booking> findBookingBy(Integer accountId, Integer subTourId);
+    Mono<List<Tourist>> findAllTourists(Integer bookingId);
+    Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form);
+    Mono<Booking> saveBooking(Booking booking);
+    Mono<Booking> update(UpdateBookingForm form);
+    Mono<Booking> update(Integer bookingId, Map<String, Object> fields);
     Mono<Void> delete(Integer bookingId);
+    Mono<Void> delete(Booking booking);
+    Mono<List<Tourist>> setBookingForTouristList(List<Tourist> tourists, Integer bookingId);
+    Mono<Boolean> existsBookingBy(Integer bookingId);
+    Mono<Boolean> existsBookingBy(Integer accountId, Integer subTourId);
+    Mono<Boolean> validateAmount(SubTourResponse subTour, CreateBookingForm form);
+    Mono<Boolean> validateTouristList(CreateBookingForm form);
+    Mono<Integer> calculateTouristNumberByTouristType(List<TouristRequest> tourists, ETouristType type);
 }
