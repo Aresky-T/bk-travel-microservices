@@ -35,6 +35,11 @@ public class BookingServiceProvider implements IBookingService{
     private TouristRepository touristRepository;
 
     @Override
+    public Mono<List<Booking>> findAllBookings() {
+        return bookingRepository.findAll().collectList();
+    }
+
+    @Override
     public Mono<Page<Booking>> findAllBookings(Pageable pageable) {
         return bookingRepository.findAllBy(pageable)
                 .collectList()
@@ -50,6 +55,11 @@ public class BookingServiceProvider implements IBookingService{
     @Override
     public Mono<Page<Booking>> findAllBookings(Pageable pageable, BookingFilter filter) {
         throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+    }
+
+    @Override
+    public Mono<List<Booking>> findAllBookings(EBookingStatus status) {
+        return bookingRepository.findAllByStatus(status).collectList();
     }
 
     @Override

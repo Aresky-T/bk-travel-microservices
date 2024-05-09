@@ -13,9 +13,11 @@ import java.util.Map;
 import org.springframework.data.domain.Pageable;
 
 public interface IBookingService {
+    Mono<List<Booking>> findAllBookings();
     Mono<Page<Booking>> findAllBookings(Pageable pageable);
     Mono<List<Booking>> findAllBookings(Integer accountId);
     Mono<Page<Booking>> findAllBookings(Pageable pageable, BookingFilter filter);
+    Mono<List<Booking>> findAllBookings(EBookingStatus status);
     Mono<Booking> findBookingBy(Integer bookingId);
     Mono<Booking> findBookingBy(Integer accountId, Integer subTourId);
     Mono<List<Tourist>> findAllTourists(Integer bookingId);
