@@ -3,6 +3,7 @@ package com.aresky.paymentservice.delivery.grpc;
 import com.aresky.paymentservice.dto.request.VnPayPaymentResult;
 import com.aresky.paymentservice.dto.response.VnPayTransactionInfoRes;
 import com.aresky.paymentservice.exception.PaymentException;
+import com.aresky.paymentservice.exception.PaymentMessage;
 import com.aresky.paymentservice.grpc.interceptors.VnPayGrpcInterceptor;
 import com.aresky.paymentservice.grpc.mappers.PaymentResultRequestMapper;
 import com.aresky.paymentservice.grpc.mappers.SessionResponseMapper;
@@ -101,17 +102,14 @@ public class VnPayGrpcProvider extends VnPayServiceGrpc.VnPayServiceImplBase {
 
     private String createOrder(int bookingId, int amount, String tourCode){
         if (vnpayService.existsTransactionInfoBy(bookingId)) {
-            throw new PaymentException("Transaction already exist!");
+            throw new PaymentException(PaymentMessage.TRANSACTION_ALREADY_EXISTS);
         }
 
-        Session session = vnpayService.openSession(bookingId);
-
-        if (session == null) {
-            throw new PaymentException("Không thể tạo phiên thanh toán!");
-        }
+        // open new payment session
+        vnpayService.openSession(bookingId);
 
         String urlReturn = "http://localhost:3000/payment" + "?bookingId=" + bookingId;
         String content = "THANH TOAN TOUR " + tourCode;
-        return VnPayUtils.generateVnPayUrl(session, amount, content, urlReturn);
+        return VnPayUtils.generateVnPayUrl(amount, content, urlReturn);
     }
 }
