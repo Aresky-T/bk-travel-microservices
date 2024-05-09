@@ -4,6 +4,8 @@
 // Protobuf Java Version: 3.25.1
 package grpc.booking;
 
+import grpc.booking.constants.PaymentMethod;
+
 public interface UpdateBookingAfterPaymentRequestOrBuilder extends
     // @@protoc_insertion_point(interface_extends:booking.UpdateBookingAfterPaymentRequest)
     com.google.protobuf.MessageOrBuilder {
@@ -23,5 +25,5 @@ public interface UpdateBookingAfterPaymentRequestOrBuilder extends
    * <code>.constants.PaymentMethod payment_method = 2;</code>
    * @return The paymentMethod.
    */
-  grpc.booking.constants.PaymentMethod getPaymentMethod();
+  PaymentMethod getPaymentMethod();
 }
