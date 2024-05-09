@@ -13,7 +13,7 @@ public class BookingGrpcInterceptor implements ServerInterceptor {
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
         MethodDescriptor<ReqT, RespT> method = call.getMethodDescriptor();
-        log.error("Service: {}, method: {}, headers: {}", method.getServiceName(), method.getBareMethodName(), headers.toString());
+        log.error("Service: {}\n, method: {}\n, headers: {}", method.getServiceName(), method.getBareMethodName(), headers.toString());
 
         return next.startCall(new ForwardingServerCall.SimpleForwardingServerCall<ReqT, RespT>(call) {
             @Override

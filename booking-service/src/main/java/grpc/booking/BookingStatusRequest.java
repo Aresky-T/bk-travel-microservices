@@ -4,71 +4,60 @@
 // Protobuf Java Version: 3.25.1
 package grpc.booking;
 
-import grpc.booking.constants.PaymentMethod;
+import grpc.booking.constants.BookingStatus;
 
 /**
- * Protobuf type {@code booking.UpdateBookingAfterPaymentRequest}
+ * Protobuf type {@code booking.BookingStatusRequest}
  */
-public final class UpdateBookingAfterPaymentRequest extends
+public final class BookingStatusRequest extends
     com.google.protobuf.GeneratedMessageV3 implements
-    // @@protoc_insertion_point(message_implements:booking.UpdateBookingAfterPaymentRequest)
-    UpdateBookingAfterPaymentRequestOrBuilder {
+    // @@protoc_insertion_point(message_implements:booking.BookingStatusRequest)
+    BookingStatusRequestOrBuilder {
 private static final long serialVersionUID = 0L;
-  // Use UpdateBookingAfterPaymentRequest.newBuilder() to construct.
-  private UpdateBookingAfterPaymentRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+  // Use BookingStatusRequest.newBuilder() to construct.
+  private BookingStatusRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
-  private UpdateBookingAfterPaymentRequest() {
-    paymentMethod_ = 0;
+  private BookingStatusRequest() {
+    status_ = 0;
   }
 
   @Override
   @SuppressWarnings({"unused"})
   protected Object newInstance(
       UnusedPrivateParameter unused) {
-    return new UpdateBookingAfterPaymentRequest();
+    return new BookingStatusRequest();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
       getDescriptor() {
-    return BookingServiceOuterClass.internal_static_booking_UpdateBookingAfterPaymentRequest_descriptor;
+    return BookingServiceOuterClass.internal_static_booking_BookingStatusRequest_descriptor;
   }
 
   @Override
   protected FieldAccessorTable
       internalGetFieldAccessorTable() {
-    return BookingServiceOuterClass.internal_static_booking_UpdateBookingAfterPaymentRequest_fieldAccessorTable
+    return BookingServiceOuterClass.internal_static_booking_BookingStatusRequest_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            UpdateBookingAfterPaymentRequest.class, Builder.class);
+            BookingStatusRequest.class, Builder.class);
   }
 
-  public static final int BOOKING_ID_FIELD_NUMBER = 1;
-  private int bookingId_ = 0;
+  public static final int STATUS_FIELD_NUMBER = 1;
+  private int status_ = 0;
   /**
-   * <code>int32 booking_id = 1;</code>
-   * @return The bookingId.
+   * <code>.constants.BookingStatus status = 1;</code>
+   * @return The enum numeric value on the wire for status.
    */
-  @Override
-  public int getBookingId() {
-    return bookingId_;
-  }
-
-  public static final int PAYMENT_METHOD_FIELD_NUMBER = 2;
-  private int paymentMethod_ = 0;
-  /**
-   * <code>.constants.PaymentMethod payment_method = 2;</code>
-   * @return The enum numeric value on the wire for paymentMethod.
-   */
-  @Override public int getPaymentMethodValue() {
-    return paymentMethod_;
+  @Override public int getStatusValue() {
+    return status_;
   }
   /**
-   * <code>.constants.PaymentMethod payment_method = 2;</code>
-   * @return The paymentMethod.
+   * <code>.constants.BookingStatus status = 1;</code>
+   * @return The status.
    */
-  @Override public PaymentMethod getPaymentMethod() {
-    PaymentMethod result = PaymentMethod.forNumber(paymentMethod_);
-    return result == null ? PaymentMethod.UNRECOGNIZED : result;
+  @Override public BookingStatus getStatus() {
+    BookingStatus result = BookingStatus.forNumber(status_);
+    return result == null ? BookingStatus.UNRECOGNIZED : result;
   }
 
   private byte memoizedIsInitialized = -1;
@@ -85,11 +74,8 @@ private static final long serialVersionUID = 0L;
   @Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
                       throws java.io.IOException {
-    if (bookingId_ != 0) {
-      output.writeInt32(1, bookingId_);
-    }
-    if (paymentMethod_ != PaymentMethod.VNPAY.getNumber()) {
-      output.writeEnum(2, paymentMethod_);
+    if (status_ != BookingStatus.ALL.getNumber()) {
+      output.writeEnum(1, status_);
     }
     getUnknownFields().writeTo(output);
   }
@@ -100,13 +86,9 @@ private static final long serialVersionUID = 0L;
     if (size != -1) return size;
 
     size = 0;
-    if (bookingId_ != 0) {
+    if (status_ != BookingStatus.ALL.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, bookingId_);
-    }
-    if (paymentMethod_ != PaymentMethod.VNPAY.getNumber()) {
-      size += com.google.protobuf.CodedOutputStream
-        .computeEnumSize(2, paymentMethod_);
+        .computeEnumSize(1, status_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -118,14 +100,12 @@ private static final long serialVersionUID = 0L;
     if (obj == this) {
      return true;
     }
-    if (!(obj instanceof UpdateBookingAfterPaymentRequest)) {
+    if (!(obj instanceof BookingStatusRequest)) {
       return super.equals(obj);
     }
-    UpdateBookingAfterPaymentRequest other = (UpdateBookingAfterPaymentRequest) obj;
+    BookingStatusRequest other = (BookingStatusRequest) obj;
 
-    if (getBookingId()
-        != other.getBookingId()) return false;
-    if (paymentMethod_ != other.paymentMethod_) return false;
+    if (status_ != other.status_) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -137,53 +117,51 @@ private static final long serialVersionUID = 0L;
     }
     int hash = 41;
     hash = (19 * hash) + getDescriptor().hashCode();
-    hash = (37 * hash) + BOOKING_ID_FIELD_NUMBER;
-    hash = (53 * hash) + getBookingId();
-    hash = (37 * hash) + PAYMENT_METHOD_FIELD_NUMBER;
-    hash = (53 * hash) + paymentMethod_;
+    hash = (37 * hash) + STATUS_FIELD_NUMBER;
+    hash = (53 * hash) + status_;
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
   }
 
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       java.nio.ByteBuffer data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(byte[] data)
+  public static BookingStatusRequest parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(java.io.InputStream input)
+  public static BookingStatusRequest parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -191,26 +169,26 @@ private static final long serialVersionUID = 0L;
         .parseWithIOException(PARSER, input, extensionRegistry);
   }
 
-  public static UpdateBookingAfterPaymentRequest parseDelimitedFrom(java.io.InputStream input)
+  public static BookingStatusRequest parseDelimitedFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input);
   }
 
-  public static UpdateBookingAfterPaymentRequest parseDelimitedFrom(
+  public static BookingStatusRequest parseDelimitedFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
-  public static UpdateBookingAfterPaymentRequest parseFrom(
+  public static BookingStatusRequest parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws java.io.IOException {
@@ -223,7 +201,7 @@ private static final long serialVersionUID = 0L;
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-  public static Builder newBuilder(UpdateBookingAfterPaymentRequest prototype) {
+  public static Builder newBuilder(BookingStatusRequest prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
   @Override
@@ -239,26 +217,26 @@ private static final long serialVersionUID = 0L;
     return builder;
   }
   /**
-   * Protobuf type {@code booking.UpdateBookingAfterPaymentRequest}
+   * Protobuf type {@code booking.BookingStatusRequest}
    */
   public static final class Builder extends
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-      // @@protoc_insertion_point(builder_implements:booking.UpdateBookingAfterPaymentRequest)
-      UpdateBookingAfterPaymentRequestOrBuilder {
+      // @@protoc_insertion_point(builder_implements:booking.BookingStatusRequest)
+      BookingStatusRequestOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return BookingServiceOuterClass.internal_static_booking_UpdateBookingAfterPaymentRequest_descriptor;
+      return BookingServiceOuterClass.internal_static_booking_BookingStatusRequest_descriptor;
     }
 
     @Override
     protected FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return BookingServiceOuterClass.internal_static_booking_UpdateBookingAfterPaymentRequest_fieldAccessorTable
+      return BookingServiceOuterClass.internal_static_booking_BookingStatusRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              UpdateBookingAfterPaymentRequest.class, Builder.class);
+              BookingStatusRequest.class, Builder.class);
     }
 
-    // Construct using grpc.booking.UpdateBookingAfterPaymentRequest.newBuilder()
+    // Construct using grpc.booking.BookingStatusRequest.newBuilder()
     private Builder() {
 
     }
@@ -272,25 +250,24 @@ private static final long serialVersionUID = 0L;
     public Builder clear() {
       super.clear();
       bitField0_ = 0;
-      bookingId_ = 0;
-      paymentMethod_ = 0;
+      status_ = 0;
       return this;
     }
 
     @Override
     public com.google.protobuf.Descriptors.Descriptor
         getDescriptorForType() {
-      return BookingServiceOuterClass.internal_static_booking_UpdateBookingAfterPaymentRequest_descriptor;
+      return BookingServiceOuterClass.internal_static_booking_BookingStatusRequest_descriptor;
     }
 
     @Override
-    public UpdateBookingAfterPaymentRequest getDefaultInstanceForType() {
-      return UpdateBookingAfterPaymentRequest.getDefaultInstance();
+    public BookingStatusRequest getDefaultInstanceForType() {
+      return BookingStatusRequest.getDefaultInstance();
     }
 
     @Override
-    public UpdateBookingAfterPaymentRequest build() {
-      UpdateBookingAfterPaymentRequest result = buildPartial();
+    public BookingStatusRequest build() {
+      BookingStatusRequest result = buildPartial();
       if (!result.isInitialized()) {
         throw newUninitializedMessageException(result);
       }
@@ -298,20 +275,17 @@ private static final long serialVersionUID = 0L;
     }
 
     @Override
-    public UpdateBookingAfterPaymentRequest buildPartial() {
-      UpdateBookingAfterPaymentRequest result = new UpdateBookingAfterPaymentRequest(this);
+    public BookingStatusRequest buildPartial() {
+      BookingStatusRequest result = new BookingStatusRequest(this);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
 
-    private void buildPartial0(UpdateBookingAfterPaymentRequest result) {
+    private void buildPartial0(BookingStatusRequest result) {
       int from_bitField0_ = bitField0_;
       if (((from_bitField0_ & 0x00000001) != 0)) {
-        result.bookingId_ = bookingId_;
-      }
-      if (((from_bitField0_ & 0x00000002) != 0)) {
-        result.paymentMethod_ = paymentMethod_;
+        result.status_ = status_;
       }
     }
 
@@ -349,21 +323,18 @@ private static final long serialVersionUID = 0L;
     }
     @Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
-      if (other instanceof UpdateBookingAfterPaymentRequest) {
-        return mergeFrom((UpdateBookingAfterPaymentRequest)other);
+      if (other instanceof BookingStatusRequest) {
+        return mergeFrom((BookingStatusRequest)other);
       } else {
         super.mergeFrom(other);
         return this;
       }
     }
 
-    public Builder mergeFrom(UpdateBookingAfterPaymentRequest other) {
-      if (other == UpdateBookingAfterPaymentRequest.getDefaultInstance()) return this;
-      if (other.getBookingId() != 0) {
-        setBookingId(other.getBookingId());
-      }
-      if (other.paymentMethod_ != 0) {
-        setPaymentMethodValue(other.getPaymentMethodValue());
+    public Builder mergeFrom(BookingStatusRequest other) {
+      if (other == BookingStatusRequest.getDefaultInstance()) return this;
+      if (other.status_ != 0) {
+        setStatusValue(other.getStatusValue());
       }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
@@ -392,15 +363,10 @@ private static final long serialVersionUID = 0L;
               done = true;
               break;
             case 8: {
-              bookingId_ = input.readInt32();
+              status_ = input.readEnum();
               bitField0_ |= 0x00000001;
               break;
             } // case 8
-            case 16: {
-              paymentMethod_ = input.readEnum();
-              bitField0_ |= 0x00000002;
-              break;
-            } // case 16
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -418,87 +384,55 @@ private static final long serialVersionUID = 0L;
     }
     private int bitField0_;
 
-    private int bookingId_ ;
+    private int status_ = 0;
     /**
-     * <code>int32 booking_id = 1;</code>
-     * @return The bookingId.
+     * <code>.constants.BookingStatus status = 1;</code>
+     * @return The enum numeric value on the wire for status.
      */
-    @Override
-    public int getBookingId() {
-      return bookingId_;
+    @Override public int getStatusValue() {
+      return status_;
     }
     /**
-     * <code>int32 booking_id = 1;</code>
-     * @param value The bookingId to set.
+     * <code>.constants.BookingStatus status = 1;</code>
+     * @param value The enum numeric value on the wire for status to set.
      * @return This builder for chaining.
      */
-    public Builder setBookingId(int value) {
-
-      bookingId_ = value;
+    public Builder setStatusValue(int value) {
+      status_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
     /**
-     * <code>int32 booking_id = 1;</code>
-     * @return This builder for chaining.
-     */
-    public Builder clearBookingId() {
-      bitField0_ = (bitField0_ & ~0x00000001);
-      bookingId_ = 0;
-      onChanged();
-      return this;
-    }
-
-    private int paymentMethod_ = 0;
-    /**
-     * <code>.constants.PaymentMethod payment_method = 2;</code>
-     * @return The enum numeric value on the wire for paymentMethod.
-     */
-    @Override public int getPaymentMethodValue() {
-      return paymentMethod_;
-    }
-    /**
-     * <code>.constants.PaymentMethod payment_method = 2;</code>
-     * @param value The enum numeric value on the wire for paymentMethod to set.
-     * @return This builder for chaining.
-     */
-    public Builder setPaymentMethodValue(int value) {
-      paymentMethod_ = value;
-      bitField0_ |= 0x00000002;
-      onChanged();
-      return this;
-    }
-    /**
-     * <code>.constants.PaymentMethod payment_method = 2;</code>
-     * @return The paymentMethod.
+     * <code>.constants.BookingStatus status = 1;</code>
+     * @return The status.
      */
     @Override
-    public PaymentMethod getPaymentMethod() {
-      PaymentMethod result = PaymentMethod.forNumber(paymentMethod_);
-      return result == null ? PaymentMethod.UNRECOGNIZED : result;
+    public BookingStatus getStatus() {
+      BookingStatus result = BookingStatus.forNumber(status_);
+      return result == null ? BookingStatus.UNRECOGNIZED : result;
     }
     /**
-     * <code>.constants.PaymentMethod payment_method = 2;</code>
-     * @param value The paymentMethod to set.
+     * <code>.constants.BookingStatus status = 1;</code>
+     * @param value The status to set.
      * @return This builder for chaining.
      */
-    public Builder setPaymentMethod(PaymentMethod value) {
+    public Builder setStatus(BookingStatus value) {
       if (value == null) {
         throw new NullPointerException();
       }
-      bitField0_ |= 0x00000002;
-      paymentMethod_ = value.getNumber();
+      bitField0_ |= 0x00000001;
+      status_ = value.getNumber();
       onChanged();
       return this;
     }
     /**
-     * <code>.constants.PaymentMethod payment_method = 2;</code>
+     * <code>.constants.BookingStatus status = 1;</code>
      * @return This builder for chaining.
      */
-    public Builder clearPaymentMethod() {
-      bitField0_ = (bitField0_ & ~0x00000002);
-      paymentMethod_ = 0;
+    public Builder clearStatus() {
+      bitField0_ = (bitField0_ & ~0x00000001);
+      status_ = 0;
       onChanged();
       return this;
     }
@@ -515,23 +449,23 @@ private static final long serialVersionUID = 0L;
     }
 
 
-    // @@protoc_insertion_point(builder_scope:booking.UpdateBookingAfterPaymentRequest)
+    // @@protoc_insertion_point(builder_scope:booking.BookingStatusRequest)
   }
 
-  // @@protoc_insertion_point(class_scope:booking.UpdateBookingAfterPaymentRequest)
-  private static final UpdateBookingAfterPaymentRequest DEFAULT_INSTANCE;
+  // @@protoc_insertion_point(class_scope:booking.BookingStatusRequest)
+  private static final BookingStatusRequest DEFAULT_INSTANCE;
   static {
-    DEFAULT_INSTANCE = new UpdateBookingAfterPaymentRequest();
+    DEFAULT_INSTANCE = new BookingStatusRequest();
   }
 
-  public static UpdateBookingAfterPaymentRequest getDefaultInstance() {
+  public static BookingStatusRequest getDefaultInstance() {
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<UpdateBookingAfterPaymentRequest>
-      PARSER = new com.google.protobuf.AbstractParser<UpdateBookingAfterPaymentRequest>() {
+  private static final com.google.protobuf.Parser<BookingStatusRequest>
+      PARSER = new com.google.protobuf.AbstractParser<BookingStatusRequest>() {
     @Override
-    public UpdateBookingAfterPaymentRequest parsePartialFrom(
+    public BookingStatusRequest parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -550,17 +484,17 @@ private static final long serialVersionUID = 0L;
     }
   };
 
-  public static com.google.protobuf.Parser<UpdateBookingAfterPaymentRequest> parser() {
+  public static com.google.protobuf.Parser<BookingStatusRequest> parser() {
     return PARSER;
   }
 
   @Override
-  public com.google.protobuf.Parser<UpdateBookingAfterPaymentRequest> getParserForType() {
+  public com.google.protobuf.Parser<BookingStatusRequest> getParserForType() {
     return PARSER;
   }
 
   @Override
-  public UpdateBookingAfterPaymentRequest getDefaultInstanceForType() {
+  public BookingStatusRequest getDefaultInstanceForType() {
     return DEFAULT_INSTANCE;
   }
 

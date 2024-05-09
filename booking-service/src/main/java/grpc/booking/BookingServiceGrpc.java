@@ -139,6 +139,68 @@ public final class BookingServiceGrpc {
     return getUpdateBookingAfterPaymentCanceledMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<BookingIdRequest,
+      GetBookingByIdResponse> getGetBookingByIdMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "GetBookingById",
+      requestType = BookingIdRequest.class,
+      responseType = GetBookingByIdResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<BookingIdRequest,
+      GetBookingByIdResponse> getGetBookingByIdMethod() {
+    io.grpc.MethodDescriptor<BookingIdRequest, GetBookingByIdResponse> getGetBookingByIdMethod;
+    if ((getGetBookingByIdMethod = BookingServiceGrpc.getGetBookingByIdMethod) == null) {
+      synchronized (BookingServiceGrpc.class) {
+        if ((getGetBookingByIdMethod = BookingServiceGrpc.getGetBookingByIdMethod) == null) {
+          BookingServiceGrpc.getGetBookingByIdMethod = getGetBookingByIdMethod =
+              io.grpc.MethodDescriptor.<BookingIdRequest, GetBookingByIdResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "GetBookingById"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  BookingIdRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  GetBookingByIdResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new BookingServiceMethodDescriptorSupplier("GetBookingById"))
+              .build();
+        }
+      }
+    }
+    return getGetBookingByIdMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<BookingStatusRequest,
+      GetAllBookingsByStatusResponse> getGetAllBookingsByStatusMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "GetAllBookingsByStatus",
+      requestType = BookingStatusRequest.class,
+      responseType = GetAllBookingsByStatusResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<BookingStatusRequest,
+      GetAllBookingsByStatusResponse> getGetAllBookingsByStatusMethod() {
+    io.grpc.MethodDescriptor<BookingStatusRequest, GetAllBookingsByStatusResponse> getGetAllBookingsByStatusMethod;
+    if ((getGetAllBookingsByStatusMethod = BookingServiceGrpc.getGetAllBookingsByStatusMethod) == null) {
+      synchronized (BookingServiceGrpc.class) {
+        if ((getGetAllBookingsByStatusMethod = BookingServiceGrpc.getGetAllBookingsByStatusMethod) == null) {
+          BookingServiceGrpc.getGetAllBookingsByStatusMethod = getGetAllBookingsByStatusMethod =
+              io.grpc.MethodDescriptor.<BookingStatusRequest, GetAllBookingsByStatusResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "GetAllBookingsByStatus"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  BookingStatusRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  GetAllBookingsByStatusResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new BookingServiceMethodDescriptorSupplier("GetAllBookingsByStatus"))
+              .build();
+        }
+      }
+    }
+    return getGetAllBookingsByStatusMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -214,6 +276,20 @@ public final class BookingServiceGrpc {
                                                    io.grpc.stub.StreamObserver<UpdateBookingResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getUpdateBookingAfterPaymentCanceledMethod(), responseObserver);
     }
+
+    /**
+     */
+    default void getBookingById(BookingIdRequest request,
+                                io.grpc.stub.StreamObserver<GetBookingByIdResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetBookingByIdMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void getAllBookingsByStatus(BookingStatusRequest request,
+                                        io.grpc.stub.StreamObserver<GetAllBookingsByStatusResponse> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getGetAllBookingsByStatusMethod(), responseObserver);
+    }
   }
 
   /**
@@ -274,6 +350,22 @@ public final class BookingServiceGrpc {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getUpdateBookingAfterPaymentCanceledMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void getBookingById(BookingIdRequest request,
+                               io.grpc.stub.StreamObserver<GetBookingByIdResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getGetBookingByIdMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void getAllBookingsByStatus(BookingStatusRequest request,
+                                       io.grpc.stub.StreamObserver<GetAllBookingsByStatusResponse> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getGetAllBookingsByStatusMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -318,6 +410,20 @@ public final class BookingServiceGrpc {
     public UpdateBookingResponse updateBookingAfterPaymentCanceled(BookingIdRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getUpdateBookingAfterPaymentCanceledMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public GetBookingByIdResponse getBookingById(BookingIdRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getGetBookingByIdMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public GetAllBookingsByStatusResponse getAllBookingsByStatus(BookingStatusRequest request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getGetAllBookingsByStatusMethod(), getCallOptions(), request);
     }
   }
 
@@ -368,12 +474,30 @@ public final class BookingServiceGrpc {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getUpdateBookingAfterPaymentCanceledMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<GetBookingByIdResponse> getBookingById(
+        BookingIdRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getGetBookingByIdMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<GetAllBookingsByStatusResponse> getAllBookingsByStatus(
+        BookingStatusRequest request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getGetAllBookingsByStatusMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_CHECK_EXIST_BOOKING_BY_ID = 0;
   private static final int METHODID_UPDATE_BOOKING_AFTER_PAYMENT_SUCCEEDED = 1;
   private static final int METHODID_UPDATE_BOOKING_AFTER_PAYMENT_FAILED = 2;
   private static final int METHODID_UPDATE_BOOKING_AFTER_PAYMENT_CANCELED = 3;
+  private static final int METHODID_GET_BOOKING_BY_ID = 4;
+  private static final int METHODID_GET_ALL_BOOKINGS_BY_STATUS = 5;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -407,6 +531,14 @@ public final class BookingServiceGrpc {
         case METHODID_UPDATE_BOOKING_AFTER_PAYMENT_CANCELED:
           serviceImpl.updateBookingAfterPaymentCanceled((BookingIdRequest) request,
               (io.grpc.stub.StreamObserver<UpdateBookingResponse>) responseObserver);
+          break;
+        case METHODID_GET_BOOKING_BY_ID:
+          serviceImpl.getBookingById((BookingIdRequest) request,
+              (io.grpc.stub.StreamObserver<GetBookingByIdResponse>) responseObserver);
+          break;
+        case METHODID_GET_ALL_BOOKINGS_BY_STATUS:
+          serviceImpl.getAllBookingsByStatus((BookingStatusRequest) request,
+              (io.grpc.stub.StreamObserver<GetAllBookingsByStatusResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -454,6 +586,20 @@ public final class BookingServiceGrpc {
               BookingIdRequest,
               UpdateBookingResponse>(
                 service, METHODID_UPDATE_BOOKING_AFTER_PAYMENT_CANCELED)))
+        .addMethod(
+          getGetBookingByIdMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              BookingIdRequest,
+              GetBookingByIdResponse>(
+                service, METHODID_GET_BOOKING_BY_ID)))
+        .addMethod(
+          getGetAllBookingsByStatusMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              BookingStatusRequest,
+              GetAllBookingsByStatusResponse>(
+                service, METHODID_GET_ALL_BOOKINGS_BY_STATUS)))
         .build();
   }
 
@@ -506,6 +652,8 @@ public final class BookingServiceGrpc {
               .addMethod(getUpdateBookingAfterPaymentSucceededMethod())
               .addMethod(getUpdateBookingAfterPaymentFailedMethod())
               .addMethod(getUpdateBookingAfterPaymentCanceledMethod())
+              .addMethod(getGetBookingByIdMethod())
+              .addMethod(getGetAllBookingsByStatusMethod())
               .build();
         }
       }

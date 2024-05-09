@@ -27,8 +27,10 @@ public final class Type {
       "\n\034booking/constants/type.proto\022\tconstant" +
       "s*t\n\rPaymentMethod\022\t\n\005VNPAY\020\000\022\017\n\013VIETTEL" +
       "_PAY\020\001\022\014\n\010ZALO_PAY\020\002\022\014\n\010MOMO_PAY\020\003\022\n\n\006PA" +
-      "YPAL\020\004\022\017\n\013CREDIT_CARD\020\005\022\016\n\nDEBIT_CARD\020\006B" +
-      "\032\n\026grpc.booking.constantsP\001b\006proto3"
+      "YPAL\020\004\022\017\n\013CREDIT_CARD\020\005\022\016\n\nDEBIT_CARD\020\006*" +
+      "O\n\rBookingStatus\022\007\n\003ALL\020\000\022\013\n\007NOT_PAY\020\001\022\n" +
+      "\n\006PAY_UP\020\002\022\016\n\nPAY_FAILED\020\003\022\014\n\010REJECTED\020\004" +
+      "B\032\n\026grpc.booking.constantsP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

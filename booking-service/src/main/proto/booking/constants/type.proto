@@ -14,3 +14,11 @@ enum PaymentMethod {
   CREDIT_CARD = 5;
   DEBIT_CARD = 6;
 }
+
+enum BookingStatus {
+    ALL = 0;
+    NOT_PAY = 1;
+    PAY_UP = 2;
+    PAY_FAILED = 3;
+    REJECTED = 4;
+}
