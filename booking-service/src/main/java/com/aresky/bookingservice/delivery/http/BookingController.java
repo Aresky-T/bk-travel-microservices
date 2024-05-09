@@ -35,10 +35,10 @@ public class BookingController {
     // .map(ResponseEntity::ok);
     // }
 
-    @PostMapping("/payment/vnpay-result")
-    public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn vnPayReturn) {
-        return bookingService.handleBookingAfterPaymentWithVnPay(vnPayReturn).map(ResponseEntity::ok);
-    }
+    // @PostMapping("/payment/vnpay-result")
+    // public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn vnPayReturn) {
+    //    return bookingService.handleBookingAfterPaymentWithVnPay(vnPayReturn).map(ResponseEntity::ok);
+    // }
 
     // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)
 
