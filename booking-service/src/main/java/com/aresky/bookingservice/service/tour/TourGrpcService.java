@@ -28,18 +28,23 @@ public class TourGrpcService {
 
     @PreDestroy
     public void stop() {
-        if (channel != null) {
-            channel.shutdownNow();
-        }
+        stopChannel();
     }
 
     public Mono<SubTourResponse> getSubTourById(int subTourId) {
+        System.out.println("tour grpc client: getSubTourById");
         stub = TourServiceGrpc.newBlockingStub(channel);
         SubTourIdRequest request = SubTourIdRequest.newBuilder().setId(subTourId).build();
         Callable<SubTourDetailsResponse> callable = () -> stub.getSubTourById(request);
         return Mono.fromCallable(callable)
                 .onErrorResume(err -> Mono.empty())
                 .map(this::convertToSubTourResponse);
+    }
+
+    private void stopChannel(){
+        if (channel != null) {
+            channel.shutdownNow();
+        }
     }
 
     private SubTourResponse convertToSubTourResponse(SubTourDetailsResponse grpcDTO) {
