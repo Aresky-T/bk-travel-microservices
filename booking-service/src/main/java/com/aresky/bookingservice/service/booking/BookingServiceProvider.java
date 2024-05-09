@@ -83,11 +83,11 @@ public class BookingServiceProvider implements IBookingService{
         return Mono.zip(validateAmount(subTour, form), validateTouristList(form))
                 .map(tuple -> {
                     if (!tuple.getT1()) {
-                        throw new BookingException("Invalid amount!");
+                        throw new BookingException(BookingException.INVALID_AMOUNT);
                     }
 
                     if (!tuple.getT2()) {
-                        return new BookingException("Invalid tourist list!");
+                        return new BookingException(BookingException.INVALID_TOURIST_LIST);
                     }
 
                     return true;
@@ -109,7 +109,7 @@ public class BookingServiceProvider implements IBookingService{
     @Override
     public Mono<Booking> saveBooking(Booking booking) {
         return Mono.just(booking)
-                .switchIfEmpty(Mono.error(new BookingException("Booking is not available!")))
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.REQUIRED_BOOKING)))
                 .then(bookingRepository.save(booking));
     }
 
@@ -128,7 +128,7 @@ public class BookingServiceProvider implements IBookingService{
     public Mono<Void> delete(Integer bookingId) {
         return bookingRepository.existsById(bookingId)
                 .filter(Boolean.TRUE::equals)
-                .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId!")))
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(isExists -> bookingRepository.deleteById(bookingId)
                         .then());
     }
@@ -138,7 +138,7 @@ public class BookingServiceProvider implements IBookingService{
     public Mono<Void> delete(Booking booking) {
         return Mono.just(booking)
                 .filter(Objects::nonNull)
-                .switchIfEmpty(Mono.error(new BookingException("Invalid booking!")))
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.REQUIRED_BOOKING)))
                 .then(bookingRepository.delete(booking));
     }
 
