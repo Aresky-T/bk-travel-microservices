@@ -141,7 +141,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     public Mono<String> handlePaymentWithVnPayAfterBooking(Integer bookingId) {
         return bookingRepository.findById(bookingId)
                 .switchIfEmpty(Mono.error(
-                        new BookingException("Invalid bookingId!")))
+                        new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(booking -> findSubTour(booking.getSubTourId())
                         .flatMap(subTour -> paymentService
                                 .getVnPayPaymentURL(PaymentRequest.createDTO(booking,
@@ -151,10 +151,10 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     @Override
     public Mono<String> handlePaymentAfterBooking(Integer bookingId, EFormOfPayment formOfPayment) {
         return bookingRepository.findById(bookingId)
-                .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId")))
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(booking -> findSubTour(booking.getSubTourId())
                         .switchIfEmpty(Mono
-                                .error(new BookingException("SubTour was not found!")))
+                                .error(new BookingException(BookingException.SUB_TOUR_NOT_FOUND)))
                         .flatMap(
                                 subTour -> paymentService.getVnPayPaymentURL(
                                                 PaymentRequest.createDTO(booking,
@@ -187,24 +187,27 @@ public class BookingDtoServiceImp implements IBookingDtoService {
 
     @Override
     public Mono<VnPayTransactionInfo> findVnPayTransactionInfo(Integer bookingId) {
-        return bookingRepository.existsById(bookingId)
-                .filter(Boolean.TRUE::equals)
-                .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId!")))
-                .flatMap(validBooking -> paymentService.getVnPayTransactionInfo(bookingId)
-                        .map(value -> value));
+        return bookingService.findBookingBy(bookingId)
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
+                .flatMap(booking -> {
+                    if(!booking.getStatus().equals(EBookingStatus.PAY_UP)){
+                        return Mono.error(new BookingException(BookingException.BOOKING_HAVE_NOT_PAID));
+                    }
+
+                    return vnPayService.getTransactionInfo(bookingId);
+                });
     }
 
     @Override
     public Mono<BookingDetails> findOne(Integer bookingId) {
         return bookingService.findBookingBy(bookingId)
-                .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId")))
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(booking -> Mono.zip(
                         findSubTour(booking.getSubTourId()),
                         findAllTourist(bookingId)).flatMap(tuple -> {
                     SubTourResponse subTour = tuple.getT1();
                     List<Tourist> touristList = tuple.getT2();
-                    return Mono.just(BookingDetails.toDTO(booking, subTour,
-                            touristList));
+                    return Mono.just(BookingDetails.toDTO(booking, subTour, touristList));
                 }))
                 .onErrorResume(Mono::error);
     }
@@ -241,7 +244,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     public Mono<Void> delete(Integer bookingId) {
         return bookingService.existsBookingBy(bookingId)
                 .filter(Boolean.TRUE::equals)
-                .switchIfEmpty(Mono.error(new BookingException("Invalid bookingId!")))
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(isExists -> bookingRepository.deleteById(bookingId)
                         .then());
     }
@@ -252,7 +255,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
 
     private Mono<Booking> findByAccountIdAndSubTourId(Integer accountId, Integer subTourId) {
         return bookingService.findBookingBy(accountId, subTourId)
-                .switchIfEmpty(Mono.error(new BookingException("This Booking info does not exist!")));
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.BOOKING_DOES_NOT_EXISTS)));
     }
 
     private Mono<Boolean> validateAccount(Integer accountId) {
@@ -307,7 +310,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
         System.out.println("amount: " + amount);
 
         if (!amount.equals(form.getAmount())) {
-            throw new BookingException("Invalid amount!");
+            throw new BookingException(BookingException.INVALID_AMOUNT);
         }
     }
 
@@ -335,15 +338,15 @@ public class BookingDtoServiceImp implements IBookingDtoService {
         }
 
         if (adultNumber != form.getAdultNumber()) {
-            throw new BookingException("Invalid adultNumber!");
+            throw new BookingException(BookingException.INVALID_ADULT_NUMBER);
         }
 
         if (childrenNumber != form.getChildrenNumber()) {
-            throw new BookingException("Invalid childrenNumber!");
+            throw new BookingException(BookingException.INVALID_CHILD_NUMBER);
         }
 
         if (babyNumber != form.getBabyNumber()) {
-            throw new BookingException("Invalid babyNumber!");
+            throw new BookingException(BookingException.INVALID_BABY_NUMBER);
         }
     }
 }
