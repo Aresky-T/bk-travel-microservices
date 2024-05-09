@@ -14,6 +14,8 @@ public interface IVNPayService {
 
     VnPayTransactionInfoRes getVnPayTransactionInfo(Integer bookingId);
 
+    boolean existsTransactionInfoBy(Integer bookingId);
+
     Session openSession(Integer bookingId);
 
     void closeSession(Integer bookingId);
