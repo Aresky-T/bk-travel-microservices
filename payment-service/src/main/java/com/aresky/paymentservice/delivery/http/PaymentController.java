@@ -1,6 +1,5 @@
 package com.aresky.paymentservice.delivery.http;
 
-import com.aresky.paymentservice.dto.request.BookingInfoReq;
 import com.aresky.paymentservice.dto.request.VnPayPaymentResult;
 import com.aresky.paymentservice.dto.response.VnPayTransactionInfoRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +27,15 @@ public class PaymentController {
         return ResponseEntity.ok("Welcome to payment-service");
     }
 
-    @GetMapping("/vnpay")
-    public ResponseEntity<VnPayTransactionInfoRes> paymentWithVNPay(@RequestParam Integer bookingId) {
+    @GetMapping("/vnpay/transaction")
+    public ResponseEntity<VnPayTransactionInfoRes> getVnPayTransactionInfo(@RequestParam Integer bookingId) {
         return ResponseEntity.ok(vnPayService.getVnPayTransactionInfo(bookingId));
     }
 
     @PostMapping("/vnpay")
     public ResponseEntity<String> paymentWithVNPay(
-            @RequestBody BookingInfoReq request) {
-        String vnpayURL = vnPayService.createOrder(request);
+            @RequestParam Integer bookingId) {
+        String vnpayURL = vnPayService.createOrder(bookingId);
         return ResponseEntity.ok(vnpayURL);
     }
 

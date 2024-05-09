@@ -94,6 +94,22 @@ public class BookingGrpcService implements IBookingService {
                 });
     }
 
+    @Override
+    public BookingResponse getBookingById(Integer bookingId){
+        ReactorBookingServiceStub stub = initStub();
+        BookingIdRequest request = BookingIdRequest.newBuilder().setId(bookingId).build();
+        try {
+            GetBookingByIdResponse response = stub.getBookingById(request).block();
+            if(response != null && response.hasBooking()){
+                return response.getBooking();
+            }
+        } catch (Exception ex) {
+            throw new PaymentException(ex.getMessage());
+        }
+
+        return null;
+    }
+
     private ReactorBookingServiceStub initStub() {
         return ReactorBookingServiceGrpc.newReactorStub(this.channel).withDeadlineAfter(TIMEOUT, TimeUnit.MILLISECONDS);
     }

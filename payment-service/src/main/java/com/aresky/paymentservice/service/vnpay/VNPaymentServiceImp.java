@@ -1,12 +1,13 @@
 package com.aresky.paymentservice.service.vnpay;
 
-import java.util.Objects;
 import java.util.Optional;
 
-import com.aresky.paymentservice.dto.request.BookingInfoReq;
 import com.aresky.paymentservice.dto.request.VnPayPaymentResult;
+import com.aresky.paymentservice.exception.PaymentMessage;
 import com.aresky.paymentservice.service.booking.BookingGrpcService;
 import com.aresky.paymentservice.utils.VnPayUtils;
+import grpc.booking.BookingResponse;
+import grpc.booking.constants.BookingStatus;
 import grpc.booking.constants.PaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,48 +33,38 @@ public class VNPaymentServiceImp implements IVNPayService {
     private BookingGrpcService bookingGrpcService;
 
     @Override
-    public String createOrder(BookingInfoReq info) {
-        Integer bookingId = info.getBookingId();
-
+    public String createOrder(Integer bookingId) {
         if (bookingId == null) {
             throw new PaymentException("Required bookingId!");
         }
 
-        if(!bookingGrpcService.checkExistBookingBy(bookingId)){
-            throw new PaymentException("Invalid bookingId!");
-        }
+        BookingResponse booking = getBookingByBookingId(bookingId);
 
         if (existsTransactionInfoBy(bookingId)) {
-            throw new PaymentException("Transaction already exist!");
+            throw new PaymentException(PaymentMessage.TRANSACTION_ALREADY_EXISTS);
         }
 
-        Session session = openSession(info.getBookingId());
+        BookingStatus status = booking.getStatus();
 
-        if (session == null) {
-            throw new PaymentException("Không thể tạo phiên thanh toán!");
+        if(status.equals(BookingStatus.PAY_UP)){
+            throw new PaymentException(PaymentMessage.CAN_NOT_PAYMENT_THE_PAY_UP_BOOKING);
         }
 
-        // set booking info for session
-        session.setBookingInfo(info);
+        if(status.equals(BookingStatus.REJECTED)){
+            throw new PaymentException(PaymentMessage.CAN_NOT_PAYMENT_THE_REJECTED_BOOKING);
+        }
+
+        // open new payment session
+        openSession(booking);
 
         // get amount from booking info
-        Integer amount = Optional.of(info)
-                .map(BookingInfoReq::getAmount)
-                .orElseGet(() -> {
-                    BookingInfoReq bookingInfo = (BookingInfoReq) session.getBookingInfo();
-
-                    if (Objects.isNull(bookingInfo)) {
-                        throw new PaymentException("Yêu cầu các thông tin về khách hàng trước khi tiếp tục!");
-                    }
-
-                    return bookingInfo.getAmount();
-                });
+        int amount = booking.getAmount();
 
         // String baseUrl = request.getScheme() + "://" + request.getServerName() + ":"
         // + request.getServerPort();
         String urlReturn = "http://localhost:3000/payment" + "?bookingId=" + bookingId;
-        String content = "THANH TOAN TOUR " + info.getTourCode();
-        return VnPayUtils.generateVnPayUrl(session, amount, content, urlReturn);
+        String content = "THANH TOAN TOUR " + booking.getTourCode();
+        return VnPayUtils.generateVnPayUrl(amount, content, urlReturn);
     }
 
     @Override
@@ -83,15 +74,15 @@ public class VNPaymentServiceImp implements IVNPayService {
         PaymentMethod paymentMethod = PaymentMethod.VNPAY;
 
         if (bookingId == null) {
-            throw new PaymentException("Required bookingId!");
+            throw new PaymentException(PaymentMessage.REQUIRED_BOOKING_ID);
         }
 
         if (!bookingGrpcService.checkExistBookingBy(bookingId)) {
-            throw new PaymentException("Invalid bookingId!");
+            throw new PaymentException(PaymentMessage.INVALID_BOOKING_ID);
         }
 
         if (existsTransactionInfoBy(bookingId)) {
-            throw new PaymentException("Transaction already exist!");
+            throw new PaymentException(PaymentMessage.TRANSACTION_ALREADY_EXISTS);
         }
 
         closeSession(bookingId);
@@ -116,7 +107,7 @@ public class VNPaymentServiceImp implements IVNPayService {
     public VnPayTransactionInfoRes getVnPayTransactionInfo(Integer bookingId) {
         Optional<VnPayTransactionInfo> optional = vnPayRepository.findByBookingId(bookingId);
         if (optional.isEmpty()) {
-            throw new PaymentException("VNPAY Payment Transaction Info doesn't exist!");
+            throw new PaymentException(PaymentMessage.TRANSACTION_NOT_FOUND);
         }
 
         return VnPayTransactionInfoRes.toDTO(optional.get());
@@ -124,7 +115,8 @@ public class VNPaymentServiceImp implements IVNPayService {
 
     @Override
     public Session openSession(Integer bookingId) {
-        return sessionManager.openSession(bookingId);
+        BookingResponse booking = getBookingByBookingId(bookingId);
+        return openSession(booking);
     }
 
     @Override
@@ -135,6 +127,30 @@ public class VNPaymentServiceImp implements IVNPayService {
     @Override
     public boolean existsTransactionInfoBy(Integer bookingId) {
         return vnPayRepository.existsByBookingId(bookingId);
+    }
+
+    private BookingResponse getBookingByBookingId(int bookingId) {
+        BookingResponse booking = bookingGrpcService.getBookingById(bookingId);
+
+        if(booking == null) {
+            throw new PaymentException(PaymentMessage.INVALID_BOOKING_ID);
+        }
+
+        return booking;
+    }
+
+    private Session openSession(BookingResponse booking) {
+        Session session = sessionManager.openSession(booking.getBookingId());
+
+        // check session validity
+        if (session == null) {
+            throw new PaymentException(PaymentMessage.CAN_NOT_OPEN_SESSION);
+        }
+
+        // set booking info for session
+        session.setBookingInfo(booking);
+
+        return session;
     }
 
     private static VnPayTransactionInfo createVnPayTransactionInfo(VnPayPaymentResult result) {

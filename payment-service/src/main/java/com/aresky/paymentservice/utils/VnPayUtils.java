@@ -1,7 +1,6 @@
 package com.aresky.paymentservice.utils;
 
 import com.aresky.paymentservice.config.VNPayConfig;
-import com.aresky.paymentservice.model.Session;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.UnsupportedEncodingException;
@@ -13,14 +12,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class VnPayUtils {
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static String generateVnPayUrl(Session session, int amount, String content, String urlReturn) {
+    public static String generateVnPayUrl(int amount, String content, String urlReturn) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
         String vnp_IpAddr = "127.0.0.1";
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
         String orderType = "order-type";
-        session.setTitle(content + "_" + vnp_TxnRef);
+        // session.setTitle(content + "_" + vnp_TxnRef);
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);

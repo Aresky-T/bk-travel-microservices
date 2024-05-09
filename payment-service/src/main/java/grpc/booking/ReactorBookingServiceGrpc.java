@@ -30,56 +30,52 @@ public final class ReactorBookingServiceGrpc {
             return new ReactorBookingServiceStub(channel, callOptions);
         }
 
-        public reactor.core.publisher.Mono<ExistBookingResponse> checkExistBookingById(
-                reactor.core.publisher.Mono<BookingIdRequest> reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest,
-                    delegateStub::checkExistBookingById, getCallOptions());
+        public reactor.core.publisher.Mono<ExistBookingResponse> checkExistBookingById(reactor.core.publisher.Mono<BookingIdRequest> reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest, delegateStub::checkExistBookingById, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentSucceeded(
-                reactor.core.publisher.Mono<UpdateBookingAfterPaymentRequest> reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest,
-                    delegateStub::updateBookingAfterPaymentSucceeded, getCallOptions());
+        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentSucceeded(reactor.core.publisher.Mono<UpdateBookingAfterPaymentRequest> reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest, delegateStub::updateBookingAfterPaymentSucceeded, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentFailed(
-                reactor.core.publisher.Mono<UpdateBookingAfterPaymentRequest> reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest,
-                    delegateStub::updateBookingAfterPaymentFailed, getCallOptions());
+        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentFailed(reactor.core.publisher.Mono<UpdateBookingAfterPaymentRequest> reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest, delegateStub::updateBookingAfterPaymentFailed, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentCanceled(
-                reactor.core.publisher.Mono<BookingIdRequest> reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest,
-                    delegateStub::updateBookingAfterPaymentCanceled, getCallOptions());
+        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentCanceled(reactor.core.publisher.Mono<BookingIdRequest> reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest, delegateStub::updateBookingAfterPaymentCanceled, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<ExistBookingResponse> checkExistBookingById(
-                BookingIdRequest reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(
-                    reactor.core.publisher.Mono.just(reactorRequest), delegateStub::checkExistBookingById,
-                    getCallOptions());
+        public reactor.core.publisher.Mono<GetBookingByIdResponse> getBookingById(reactor.core.publisher.Mono<BookingIdRequest> reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest, delegateStub::getBookingById, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentSucceeded(
-                UpdateBookingAfterPaymentRequest reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(
-                    reactor.core.publisher.Mono.just(reactorRequest), delegateStub::updateBookingAfterPaymentSucceeded,
-                    getCallOptions());
+        public reactor.core.publisher.Mono<GetAllBookingsByStatusResponse> getAllBookingsByStatus(reactor.core.publisher.Mono<BookingStatusRequest> reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactorRequest, delegateStub::getAllBookingsByStatus, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentFailed(
-                UpdateBookingAfterPaymentRequest reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(
-                    reactor.core.publisher.Mono.just(reactorRequest), delegateStub::updateBookingAfterPaymentFailed,
-                    getCallOptions());
+        public reactor.core.publisher.Mono<ExistBookingResponse> checkExistBookingById(BookingIdRequest reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactor.core.publisher.Mono.just(reactorRequest), delegateStub::checkExistBookingById, getCallOptions());
         }
 
-        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentCanceled(
-                BookingIdRequest reactorRequest) {
-            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(
-                    reactor.core.publisher.Mono.just(reactorRequest), delegateStub::updateBookingAfterPaymentCanceled,
-                    getCallOptions());
+        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentSucceeded(UpdateBookingAfterPaymentRequest reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactor.core.publisher.Mono.just(reactorRequest), delegateStub::updateBookingAfterPaymentSucceeded, getCallOptions());
+        }
+
+        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentFailed(UpdateBookingAfterPaymentRequest reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactor.core.publisher.Mono.just(reactorRequest), delegateStub::updateBookingAfterPaymentFailed, getCallOptions());
+        }
+
+        public reactor.core.publisher.Mono<UpdateBookingResponse> updateBookingAfterPaymentCanceled(BookingIdRequest reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactor.core.publisher.Mono.just(reactorRequest), delegateStub::updateBookingAfterPaymentCanceled, getCallOptions());
+        }
+
+        public reactor.core.publisher.Mono<GetBookingByIdResponse> getBookingById(BookingIdRequest reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactor.core.publisher.Mono.just(reactorRequest), delegateStub::getBookingById, getCallOptions());
+        }
+
+        public reactor.core.publisher.Mono<GetAllBookingsByStatusResponse> getAllBookingsByStatus(BookingStatusRequest reactorRequest) {
+            return com.salesforce.reactorgrpc.stub.ClientCalls.oneToOne(reactor.core.publisher.Mono.just(reactorRequest), delegateStub::getAllBookingsByStatus, getCallOptions());
         }
 
     }
@@ -125,29 +121,55 @@ public final class ReactorBookingServiceGrpc {
             throw new io.grpc.StatusRuntimeException(io.grpc.Status.UNIMPLEMENTED);
         }
 
+        public reactor.core.publisher.Mono<GetBookingByIdResponse> getBookingById(BookingIdRequest request) {
+            return getBookingById(reactor.core.publisher.Mono.just(request));
+        }
+
+        public reactor.core.publisher.Mono<GetBookingByIdResponse> getBookingById(reactor.core.publisher.Mono<BookingIdRequest> request) {
+            throw new io.grpc.StatusRuntimeException(io.grpc.Status.UNIMPLEMENTED);
+        }
+
+        public reactor.core.publisher.Mono<GetAllBookingsByStatusResponse> getAllBookingsByStatus(BookingStatusRequest request) {
+            return getAllBookingsByStatus(reactor.core.publisher.Mono.just(request));
+        }
+
+        public reactor.core.publisher.Mono<GetAllBookingsByStatusResponse> getAllBookingsByStatus(reactor.core.publisher.Mono<BookingStatusRequest> request) {
+            throw new io.grpc.StatusRuntimeException(io.grpc.Status.UNIMPLEMENTED);
+        }
+
         @Override
         public final io.grpc.ServerServiceDefinition bindService() {
             return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
                     .addMethod(
-                            grpc.booking.BookingServiceGrpc.getCheckExistBookingByIdMethod(),
+                            BookingServiceGrpc.getCheckExistBookingByIdMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<BookingIdRequest, ExistBookingResponse>(
                                             this, METHODID_CHECK_EXIST_BOOKING_BY_ID)))
                     .addMethod(
-                            grpc.booking.BookingServiceGrpc.getUpdateBookingAfterPaymentSucceededMethod(),
+                            BookingServiceGrpc.getUpdateBookingAfterPaymentSucceededMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<UpdateBookingAfterPaymentRequest, UpdateBookingResponse>(
                                             this, METHODID_UPDATE_BOOKING_AFTER_PAYMENT_SUCCEEDED)))
                     .addMethod(
-                            grpc.booking.BookingServiceGrpc.getUpdateBookingAfterPaymentFailedMethod(),
+                            BookingServiceGrpc.getUpdateBookingAfterPaymentFailedMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<UpdateBookingAfterPaymentRequest, UpdateBookingResponse>(
                                             this, METHODID_UPDATE_BOOKING_AFTER_PAYMENT_FAILED)))
                     .addMethod(
-                            grpc.booking.BookingServiceGrpc.getUpdateBookingAfterPaymentCanceledMethod(),
+                            BookingServiceGrpc.getUpdateBookingAfterPaymentCanceledMethod(),
                             asyncUnaryCall(
                                     new MethodHandlers<BookingIdRequest, UpdateBookingResponse>(
                                             this, METHODID_UPDATE_BOOKING_AFTER_PAYMENT_CANCELED)))
+                    .addMethod(
+                            BookingServiceGrpc.getGetBookingByIdMethod(),
+                            asyncUnaryCall(
+                                    new MethodHandlers<BookingIdRequest, GetBookingByIdResponse>(
+                                            this, METHODID_GET_BOOKING_BY_ID)))
+                    .addMethod(
+                            BookingServiceGrpc.getGetAllBookingsByStatusMethod(),
+                            asyncUnaryCall(
+                                    new MethodHandlers<BookingStatusRequest, GetAllBookingsByStatusResponse>(
+                                            this, METHODID_GET_ALL_BOOKINGS_BY_STATUS)))
                     .build();
         }
 
@@ -164,6 +186,8 @@ public final class ReactorBookingServiceGrpc {
     public static final int METHODID_UPDATE_BOOKING_AFTER_PAYMENT_SUCCEEDED = 1;
     public static final int METHODID_UPDATE_BOOKING_AFTER_PAYMENT_FAILED = 2;
     public static final int METHODID_UPDATE_BOOKING_AFTER_PAYMENT_CANCELED = 3;
+    public static final int METHODID_GET_BOOKING_BY_ID = 4;
+    public static final int METHODID_GET_ALL_BOOKINGS_BY_STATUS = 5;
 
     private static final class MethodHandlers<Req, Resp> implements
             io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -201,6 +225,16 @@ public final class ReactorBookingServiceGrpc {
                     com.salesforce.reactorgrpc.stub.ServerCalls.oneToOne((BookingIdRequest) request,
                             (io.grpc.stub.StreamObserver<UpdateBookingResponse>) responseObserver,
                             serviceImpl::updateBookingAfterPaymentCanceled, serviceImpl::onErrorMap);
+                    break;
+                case METHODID_GET_BOOKING_BY_ID:
+                    com.salesforce.reactorgrpc.stub.ServerCalls.oneToOne((BookingIdRequest) request,
+                            (io.grpc.stub.StreamObserver<GetBookingByIdResponse>) responseObserver,
+                            serviceImpl::getBookingById, serviceImpl::onErrorMap);
+                    break;
+                case METHODID_GET_ALL_BOOKINGS_BY_STATUS:
+                    com.salesforce.reactorgrpc.stub.ServerCalls.oneToOne((BookingStatusRequest) request,
+                            (io.grpc.stub.StreamObserver<GetAllBookingsByStatusResponse>) responseObserver,
+                            serviceImpl::getAllBookingsByStatus, serviceImpl::onErrorMap);
                     break;
                 default:
                     throw new AssertionError();
