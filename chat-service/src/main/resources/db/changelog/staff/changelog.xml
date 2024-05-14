@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table staff" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table staff already exist!">
+            <not>
+                <tableExists tableName="staff" />
+            </not>
+        </preConditions>
+        <createTable tableName="staff" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="account_id" type="INT">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="status" type="ENUM('ONLINE', 'OFFLINE')" defaultValue="OFFLINE">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
