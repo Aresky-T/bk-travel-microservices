@@ -1,0 +1,27 @@
+server:
+  port: 8087
+spring:
+  application:
+    name: chat-service
+#  r2dbc:
+#    url: r2dbc:mysql://localhost:3306/bk_travel_chat
+#    username: root
+#    password: root
+  liquibase:
+    url: jdbc:mysql://localhost:3306/bk_travel_chat
+    user: root
+    password: root
+    change-log: classpath:db/changelog/changelog-master.xml
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultUrl: http://localhost:8761/eureka
+bk-travel:
+  database:
+    config:
+      server:
+        url: r2dbc:mysql://localhost:3306/bk_travel_chat
+        username: root
+        password: root

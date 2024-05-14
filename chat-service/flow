@@ -1,0 +1,17 @@
+(*) Tìm kếm Staff "ONLINE"
+
+=> Có => Kết nối
+
+=> Không có => Thử lại
+
+1. Tìm kiếm ngẫu nhiên Staff
+2. Tạo chat box / Kết nối tới chat box
+    USER:
+        - validate account => AccountResponse
+        - update status => ONLINE
+        - return ChatBoxResponse
+    Staff:
+        - validate account => AccountResponse
+        - validate staff => StaffResponse
+        - update status => ONLINE
+        - return ChatBoxResponse
