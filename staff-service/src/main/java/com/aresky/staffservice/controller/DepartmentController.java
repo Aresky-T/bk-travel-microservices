@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,7 +22,6 @@ import com.aresky.staffservice.service.department.IDepartmentService;
 
 import reactor.core.publisher.Mono;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/departments")
 public class DepartmentController {
@@ -77,6 +75,14 @@ public class DepartmentController {
             @RequestParam(name = "id") Integer departmentId,
             @RequestBody Map<String, Object> fields) {
         return departmentService.updateDepartment(departmentId, fields).map(ResponseEntity::ok);
+    }
+
+    @PatchMapping("/add-manager")
+    public Mono<ResponseEntity<?>> updateDepartment(
+            @RequestParam(name = "departmentId") Integer departmentId,
+            @RequestParam(name = "staffId") Integer staffId
+    ) {
+        return departmentService.applyManager(departmentId, staffId).thenReturn(ResponseEntity.ok("success"));
     }
 
     // DELETE- deleteDepartment(Integer departmentId)

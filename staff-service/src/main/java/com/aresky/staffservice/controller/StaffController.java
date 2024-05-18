@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/staffs")
 public class StaffController {
@@ -37,20 +37,6 @@ public class StaffController {
         return staffService.getAllStaffResponses(pageable, filter).map(ResponseEntity::ok);
     }
 
-    // GET - getAllStaffs(Integer departmentId)
-    @GetMapping("/department-id/{id}")
-    public Mono<ResponseEntity<List<StaffResponse>>> getAllStaffs(@PathVariable(name = "id") Integer departmentId) {
-        return staffService.getAllStaffResponses(departmentId).map(ResponseEntity::ok);
-    }
-
-    // GET - getAllStaffs(Integer departmentId, Integer positionId)
-    @GetMapping("/by-department-and-position")
-    public Mono<ResponseEntity<?>> getAllStaffs(
-            @RequestParam Integer departmentId,
-            @RequestParam Integer positionId) {
-        return staffService.getAllStaffResponses(departmentId, positionId).map(ResponseEntity::ok);
-    }
-
     // GET - getDetailsStaffById(Integer id)
     @GetMapping("/id/{id}")
     public Mono<ResponseEntity<?>> getDetailsStaffById(@PathVariable(name = "id") Integer id) {
@@ -67,6 +53,11 @@ public class StaffController {
     @GetMapping("/phone/{phone}")
     public Mono<ResponseEntity<?>> getDetailsStaffByPhone(@PathVariable(name = "phone") String phone) {
         return staffService.getDetailsStaffByPhone(phone).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/check-account/email")
+    public Mono<ResponseEntity<?>> checkStaffByEmail(@RequestParam String email) {
+        return staffService.existsAccountOfStaffByEmail(email).map(ResponseEntity::ok);
     }
 
     // POST - createStaff(StaffCreateForm form)
@@ -97,6 +88,11 @@ public class StaffController {
             @RequestParam("id") Integer staffId,
             @RequestBody Map<String, Object> fields) {
         return staffService.updateStaff(staffId, fields).map(ResponseEntity::ok);
+    }
+
+    @PatchMapping("/layoff")
+    public Mono<ResponseEntity<?>> layoffStaff(@RequestParam("staffId") Integer staffId) {
+        return staffService.layoffStaff(staffId).thenReturn(ResponseEntity.ok("success"));
     }
 
     // DELETE- deleteStaff(Integer staffId)
