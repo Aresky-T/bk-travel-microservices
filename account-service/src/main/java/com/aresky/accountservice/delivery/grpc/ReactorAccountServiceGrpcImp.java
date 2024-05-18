@@ -1,7 +1,6 @@
 package com.aresky.accountservice.delivery.grpc;
 
 import com.aresky.accountservice.exception.AccountGrpcException;
-import com.aresky.accountservice.interceptors.AccountGrpcInterceptor;
 import com.aresky.accountservice.mappers.AccountGrpcMapper;
 import com.aresky.accountservice.model.Account;
 import com.aresky.accountservice.model.Profile;
@@ -17,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-@GrpcService(interceptors = { AccountGrpcInterceptor.class })
+@GrpcService
 public class ReactorAccountServiceGrpcImp extends ReactorAccountServiceGrpc.AccountServiceImplBase {
 
     @Autowired

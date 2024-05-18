@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package account;
+
+import "account/dto/response/check-account-by-email-response.proto";
+import "account/dto/response/check-account-by-id-response.proto";
+import "account/fields/account-email-field.proto";
+import "account/fields/account-id-field.proto";
+
+option java_multiple_files=true;
+option java_package="grpc.account.check";
+
+service AccountServiceCheck {
+  rpc CheckAccountById(fields.AccountIdField) returns (response.CheckAccountByIdResponse);
+  rpc CheckAccountByEmail(fields.AccountEmailField) returns (response.CheckAccountByEmailResponse);
+}

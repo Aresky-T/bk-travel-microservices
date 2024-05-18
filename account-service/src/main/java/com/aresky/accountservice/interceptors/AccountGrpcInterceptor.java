@@ -3,8 +3,10 @@ package com.aresky.accountservice.interceptors;
 import com.google.common.annotations.VisibleForTesting;
 import io.grpc.*;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor;
 
 @Slf4j
+@GrpcGlobalServerInterceptor
 public class AccountGrpcInterceptor implements ServerInterceptor {
 
     @VisibleForTesting
