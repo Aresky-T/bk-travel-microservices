@@ -5,27 +5,19 @@ import com.aresky.staffservice.dto.request.StaffFilter;
 import com.aresky.staffservice.dto.request.StaffUpdateForm;
 import com.aresky.staffservice.dto.response.StaffDetails;
 import com.aresky.staffservice.dto.response.StaffResponse;
+import com.aresky.staffservice.model.EStaffStatus;
 import com.aresky.staffservice.model.Staff;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 
 public interface IStaffService {
-    Mono<List<Staff>> getAllStaffsBy(Integer departmentId);
-
-    Mono<List<Staff>> getAllStaffsByPosition(Integer positionId);
-
     Mono<Page<StaffResponse>> getAllStaffResponses(Pageable pageable);
 
     Mono<Page<StaffResponse>> getAllStaffResponses(Pageable pageable, StaffFilter filter);
-
-    Mono<List<StaffResponse>> getAllStaffResponses(Integer departmentId);
-
-    Mono<List<StaffResponse>> getAllStaffResponses(Integer departmentId, Integer positionId);
 
     Mono<StaffDetails> getDetailsStaffById(Integer id);
 
@@ -41,5 +33,15 @@ public interface IStaffService {
 
     Mono<StaffResponse> updateStaff(Integer staffId, Map<String, Object> fields);
 
+    Mono<Staff> updateStatus(Staff staff, EStaffStatus newStatus);
+
     Mono<Void> deleteStaff(Integer staffId);
+
+    Mono<Boolean> existsStaffById(Integer staffId);
+
+    Mono<Boolean> existsAccountOfStaffByEmail(String email);
+
+    Mono<Staff> getStaffById(Integer staffId);
+
+    Mono<Void> layoffStaff(Integer staffId);
 }

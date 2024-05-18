@@ -25,4 +25,8 @@ public interface IDepartmentService {
     Mono<DepartmentResponse> updateDepartment(Integer id, String key, Object value);
 
     Mono<Void> deleteDepartment(Integer id);
+
+    Mono<Boolean> existsDepartmentById(Integer id);
+
+    Mono<Void> applyManager(Integer departmentId, Integer staffId);
 }

@@ -20,9 +20,14 @@
             <column name="description" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
+            <column name="manager_id" type="INT"/>
             <column name="number_of_staffs" type="INT" defaultValue="0">
-                <constraints nullable="false" checkConstraint="number_of_staffs >= 0" />
+                <constraints nullable="false" />
             </column>
         </createTable>
+        <sql>
+            ALTER TABLE department
+            ADD CONSTRAINT ck_number_of_staffs CHECK (number_of_staffs >= 0);
+        </sql>
     </changeSet>
 </databaseChangeLog>

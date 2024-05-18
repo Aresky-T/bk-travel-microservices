@@ -3,6 +3,7 @@ package com.aresky.staffservice.dto.response;
 import java.math.BigDecimal;
 
 import com.aresky.staffservice.model.Department;
+import com.aresky.staffservice.model.Job;
 import com.aresky.staffservice.model.Position;
 import com.aresky.staffservice.model.Staff;
 
@@ -27,12 +28,10 @@ public class StaffDetails {
         private String avatarUrl;
         private String description;
         private String status;
-        public String department;
-        public String position;
-        private String startedDate;
-        private BigDecimal basicSalary;
+        private String hireDate;
         private String contractUrl;
         private String accountInfo;
+        private JobResponse job;
 
         public static StaffDetails toDTO(Staff staff) {
                 return StaffDetails.builder()
@@ -47,8 +46,7 @@ public class StaffDetails {
                                 .gender(staff.getGender().name())
                                 .dateOfBirth(staff.getDateOfBirth().toString())
                                 .status(staff.getStatus().name())
-                                .startedDate(staff.getStartedDate().toString())
-                                .basicSalary(staff.getBasicSalary())
+                                .hireDate(staff.getHireDate().toString())
                                 .contractUrl(staff.getContractUrl())
                                 .accountInfo(
                                                 staff.getAccountId() != null ? "Đã có tài khoản trong hệ thống"
@@ -56,51 +54,33 @@ public class StaffDetails {
                                 .build();
         }
 
-        public static StaffDetails toDTO(Staff staff, Department department) {
-                return StaffDetails.builder()
-                                .id(staff.getId())
-                                .firstName(staff.getFirstName())
-                                .lastName(staff.getLastName())
-                                .avatarUrl(staff.getAvatarUrl())
-                                .email(staff.getEmail())
-                                .phone(staff.getPhone())
-                                .address(staff.getAddress())
-                                .description(staff.getDescription())
-                                .gender(staff.getGender().name())
-                                .dateOfBirth(staff.getDateOfBirth().toString())
-                                .status(staff.getStatus().name())
-                                .department(department.getName())
-                                .startedDate(staff.getStartedDate().toString())
-                                .basicSalary(staff.getBasicSalary())
-                                .contractUrl(staff.getContractUrl())
-                                .accountInfo(
-                                                staff.getAccountId() != null ? "Đã có tài khoản trong hệ thống"
-                                                                : "Không có tài khoản trong hệ thống")
-                                .build();
+        public static StaffDetails toDTO(Staff staff, JobResponse job) {
+                StaffDetails sd = toDTO(staff);
+                sd.job = job;
+                return sd;
         }
 
-        public static StaffDetails toDTO(Staff staff, Department department, Position position) {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class JobResponse {
+                public String position;
+                public String department;
+                public BigDecimal salary;
+                public String startDate;
+                public String endDate;
+                private String status;
 
-                return StaffDetails.builder()
-                                .id(staff.getId())
-                                .firstName(staff.getFirstName())
-                                .lastName(staff.getLastName())
-                                .avatarUrl(staff.getAvatarUrl())
-                                .email(staff.getEmail())
-                                .phone(staff.getPhone())
-                                .address(staff.getAddress())
-                                .description(staff.getDescription())
-                                .gender(staff.getGender().name())
-                                .dateOfBirth(staff.getDateOfBirth().toString())
-                                .status(staff.getStatus().name())
-                                .department(department.getName())
-                                .position(position.getName())
-                                .startedDate(staff.getStartedDate().toString())
-                                .basicSalary(staff.getBasicSalary())
-                                .contractUrl(staff.getContractUrl())
-                                .accountInfo(
-                                                staff.getAccountId() != null ? "Đã có tài khoản trong hệ thống"
-                                                                : "Không có tài khoản trong hệ thống")
-                                .build();
+                public static JobResponse toDTO(Job job, Position position, Department department) {
+                        return JobResponse.builder()
+                                        .position(position.getName())
+                                        .department(department.getName())
+                                        .salary(job.getSalary())
+                                        .startDate(job.getStartDate().toString())
+                                        .endDate(job.getEndDate().toString())
+                                        .status(job.getStatus().getValue())
+                                        .build();
+                }
         }
 }

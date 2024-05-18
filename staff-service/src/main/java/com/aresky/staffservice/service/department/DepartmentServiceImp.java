@@ -6,10 +6,7 @@ import com.aresky.staffservice.dto.response.DepartmentDetails;
 import com.aresky.staffservice.dto.response.DepartmentResponse;
 import com.aresky.staffservice.exception.StaffException;
 import com.aresky.staffservice.model.Department;
-import com.aresky.staffservice.model.Position;
-import com.aresky.staffservice.model.Staff;
 import com.aresky.staffservice.repository.IDepartmentRepository;
-import com.aresky.staffservice.service.position.IPositionService;
 import com.aresky.staffservice.service.staff.IStaffService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +30,6 @@ public class DepartmentServiceImp implements IDepartmentService {
     @Autowired
     private IStaffService staffService;
 
-    @Autowired
-    private IPositionService positionService;
-
     private final String[] blackList = {
             "id", "numberOfStaffs"
     };
@@ -50,17 +44,9 @@ public class DepartmentServiceImp implements IDepartmentService {
 
     @Override
     public Mono<DepartmentDetails> getDetailsDepartmentBy(Integer departmentId) {
-        Mono<List<Staff>> staffsMono = staffService.getAllStaffsBy(departmentId);
-        Mono<List<Position>> positionsMono = positionService.getAllPositionsBy(departmentId);
-
         return departmentRepository.findById(departmentId)
                 .switchIfEmpty(Mono.empty())
-                .flatMap(dep -> Mono.zip(staffsMono, positionsMono).map(tuple -> {
-                    List<Staff> staffs = tuple.getT1();
-                    List<Position> positions = tuple.getT2();
-
-                    return DepartmentDetails.toDTO(dep, staffs, positions);
-                }));
+                .map(DepartmentDetails::toDTO);
     }
 
     @Override
@@ -68,17 +54,7 @@ public class DepartmentServiceImp implements IDepartmentService {
 
         return departmentRepository.findByName(departmentName)
                 .switchIfEmpty(Mono.empty())
-                .flatMap(dep -> {
-                    Mono<List<Staff>> staffsMono = staffService.getAllStaffsBy(dep.getId());
-                    Mono<List<Position>> positionsMono = positionService.getAllPositionsBy(dep.getId());
-
-                    return Mono.zip(staffsMono, positionsMono).map(tuple -> {
-                        List<Staff> staffs = tuple.getT1();
-                        List<Position> positions = tuple.getT2();
-
-                        return DepartmentDetails.toDTO(dep, staffs, positions);
-                    });
-                });
+                .map(DepartmentDetails::toDTO);
     }
 
     @Transactional
@@ -91,6 +67,7 @@ public class DepartmentServiceImp implements IDepartmentService {
                 .then();
     }
 
+    @Transactional
     @Override
     public Mono<DepartmentResponse> updateDepartment(Integer id, DepartmentUpdateForm form) {
         return departmentRepository.findById(id)
@@ -105,6 +82,7 @@ public class DepartmentServiceImp implements IDepartmentService {
                 });
     }
 
+    @Transactional
     @Override
     public Mono<DepartmentResponse> updateDepartment(Integer id, Map<String, Object> fields) {
         return departmentRepository.findById(id)
@@ -114,6 +92,7 @@ public class DepartmentServiceImp implements IDepartmentService {
                         .map(DepartmentResponse::toDTO));
     }
 
+    @Transactional
     @Override
     public Mono<DepartmentResponse> updateDepartment(Integer id, String key, Object value) {
         return departmentRepository.findById(id)
@@ -138,11 +117,31 @@ public class DepartmentServiceImp implements IDepartmentService {
                 });
     }
 
+    @Transactional
     @Override
     public Mono<Void> deleteDepartment(Integer id) {
         return departmentRepository.existsById(id)
                 .flatMap(value -> departmentRepository.deleteById(id).then())
                 .switchIfEmpty(Mono.error(new StaffException("Phòng ban không tồn tại!")));
+    }
+
+    @Override
+    public Mono<Boolean> existsDepartmentById(Integer id) {
+        return departmentRepository.existsById(id);
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> applyManager(Integer departmentId, Integer staffId) {
+        return departmentRepository.findById(departmentId)
+                .switchIfEmpty(Mono.error(new StaffException(StaffException.INVALID_DEPARTMENT_ID)))
+                .flatMap(department -> staffService.existsStaffById(staffId)
+                        .filter(Boolean.TRUE::equals)
+                        .switchIfEmpty(Mono.error(new StaffException(StaffException.INVALID_STAFF_ID)))
+                        .flatMap(existStaff -> {
+                            department.setManagerId(staffId);
+                            return departmentRepository.save(department).then();
+                        }));
     }
 
     private Department update(Department department, Map<String, Object> fields) {

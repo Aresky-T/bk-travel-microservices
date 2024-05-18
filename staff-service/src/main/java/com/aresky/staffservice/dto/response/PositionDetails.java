@@ -3,56 +3,41 @@ package com.aresky.staffservice.dto.response;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.math.BigDecimal;
 
 import com.aresky.staffservice.model.Position;
-import com.aresky.staffservice.model.Staff;
 
 @Data
 @NoArgsConstructor
 public class PositionDetails {
     private Integer id;
-    private Integer departmentId;
     private String name;
     private String description;
-    private Integer headcount;
-    private List<StaffResponse> staffs = new ArrayList<>();
+    private BigDecimal basicSalary;
+    // private List<StaffResponse> staffs = new ArrayList<>();
 
-    public PositionDetails(Integer id, Integer departmentId, String name, String description, Integer headcount) {
+    public PositionDetails(Integer id, String name, String description, BigDecimal basicSalary) {
         this.id = id;
-        this.departmentId = departmentId;
         this.name = name;
         this.description = description;
-        this.headcount = headcount;
+        this.basicSalary = basicSalary;
     }
 
     public static PositionDetails toDTO(Position position) {
-        PositionDetails dto = new PositionDetails(
+        return new PositionDetails(
                 position.getId(),
-                position.getDepartmentId(),
                 position.getName(),
                 position.getDescription(),
-                position.getHeadcount());
-        return dto;
+                position.getBasicSalary());
     }
 
-    public static PositionDetails toDTO(Position position, List<Staff> staffs) {
-        PositionDetails dto = new PositionDetails(
-                position.getId(),
-                position.getDepartmentId(),
-                position.getName(),
-                position.getDescription(),
-                position.getHeadcount());
+    // public static PositionDetails toDTO(Position position, List<Staff> staffs) {
+    // PositionDetails dto = toDTO(position);
 
-        if (!staffs.isEmpty()) {
-            dto.staffs.addAll(
-                    staffs.stream()
-                            .map(StaffResponse::toDTO)
-                            .collect(Collectors.toList()));
-        }
+    // if (!staffs.isEmpty()) {
+    // dto.staffs.addAll(staffs.stream().map(StaffResponse::toDTO).toList());
+    // }
 
-        return dto;
-    }
+    // return dto;
+    // }
 }

@@ -4,7 +4,6 @@ import com.aresky.staffservice.dto.request.PositionCreateForm;
 import com.aresky.staffservice.dto.request.PositionUpdateForm;
 import com.aresky.staffservice.dto.response.PositionDetails;
 import com.aresky.staffservice.dto.response.PositionResponse;
-import com.aresky.staffservice.model.Position;
 
 import reactor.core.publisher.Mono;
 
@@ -12,11 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IPositionService {
-    Mono<List<Position>> getAllPositionsBy(Integer departmentId);
-
     Mono<List<PositionResponse>> getAllPositionResponses();
-
-    Mono<List<PositionResponse>> getAllPositionResponses(Integer departmentId);
 
     Mono<PositionDetails> getPositionDetailsBy(Integer positionId);
 
@@ -31,4 +26,8 @@ public interface IPositionService {
     Mono<PositionResponse> updatePosition(Integer positionId, String key, Object value);
 
     Mono<Void> deletePosition(Integer staffId);
+
+    Mono<Boolean> existsPositionById(Integer positionId);
+
+    Mono<Boolean> existsPositionByName(String name);
 }
