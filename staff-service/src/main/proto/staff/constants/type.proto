@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package constants;
+
+option java_package = "grpc.staff.constants.type";
+
+enum StaffStatus {
+  ACTIVE = 0;
+  INACTIVE = 1;
+  ON_LEAVE = 2;
+  CONTRACT = 3;
+  TERMINATED = 4;
+  RETIRED = 5;
+  PROBATION = 6;
+  TRAINING = 7;
+  SUSPENDED = 8;
+  TRANSFERRED = 9;
+}
+
+enum StaffGender {
+  MALE = 0;
+  FEMALE = 1;
+  OTHER = 2;
+}
