@@ -8,5 +8,4 @@ import lombok.NoArgsConstructor;
 public class PositionUpdateForm {
     private String name;
     private String description;
-    private Integer headcount;
 }

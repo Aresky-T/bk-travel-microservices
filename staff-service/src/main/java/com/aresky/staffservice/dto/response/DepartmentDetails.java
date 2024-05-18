@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.aresky.staffservice.model.Department;
-import com.aresky.staffservice.model.Position;
 import com.aresky.staffservice.model.Staff;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,7 +20,7 @@ public class DepartmentDetails {
     private String name;
     private String description;
     private Integer numberOfStaffs;
-    private List<PositionResponse> positions = new ArrayList<>();
+    private ManagerResponse manager;
     private List<StaffResponse> staffs = new ArrayList<>();
 
     public DepartmentDetails(Integer id, String name, String description, Integer numberOfStaffs) {
@@ -37,11 +37,15 @@ public class DepartmentDetails {
         this.numberOfStaffs = department.getNumberOfStaffs();
     }
 
-    public static DepartmentDetails toDTO(Department department, List<Staff> staffs, List<Position> positions) {
+    public static DepartmentDetails toDTO(Department department) {
+        return new DepartmentDetails(department);
+    }
+
+    public static DepartmentDetails toDTO(Department department, Staff manager, List<Staff> staffs) {
         DepartmentDetails dto = new DepartmentDetails(department);
 
-        if (!positions.isEmpty()) {
-            dto.positions = positions.stream().map(PositionResponse::toDTO).collect(Collectors.toList());
+        if (manager != null) {
+            dto.manager = ManagerResponse.toDTO(manager);
         }
 
         if (!staffs.isEmpty()) {
@@ -49,5 +53,33 @@ public class DepartmentDetails {
         }
 
         return dto;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ManagerResponse {
+        private Integer id;
+        private String firstName;
+        private String lastName;
+        private String avatarUrl;
+        private String email;
+        private String phone;
+        private String gender;
+        private String dateOfBirth;
+
+        public static ManagerResponse toDTO(Staff staff){
+            return ManagerResponse.builder()
+                    .id(staff.getId())
+                    .firstName(staff.getFirstName())
+                    .lastName(staff.getLastName())
+                    .avatarUrl(staff.getFirstName())
+                    .email(staff.getEmail())
+                    .phone(staff.getPhone())
+                    .gender(staff.getGender().name())
+                    .dateOfBirth(staff.getDateOfBirth().toString())
+                    .build();
+        }
     }
 }

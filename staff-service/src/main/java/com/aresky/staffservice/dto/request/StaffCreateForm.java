@@ -1,8 +1,6 @@
 package com.aresky.staffservice.dto.request;
 
-import java.math.BigDecimal;
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.aresky.staffservice.model.EGender;
 import com.aresky.staffservice.model.Staff;
@@ -21,9 +19,8 @@ public class StaffCreateForm {
     private String description;
     private String avatarUrl;
     private EGender gender;
-    private Date dateOfBirth;
-    private BigDecimal basicSalary;
-    private Date startedDate;
+    private LocalDate dateOfBirth;
+    private LocalDate hireDate;
     private String contractUrl;
 
     public static Staff toStaff(StaffCreateForm dto) {
@@ -32,13 +29,12 @@ public class StaffCreateForm {
                 .lastName(dto.lastName)
                 .avatarUrl(dto.avatarUrl)
                 .gender(dto.gender)
-                .dateOfBirth(dto.dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .dateOfBirth(dto.dateOfBirth)
                 .email(dto.email)
                 .phone(dto.phone)
                 .address(dto.address)
                 .description(dto.description)
-                .basicSalary(dto.basicSalary)
-                .startedDate(dto.startedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .hireDate(dto.hireDate)
                 .contractUrl(dto.contractUrl)
                 .build();
     }

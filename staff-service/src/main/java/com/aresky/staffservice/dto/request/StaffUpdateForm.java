@@ -1,9 +1,9 @@
 package com.aresky.staffservice.dto.request;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.aresky.staffservice.model.EGender;
+import com.aresky.staffservice.model.EStaffStatus;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +19,8 @@ public class StaffUpdateForm {
     private String description;
     private String avatarUrl;
     private EGender gender;
-    private Date dateOfBirth;
-    private BigDecimal basicSalary;
-    private Date startedDate;
+    private LocalDate dateOfBirth;
+    private LocalDate hireDate;
     private String contractUrl;
-    private Integer statusId;
+    private EStaffStatus status;
 }
