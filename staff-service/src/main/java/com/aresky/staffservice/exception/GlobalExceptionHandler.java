@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.format.DateTimeParseException;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -63,6 +65,15 @@ public class GlobalExceptionHandler {
                 log.error("ConverterNotFoundException: {}", ex.getMessage());
                 return ResponseEntity.status(500)
                                 .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                                                ex.getMessage(),
+                                                HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        }
+
+        @ExceptionHandler(DateTimeParseException.class)
+        public ResponseEntity<MessageResponse> handlingDateTimeParseException(DateTimeParseException ex){
+                log.error("DateTimeParseException: {}", ex.getMessage());
+                return ResponseEntity.status(500)
+                               .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                                                 ex.getMessage(),
                                                 HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
