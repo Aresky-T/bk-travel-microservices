@@ -6,12 +6,14 @@ import com.aresky.staffservice.dto.request.StaffUpdateForm;
 import com.aresky.staffservice.dto.response.StaffDetails;
 import com.aresky.staffservice.dto.response.StaffResponse;
 import com.aresky.staffservice.exception.StaffException;
-import com.aresky.staffservice.model.Department;
-import com.aresky.staffservice.model.Position;
+import com.aresky.staffservice.model.EJobStatus;
+import com.aresky.staffservice.model.EStaffStatus;
 import com.aresky.staffservice.model.Staff;
 import com.aresky.staffservice.repository.IDepartmentRepository;
+import com.aresky.staffservice.repository.IJobRepository;
 import com.aresky.staffservice.repository.IPositionRepository;
 import com.aresky.staffservice.repository.IStaffRepository;
+import com.aresky.staffservice.utils.FieldUtils;
 import com.google.common.base.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
@@ -43,6 +45,9 @@ public class StaffServiceImp implements IStaffService {
     private IPositionRepository positionRepository;
 
     @Autowired
+    private IJobRepository jobRepository;
+
+    @Autowired
     private DatabaseClient databaseClient;
 
     private final String[] BLACKLIST = {
@@ -50,54 +55,18 @@ public class StaffServiceImp implements IStaffService {
     };
 
     @Override
-    public Mono<List<Staff>> getAllStaffsBy(Integer departmentId) {
-        return staffRepository
-                .findAllByDepartmentId(departmentId)
-                .switchIfEmpty(Mono.empty())
-                .collectList();
-    }
-
-    @Override
-    public Mono<List<Staff>> getAllStaffsByPosition(Integer positionId) {
-        return staffRepository
-                .findAllByPositionId(positionId)
-                .switchIfEmpty(Mono.empty())
-                .collectList();
-    }
-
-    @Override
     public Mono<Page<StaffResponse>> getAllStaffResponses(Pageable pageable) {
         return staffRepository.findAllBy(pageable)
-                .switchIfEmpty(Mono.empty())
-                .flatMap(staff -> createStaffResponse(staff))
+                .switchIfEmpty(Flux.empty())
+                .map(StaffResponse::toDTO)
                 .collectList()
-                .map(dtos -> {
-                    return new PageImpl<>(dtos, pageable, dtos.size());
-                });
+                .zipWith(staffRepository.count())
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
     }
 
     @Override
     public Mono<Page<StaffResponse>> getAllStaffResponses(Pageable pageable, StaffFilter filter) {
         throw new StaffException("Đang phát triển!");
-    }
-
-    @Override
-    public Mono<List<StaffResponse>> getAllStaffResponses(Integer departmentId) {
-        return staffRepository
-                .findAllByDepartmentId(departmentId)
-                .switchIfEmpty(Mono.empty())
-                .flatMap(staff -> createStaffResponse(staff))
-                .collectList();
-    }
-
-    @Override
-    public Mono<List<StaffResponse>> getAllStaffResponses(Integer departmentId, Integer positionId) {
-        return staffRepository
-                .findAllByDepartmentId(departmentId)
-                .switchIfEmpty(Mono.empty())
-                .filter(staff -> staff.getPositionId() == positionId)
-                .flatMap(staff -> createStaffResponse(staff))
-                .collectList();
     }
 
     @Override
@@ -121,7 +90,8 @@ public class StaffServiceImp implements IStaffService {
         return Mono.zip(
                 existsByEmail(form.getEmail()),
                 existsByPhone(form.getPhone()),
-                existsByContractUrl(form.getContractUrl())).flatMap(tuple -> {
+                existsByContractUrl(form.getContractUrl()))
+                .flatMap(tuple -> {
                     boolean isExistEmail = tuple.getT1();
                     boolean isExistPhone = tuple.getT2();
                     boolean isExistContractUrl = tuple.getT3();
@@ -138,8 +108,12 @@ public class StaffServiceImp implements IStaffService {
                         throw new StaffException("Contract URL " + StaffException.ALREADY_EXIST);
                     }
 
-                    return staffRepository.save(StaffCreateForm.toStaff(form))
-                            .then();
+                    Staff staff = StaffCreateForm.toStaff(form);
+
+                    // set staff status to inactive
+                    staff.setStatus(EStaffStatus.INACTIVE);
+
+                    return staffRepository.save(staff).then();
                 });
     }
 
@@ -151,6 +125,7 @@ public class StaffServiceImp implements IStaffService {
                     List.of(StaffUpdateForm.class.getDeclaredFields())
                             .forEach(dtoField -> {
                                 try {
+                                    dtoField.setAccessible(true);
                                     String key = dtoField.getName();
                                     Object value = dtoField.get(form);
                                     updateFieldInStaff(staff, key, value);
@@ -160,7 +135,8 @@ public class StaffServiceImp implements IStaffService {
                             });
 
                     return staffRepository.save(staff).map(StaffResponse::toDTO);
-                });
+                })
+                .onErrorResume(err -> Mono.error(new StaffException(err.getMessage())));
     }
 
     @Transactional
@@ -182,60 +158,77 @@ public class StaffServiceImp implements IStaffService {
     }
 
     @Override
+    public Mono<Staff> updateStatus(Staff staff, EStaffStatus newStatus) {
+        return Mono.just(staff)
+                .flatMap(staffUpdate -> {
+                    staffUpdate.setStatus(newStatus);
+                    return staffRepository.save(staffUpdate);
+                });
+    }
+
+    @Override
+    public Mono<Boolean> existsAccountOfStaffByEmail(String email) {
+        return staffRepository.findByEmail(email)
+                .switchIfEmpty(Mono.error(new StaffException(StaffException.INVALID_STAFF_EMAIL)))
+                .thenReturn(true);
+    }
+
+    @Override
     public Mono<Void> deleteStaff(Integer staffId) {
         return findStaffById(staffId)
                 .map(staff -> staffRepository.delete(staff))
                 .then();
     }
 
-    private Mono<StaffDetails> createStaffDetails(Mono<Staff> staffMono) {
-        return staffMono.switchIfEmpty(Mono.empty())
-                .flatMap(staff -> {
-
-                    if (staff.getDepartmentId() == null) {
-                        return Mono.just(StaffDetails.toDTO(staff));
-                    }
-
-                    if (staff.getPositionId() == null) {
-                        return findDepartment(staff.getDepartmentId())
-                                .map(dept -> StaffDetails.toDTO(staff, dept));
-                    }
-
-                    return Mono.zip(
-                            findDepartment(staff.getDepartmentId()),
-                            findPosition(staff.getPositionId()))
-                            .map(tuple -> {
-                                Department dept = tuple.getT1();
-                                Position position = tuple.getT2();
-
-                                return StaffDetails.toDTO(staff, dept, position);
-                            });
-                });
+    @Override
+    public Mono<Boolean> existsStaffById(Integer staffId) {
+        return staffRepository.existsById(staffId);
     }
 
-    private Mono<StaffResponse> createStaffResponse(Staff staff) {
-        return Mono.just(staff).flatMap(value -> {
-            if (staff.getPositionId() == null) {
-                return Mono.just(StaffResponse.toDTO(staff));
-            }
+    @Override
+    public Mono<Staff> getStaffById(Integer staffId) {
+        return staffRepository.findById(staffId);
+    }
 
-            return positionRepository.findById(staff.getPositionId())
-                    .map(position -> StaffResponse.toDTO(staff, position));
-        });
+    @Override
+    public Mono<Void> layoffStaff(Integer staffId) {
+        return staffRepository.findById(staffId)
+                .switchIfEmpty(Mono.error(new StaffException(StaffException.INVALID_STAFF_ID)))
+                .flatMap(staff -> jobRepository.existsByStaffIdAndStatus(staffId, EJobStatus.CURRENT_JOB)
+                        .flatMap(isExist -> {
+                            if (isExist) {
+                                return Mono.error(new StaffException(
+                                        "Vui lòng kết thúc tất cả công việc của nhân viên trước khi sa thải!"));
+                            }
+
+                            staff.setStatus(EStaffStatus.TERMINATED);
+                            return staffRepository.save(staff).then();
+                        }));
+    }
+
+    private Mono<StaffDetails> createStaffDetails(Mono<Staff> staffMono) {
+        return staffMono
+                .switchIfEmpty(Mono.error(new StaffException(StaffException.STAFF_DOES_NOT_EXIST)))
+                .flatMap(staff -> jobRepository.existsById(staff.getId())
+                        .flatMap(existJob -> {
+                            if (Boolean.FALSE.equals(existJob)) {
+                                return Mono.just(StaffDetails.toDTO(staff));
+                            }
+
+                            return jobRepository.findByStaffId(staff.getId())
+                                    .flatMap(job -> Mono.zip(
+                                            positionRepository.findById(job.getPositionId()),
+                                            departmentRepository.findById(job.getDepartmentId()))
+                                            .map(tuple -> StaffDetails.toDTO(staff,
+                                                    StaffDetails.JobResponse.toDTO(job, tuple.getT1(),
+                                                            tuple.getT2()))));
+                        }));
     }
 
     private Mono<Staff> findStaffById(Integer staffId) {
         return staffRepository.findById(staffId)
-                .switchIfEmpty(Mono.error(new StaffException("ID " + StaffException.DOES_NOT_EXIST)))
+                .switchIfEmpty(Mono.error(new StaffException(StaffException.INVALID_STAFF_ID)))
                 .map(staff -> staff);
-    }
-
-    private Mono<Department> findDepartment(Integer departmentId) {
-        return departmentRepository.findById(departmentId);
-    }
-
-    private Mono<Position> findPosition(Integer positionId) {
-        return positionRepository.findById(positionId);
     }
 
     private Mono<Boolean> existsByEmail(String email) {
@@ -250,6 +243,7 @@ public class StaffServiceImp implements IStaffService {
         return staffRepository.existsByContractUrl(contractUrl);
     }
 
+    @SuppressWarnings("unused")
     private Mono<Staff> updateStaffEmail(Staff staff, String newEmail) {
         return Mono.just(!staff.getEmail().equals(newEmail))
                 .filter(Boolean.TRUE::equals)
@@ -265,6 +259,7 @@ public class StaffServiceImp implements IStaffService {
                         }));
     }
 
+    @SuppressWarnings("unused")
     private Mono<Staff> updateStaffPhone(Staff staff, String newPhone) {
         return Mono.just(!staff.getPhone().equals(newPhone))
                 .filter(Boolean.TRUE::equals)
@@ -281,6 +276,7 @@ public class StaffServiceImp implements IStaffService {
                         }));
     }
 
+    @SuppressWarnings("unused")
     private Mono<Staff> updateStaffContractUrl(Staff staff, String newContractUrl) {
         return Mono.just(!staff.getContractUrl().equals(newContractUrl))
                 .filter(Boolean.TRUE::equals)
@@ -298,59 +294,36 @@ public class StaffServiceImp implements IStaffService {
     }
 
     private Mono<Staff> updateStaffByField(Staff staff, String key, Object newValue) {
-        Field field = ReflectionUtils.findField(Staff.class, key);
-
-        if (field == null) {
-            throw new StaffException(key + " " + StaffException.DOES_NOT_EXIST);
-        }
-
         if (checkKeyExistInBlackList(key)) {
             throw new StaffException(StaffException.CAN_NOT_UPDATE + " " + key);
         }
 
-        field.setAccessible(true);
-        Object currentValue = null;
-
-        try {
-            currentValue = field.get(staff);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            throw new StaffException(e.getMessage());
-        }
+        Field field = FieldUtils.findField(staff, key);
+        Object currentValue = FieldUtils.findFieldValue(staff, field);
 
         Map<String, String> uniqueFieldsMap = getUniqueFieldsMap();
         boolean isUniqueField = uniqueFieldsMap.containsKey(key);
 
-        if (isUniqueField) {
-            if (!Objects.equal(currentValue, newValue)) {
-                String query = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END AS is_exists FROM staff AS s WHERE s."
-                        + uniqueFieldsMap.get(key) + " = :value";
+        if (!Objects.equal(currentValue, newValue) && isUniqueField) {
+            String query = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END AS is_exists FROM staff AS s WHERE s."
+                    + uniqueFieldsMap.get(key) + " = :value";
 
-                return databaseClient.sql(query)
-                        .bind("value", newValue)
-                        .map((row, metadata) -> row.get("is_exists", Integer.class) == 1)
-                        .one()
-                        .flatMap(isExistField -> {
-                            if (isExistField) {
-                                return Mono.error(new StaffException("Key " + key + " with value "
-                                        + String.valueOf(newValue) + " already exist!"));
-                            } else {
-                                ReflectionUtils.setField(field, staff, field.getType().cast(newValue));
-                            }
+            return databaseClient.sql(query)
+                    .bind("value", newValue)
+                    .map((row, metadata) -> row.get("is_exists", Integer.class) == 1)
+                    .one()
+                    .flatMap(isExistField -> {
+                        if (isExistField) {
+                            return Mono.error(new StaffException("Key " + key + " with value "
+                                    + String.valueOf(newValue) + " already exist!"));
+                        }
 
-                            return Mono.just(staff);
-                        });
-            }
+                        FieldUtils.setFieldValue(staff, field, newValue);
+                        return Mono.just(staff);
+                    });
         }
 
-        boolean isEnumField = field.getType().isEnum();
-
-        if (isEnumField) {
-            Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) field.getType(), String.valueOf(newValue));
-            ReflectionUtils.setField(field, staff, enumValue);
-        } else {
-            ReflectionUtils.setField(field, staff, field.getType().cast(newValue));
-        }
-
+        FieldUtils.setFieldValue(staff, field, newValue);
         return Mono.just(staff);
     }
 
@@ -359,21 +332,13 @@ public class StaffServiceImp implements IStaffService {
         return staff;
     }
 
-    private Staff updateFieldInStaff(Staff staff, String key, Object value) {
-        Field field = ReflectionUtils.findField(Staff.class, key);
-
-        if (field == null) {
-            throw new StaffException(key + " " + StaffException.DOES_NOT_EXIST);
-        }
-
+    private void updateFieldInStaff(Staff staff, String key, Object value) {
         if (checkKeyExistInBlackList(key)) {
             throw new StaffException(StaffException.CAN_NOT_UPDATE + " " + key);
         }
 
-        field.setAccessible(true);
-        ReflectionUtils.setField(field, staff, field.getType().cast(value));
-
-        return staff;
+        Field field = FieldUtils.findField(staff, key);
+        FieldUtils.setFieldValue(staff, field, value);
     }
 
     private boolean checkKeyExistInBlackList(String key) {
