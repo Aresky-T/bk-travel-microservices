@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package response;
+
+import "staff/fields/staff_firstname_field.proto";
+import "staff/fields/staff_lastname_field.proto";
+import "staff/constants/staff_gender.proto";
+import "staff/constants/staff_status.proto";
+import "staff/fields/staff_id_field.proto";
+import "staff/fields/staff_email_field.proto";
+
+option java_multiple_files = true;
+option java_package = "grpc.staff.dto.response";
+
+message StaffResponse {
+  fields.StaffIdField id = 1;
+  fields.StaffEmailField email = 2;
+  fields.StaffFirstnameField firstname = 3;
+  fields.StaffLastnameField lastname = 4;
+  constants.StaffGender gender = 5;
+  constants.StaffStatus status = 6;
+}
