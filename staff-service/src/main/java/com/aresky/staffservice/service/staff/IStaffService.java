@@ -39,9 +39,13 @@ public interface IStaffService {
 
     Mono<Boolean> existsStaffById(Integer staffId);
 
-    Mono<Boolean> existsAccountOfStaffByEmail(String email);
+    Mono<Boolean> existsStaffByEmail(String email);
+
+    Mono<String> checkAccountOfStaffByEmail(String email);
 
     Mono<Staff> getStaffById(Integer staffId);
+
+    Mono<Staff> getStaffByEmail(String email);
 
     Mono<Void> layoffStaff(Integer staffId);
 }

@@ -13,6 +13,7 @@ import com.aresky.staffservice.repository.IDepartmentRepository;
 import com.aresky.staffservice.repository.IJobRepository;
 import com.aresky.staffservice.repository.IPositionRepository;
 import com.aresky.staffservice.repository.IStaffRepository;
+import com.aresky.staffservice.service.account.IAccountService;
 import com.aresky.staffservice.utils.FieldUtils;
 import com.google.common.base.Objects;
 
@@ -46,6 +47,9 @@ public class StaffServiceImp implements IStaffService {
 
     @Autowired
     private IJobRepository jobRepository;
+
+    @Autowired
+    private IAccountService accountService;
 
     @Autowired
     private DatabaseClient databaseClient;
@@ -167,10 +171,24 @@ public class StaffServiceImp implements IStaffService {
     }
 
     @Override
-    public Mono<Boolean> existsAccountOfStaffByEmail(String email) {
+    public Mono<String> checkAccountOfStaffByEmail(String email) {
         return staffRepository.findByEmail(email)
                 .switchIfEmpty(Mono.error(new StaffException(StaffException.INVALID_STAFF_EMAIL)))
-                .thenReturn(true);
+                .flatMap(staff -> {
+                    if(staff.getAccountId() != null) {
+                        return Mono.just("Đã có tài khoản trong hệ thống!");
+                    }
+
+                    return accountService.checkAccountByEmail(email)
+                            .flatMap(account -> {
+                                staff.setAccountId(account.getId());
+                                return staffRepository.save(staff)
+                                        .then()
+                                        .thenReturn("Đã có tài khoản trong hệ thống!");
+                            });
+                })
+                .switchIfEmpty(Mono.just("Chưa có tài khoản trong hệ thống!"));
+
     }
 
     @Override
@@ -186,8 +204,18 @@ public class StaffServiceImp implements IStaffService {
     }
 
     @Override
+    public Mono<Boolean> existsStaffByEmail(String email) {
+        return staffRepository.existsByEmail(email);
+    }
+
+    @Override
     public Mono<Staff> getStaffById(Integer staffId) {
         return staffRepository.findById(staffId);
+    }
+
+    @Override
+    public Mono<Staff> getStaffByEmail(String email) {
+        return staffRepository.findByEmail(email);
     }
 
     @Override
