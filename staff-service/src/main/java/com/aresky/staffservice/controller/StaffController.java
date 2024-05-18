@@ -57,7 +57,7 @@ public class StaffController {
 
     @GetMapping("/check-account/email")
     public Mono<ResponseEntity<?>> checkStaffByEmail(@RequestParam String email) {
-        return staffService.existsAccountOfStaffByEmail(email).map(ResponseEntity::ok);
+        return staffService.checkAccountOfStaffByEmail(email).map(ResponseEntity::ok);
     }
 
     // POST - createStaff(StaffCreateForm form)

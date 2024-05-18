@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package constants;
 
+option java_multiple_files = true;
 option java_package = "grpc.staff.constants.type";
 
 enum StaffStatus {
@@ -15,10 +16,4 @@ enum StaffStatus {
   TRAINING = 7;
   SUSPENDED = 8;
   TRANSFERRED = 9;
-}
-
-enum StaffGender {
-  MALE = 0;
-  FEMALE = 1;
-  OTHER = 2;
 }
