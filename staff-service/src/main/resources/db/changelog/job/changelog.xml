@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table job" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table job already exist!">
+            <not>
+                <tableExists tableName="job"/>
+            </not>
+        </preConditions>
+        <createTable tableName="job" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="staff_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="department_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salary" type="DECIMAL(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="ENUM('CURRENT_JOB', 'END_JOB')">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE job
+            ADD CONSTRAINT fk_staff_id FOREIGN KEY (staff_id) REFERENCES staff (id) ON DELETE CASCADE;
+        </sql>
+        <sql>
+            ALTER TABLE job
+            ADD CONSTRAINT fk_department_id FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE CASCADE;
+        </sql>
+        <sql>
+            ALTER TABLE job
+            ADD CONSTRAINT fk_position_id FOREIGN KEY (position_id) REFERENCES position (id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

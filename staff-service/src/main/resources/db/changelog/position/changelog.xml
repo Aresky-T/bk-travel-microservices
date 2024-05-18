@@ -14,26 +14,19 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="department_id" type="INT">
-                <constraints nullable="false" />
-            </column>
             <column name="name" type="VARCHAR(100)">
                 <constraints nullable="false" unique="true" />
             </column>
             <column name="description" type="VARCHAR(1000)">
                 <constraints nullable="false" />
             </column>
-            <column name="headcount" type="INT">
-                <constraints nullable="false" checkConstraint="headcount > 0" />
+            <column name="basic_salary" type="DECIMAL(10,2)">
+                <constraints nullable="false" />
             </column>
         </createTable>
-        <addForeignKeyConstraint
-            baseTableName="position"
-            baseColumnNames="department_id"
-            constraintName="position_fk_department_id"
-            referencedTableName="department"
-            referencedColumnNames="id"
-            onDelete="CASCADE"
-        />
+        <sql>
+            ALTER TABLE position
+            ADD CONSTRAINT ck_basic_salary_non_negative CHECK (basic_salary >= 0);
+        </sql>
     </changeSet>
 </databaseChangeLog>
