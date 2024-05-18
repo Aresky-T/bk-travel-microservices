@@ -25,6 +25,9 @@ public class Department {
     @Column("description")
     private String description;
 
+    @Column("manager_id")
+    private Integer managerId;
+
     @Column("number_of_staffs")
     private Integer numberOfStaffs;
 }

@@ -1,6 +1,5 @@
 package com.aresky.staffservice.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
@@ -49,24 +48,15 @@ public class Staff {
     @Column("description")
     private String description;
 
-    @Column("basic_salary")
-    private BigDecimal basicSalary;
-
-    @Column("started_date")
-    private LocalDate startedDate;
+    @Column("hire_date")
+    private LocalDate hireDate;
 
     @Column("contract_url")
     private String contractUrl;
 
+    @Column("status")
+    private EStaffStatus status;
+
     @Column("account_id")
     private Integer accountId;
-
-    @Column("department_id")
-    private Integer departmentId;
-
-    @Column("position_id")
-    private Integer positionId;
-
-    @Column("status")
-    private EStatus status;
 }
