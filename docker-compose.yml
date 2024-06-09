@@ -161,6 +161,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  chat-service:
+    container_name: chat-service
+    image: chat-service-image:v1.0.0
+    ports:
+      - "8087:8087"
+    depends_on:
+      - mysql-server
+    build:
+      context: ./chat-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./chat-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
