@@ -26,7 +26,4 @@ public class Customer {
 
     @Column("status")
     private EActivationStatus status;
-
-    @Column("account_id")
-    private Integer accountId;
 }

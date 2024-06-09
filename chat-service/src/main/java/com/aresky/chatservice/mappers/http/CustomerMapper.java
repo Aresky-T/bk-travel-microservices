@@ -14,7 +14,7 @@ public class CustomerMapper {
                 .build();
     }
 
-    public CustomerResponse mapCustomerToCustomerResponse(Customer customer){
+    public static CustomerResponse mapCustomerToCustomerResponse(Customer customer){
         return CustomerResponse.builder()
                .id(customer.getId())
                .fullName(customer.getFullName())

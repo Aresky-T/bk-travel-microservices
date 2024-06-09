@@ -11,15 +11,45 @@
             </not>
         </preConditions>
         <createTable tableName="staff" ifNotExists="true">
-            <column name="id" type="INT" autoIncrement="true">
+            <column name="id" type="INT">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="account_id" type="INT">
+            <column name="email" type="VARCHAR(100)">
                 <constraints nullable="false" unique="true" />
             </column>
             <column name="status" type="ENUM('ONLINE', 'OFFLINE')" defaultValue="OFFLINE">
                 <constraints nullable="false" />
             </column>
         </createTable>
+    </changeSet>
+    <changeSet id="Add new column full_name for table staff" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column full_name already exist!">
+            <and>
+                <tableExists tableName="staff" />
+                <not>
+                    <columnExists tableName="staff" columnName="full_name" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="staff">
+            <column name="full_name" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="Add new column avatar_url for table staff" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column avatar_url already exist!">
+            <and>
+                <tableExists tableName="staff" />
+                <not>
+                    <columnExists tableName="staff" columnName="avatar_url" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="staff">
+            <column name="avatar_url" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

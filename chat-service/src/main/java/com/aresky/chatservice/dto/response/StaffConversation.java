@@ -5,15 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationForCustomer {
+public class StaffConversation {
     private Integer id;
     private CustomerResponse customer;
-    private StaffResponse staff;
-    private List<MessageResponse> chatList;
+    private Integer newCustomerMessageCount;
+    private MessageResponse latestMessage;
+    private String createdAt;
 }

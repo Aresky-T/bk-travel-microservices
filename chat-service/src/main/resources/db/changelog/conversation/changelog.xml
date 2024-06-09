@@ -1,40 +1,121 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
 >
     <changeSet id="Create table conversation" author="Aresky" runAlways="true">
         <preConditions onFail="CONTINUE" onFailMessage="Table conversation already exist!">
             <not>
-                <tableExists tableName="conversation"/>
+                <tableExists tableName="conversation" />
             </not>
         </preConditions>
         <createTable tableName="conversation" ifNotExists="true">
             <column name="id" type="INT" autoIncrement="true">
-                <constraints nullable="false" primaryKey="true"/>
+                <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="customer_id" type="INT">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="staff_id" type="INT">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
             <column name="created_at" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
-                <constraints nullable="false"/>
+                <constraints nullable="false" />
             </column>
         </createTable>
-        <sql>
-            ALTER TABLE conversation
-            ADD CONSTRAINT fk_customer_id FOREIGN KEY (customer_id) REFERENCES `customer` (id) ON DELETE CASCADE;
-        </sql>
-        <sql>
-            ALTER TABLE conversation
-            ADD CONSTRAINT fk_staff_id FOREIGN KEY (staff_id) REFERENCES `staff` (id) ON DELETE CASCADE;
-        </sql>
-        <sql>
-            ALTER TABLE conversation
-            ADD CONSTRAINT uk_customer_id_staff_id UNIQUE KEY (customer_id, staff_id);
-        </sql>
+        <sql> ALTER TABLE conversation ADD CONSTRAINT fk_customer_id FOREIGN KEY (customer_id)
+            REFERENCES `customer` (id) ON DELETE CASCADE; </sql>
+        <sql> ALTER TABLE conversation ADD CONSTRAINT fk_staff_id FOREIGN KEY (staff_id) REFERENCES
+            `staff` (id) ON DELETE CASCADE; </sql>
+        <sql> ALTER TABLE conversation ADD CONSTRAINT uk_customer_id_staff_id UNIQUE KEY
+            (customer_id, staff_id); </sql>
+    </changeSet>
+    <changeSet id="Add new column latest_message_id for table conversation" author="Aresky"
+        runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column latest_message_id already exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <not>
+                    <columnExists tableName="conversation" columnName="latest_message_id" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="latest_message_id" type="INT" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="Add new column new_customer_msg_count for table conversation" author="Aresky"
+        runAlways="true">
+        <preConditions onFail="CONTINUE"
+            onFailMessage="Column new_customer_msg_count already exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <not>
+                    <columnExists tableName="conversation" columnName="new_customer_msg_count" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="new_customer_msg_count" type="INT" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <sql> ALTER TABLE conversation ADD CONSTRAINT ck_new_customer_msg_count CHECK
+            (new_customer_msg_count >= 0); </sql>
+    </changeSet>
+    <changeSet id="Add new column new_staff_msg_count for table conversation" author="Aresky"
+        runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column new_staff_msg_count already exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <not>
+                    <columnExists tableName="conversation" columnName="new_staff_msg_count" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="new_staff_msg_count" type="INT" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <sql> ALTER TABLE conversation ADD CONSTRAINT ck_new_staff_msg_count CHECK
+            (new_staff_msg_count >= 0); </sql>
+    </changeSet>
+    <changeSet id="Drop column latest_message_id" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column latest_message_id doesn't exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <columnExists tableName="conversation" columnName="latest_message_id" />
+            </and>
+        </preConditions>
+        <dropColumn tableName="conversation" columnName="latest_message_id" />
+    </changeSet>
+    <changeSet id="Add new column latest_customer_msg_id" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE"
+            onFailMessage="Column latest_customer_msg_id already exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <not>
+                    <columnExists tableName="conversation" columnName="latest_customer_msg_id" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="latest_customer_msg_id" type="INT" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="Add new column latest_staff_msg_id" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column latest_staff_msg_id already exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <not>
+                    <columnExists tableName="conversation" columnName="latest_staff_msg_id" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="latest_staff_msg_id" type="INT" />
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

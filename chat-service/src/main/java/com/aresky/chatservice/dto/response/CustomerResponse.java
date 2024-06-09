@@ -14,5 +14,4 @@ public class CustomerResponse {
     private String status;
     private String fullName;
     private String email;
-    private String avatarUrl;
 }
