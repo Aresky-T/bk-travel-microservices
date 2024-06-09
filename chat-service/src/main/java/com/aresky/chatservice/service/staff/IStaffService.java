@@ -10,21 +10,21 @@ import java.util.List;
 public interface IStaffService {
     Mono<Staff> save(Staff staff);
 
-    Mono<Staff> create(Integer staffId, Integer accountId);
+    Mono<Void> create(String email);
 
     Mono<Staff> getStaffById(Integer staffId);
 
-    Mono<Staff> getStaffByAccountId(Integer accountId);
+    Mono<Staff> getStaffByEmail(String email);
 
     Mono<List<Staff>> getAllStaffsBy(EActivationStatus status);
 
     Mono<Staff> getRandomOnlineStaff();
 
-    Mono<Boolean> validateStaffByAccountId(Integer accountId);
-
     Mono<Boolean> existsById(Integer staffId);
 
-    Mono<Boolean> existsByAccountId(Integer accountId);
+    Mono<Boolean> existsByEmail(String email);
+
+    Mono<Void> updateStatus(Integer staffId, EActivationStatus status);
 
     Mono<Void> deleteStaff(Integer staffId);
 }
