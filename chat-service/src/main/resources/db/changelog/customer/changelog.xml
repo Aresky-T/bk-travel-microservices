@@ -23,7 +23,6 @@
             <column name="status" type="ENUM('ONLINE', 'OFFLINE')" defaultValue="OFFLINE">
                 <constraints nullable="false"/>
             </column>
-            <column name="account_id" type="INT"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>
