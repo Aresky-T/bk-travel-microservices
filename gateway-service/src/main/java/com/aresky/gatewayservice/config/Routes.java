@@ -44,33 +44,41 @@ public class Routes {
                                 "/api/v1/payment/**"
                 };
 
+                String[] chatPaths = {
+                                "/api/v1/chat/**"
+                };
+
                 this.registerRoute(
                                 "auth-service",
-                                "http://auth-service:8081",
+                                "lb://auth-service",
                                 authPaths);
                 this.registerRoute(
                                 "account-service",
-                                "http://account-service:8082",
+                                "lb://account-service",
                                 accountPaths);
                 this.registerRoute(
                                 "tour-service",
-                                "http://tour-service:8083",
+                                "lb://tour-service",
                                 tourPaths);
                 this.registerRoute(
                                 "booking-service",
-                                "http://booking-service:8084",
+                                "lb://booking-service",
                                 bookingPaths);
                 this.registerRoute(
                                 "staff-service",
-                                "http://staff-service:8085",
+                                "lb://staff-service",
                                 staffPaths);
                 this.registerRoute(
                                 "tourist-attraction-service",
-                                "http://tourist-attraction-service:8086",
+                                "lb://tourist-attraction-service",
                                 touristAttractionPaths);
                 this.registerRoute("payment-service",
-                                "http://payment-service:8090",
+                                "lb://payment-service",
                                 paymentPaths);
+                this.registerRoute(
+                                "chat-service",
+                                "lb://chat-service",
+                                chatPaths);
         }
 
         public Route getRoute(String id) {

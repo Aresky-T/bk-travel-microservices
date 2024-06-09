@@ -23,6 +23,7 @@ public class RouterConfig {
                 Route bookingService = routes.getRoute("booking-service");
                 Route touristAttractionService = routes.getRoute("tourist-attraction-service");
                 Route staffService = routes.getRoute("staff-service");
+                Route chatService = routes.getRoute("chat-service");
 
                 return builder.routes()
                                 .route(authRoute.getId(), r -> r
@@ -43,6 +44,9 @@ public class RouterConfig {
                                 .route(staffService.getId(), r -> r
                                                 .path(staffService.getPaths())
                                                 .uri(staffService.getUri()))
+                                .route(chatService.getId(), r -> r
+                                                .path(chatService.getPaths())
+                                                .uri(chatService.getUri()))
                                 .build();
         }
 }
