@@ -1,7 +1,5 @@
 package com.aresky.chatservice.dto.response;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,11 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationForEmployee {
+public class CustomerConversation {
     private Integer id;
+    private Integer newStaffMessageCount;
+    private MessageResponse latestStaffMessage;
     private String createdAt;
-    private CustomerResponse customer;
-    private Integer newMessagesCount;
-    private MessageResponse latestMessage;
-    private List<MessageResponse> messageList;
 }

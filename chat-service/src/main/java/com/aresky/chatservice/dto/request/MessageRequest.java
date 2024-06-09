@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class MessageRequest {
-    private Integer conversationId;
     private String content;
     private EMessageSender sender;
+    private Integer senderId;
 }

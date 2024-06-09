@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StaffResponse {
     private Integer id;
+    private String fullName;
     private String status;
     private String avatarUrl;
 }
