@@ -11,7 +11,7 @@ public class StaffMapper {
                 .id(input.getId().getId())
                 .email(input.getEmail().getEmail())
                 .fullName(input.getLastname().getLastName() + " " + input.getFirstname().getFistName())
-                .avatarUrl("null")
+                .avatarUrl(input.getAvatarUrl().getAvatarUrl())
                 .status(EActivationStatus.OFFLINE)
                 .build();
     }

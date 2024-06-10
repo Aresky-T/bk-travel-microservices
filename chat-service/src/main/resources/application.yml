@@ -14,7 +14,7 @@ spring:
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: localhost
+    hostname: chat-service
     appname: chat-service
   client:
     service-url:
