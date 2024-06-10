@@ -5,8 +5,8 @@
 package grpc.staff.dto.response;
 
 public interface StaffResponseOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:response.StaffResponse)
-    com.google.protobuf.MessageOrBuilder {
+        // @@protoc_insertion_point(interface_extends:response.StaffResponse)
+        com.google.protobuf.MessageOrBuilder {
 
   /**
    * <code>.fields.StaffIdField id = 1;</code>
@@ -89,4 +89,19 @@ public interface StaffResponseOrBuilder extends
    * @return The status.
    */
   grpc.staff.constants.type.StaffStatus getStatus();
+
+  /**
+   * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+   * @return Whether the avatarUrl field is set.
+   */
+  boolean hasAvatarUrl();
+  /**
+   * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+   * @return The avatarUrl.
+   */
+  grpc.staff.fields.StaffAvatarUrlField getAvatarUrl();
+  /**
+   * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+   */
+  grpc.staff.fields.StaffAvatarUrlFieldOrBuilder getAvatarUrlOrBuilder();
 }
