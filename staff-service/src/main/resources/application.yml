@@ -10,7 +10,8 @@ spring:
     change-log: classpath:/db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: localhost
+    appname: staff-service
+    hostname: staff-service
   client:
     enabled: true
     service-url:

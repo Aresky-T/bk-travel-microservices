@@ -8,6 +8,7 @@ import "staff/constants/staff_gender.proto";
 import "staff/constants/staff_status.proto";
 import "staff/fields/staff_id_field.proto";
 import "staff/fields/staff_email_field.proto";
+import "staff/fields/staff_avatar_url_field.proto";
 
 option java_multiple_files = true;
 option java_package = "grpc.staff.dto.response";
@@ -19,4 +20,5 @@ message StaffResponse {
   fields.StaffLastnameField lastname = 4;
   constants.StaffGender gender = 5;
   constants.StaffStatus status = 6;
+  fields.StaffAvatarUrlField avatar_url = 7;
 }

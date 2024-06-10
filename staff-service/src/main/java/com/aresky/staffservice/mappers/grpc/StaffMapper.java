@@ -4,10 +4,7 @@ import com.aresky.staffservice.model.Staff;
 import grpc.staff.constants.type.StaffGender;
 import grpc.staff.constants.type.StaffStatus;
 import grpc.staff.dto.response.StaffResponse;
-import grpc.staff.fields.StaffEmailField;
-import grpc.staff.fields.StaffFirstnameField;
-import grpc.staff.fields.StaffIdField;
-import grpc.staff.fields.StaffLastnameField;
+import grpc.staff.fields.*;
 
 public class StaffMapper {
     public static StaffResponse mapStaffToStaffResponse(Staff staff){
@@ -18,6 +15,7 @@ public class StaffMapper {
                 .setLastname(StaffLastnameField.newBuilder().setLastName(staff.getLastName()).build())
                 .setGender(StaffGender.valueOf(staff.getGender().name()))
                 .setStatus(StaffStatus.valueOf(staff.getStatus().name()))
+                .setAvatarUrl(StaffAvatarUrlField.newBuilder().setAvatarUrl(staff.getAvatarUrl()).build())
                 .build();
     }
 }
