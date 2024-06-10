@@ -17,7 +17,7 @@ public final class StaffResponseOuterClass {
   }
   static final com.google.protobuf.Descriptors.Descriptor
     internal_static_response_StaffResponse_descriptor;
-  static final 
+  static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_response_StaffResponse_fieldAccessorTable;
 
@@ -35,15 +35,17 @@ public final class StaffResponseOuterClass {
       "me_field.proto\032\"staff/constants/staff_ge" +
       "nder.proto\032\"staff/constants/staff_status" +
       ".proto\032!staff/fields/staff_id_field.prot" +
-      "o\032$staff/fields/staff_email_field.proto\"" +
-      "\207\002\n\rStaffResponse\022 \n\002id\030\001 \001(\0132\024.fields.S" +
-      "taffIdField\022&\n\005email\030\002 \001(\0132\027.fields.Staf" +
-      "fEmailField\022.\n\tfirstname\030\003 \001(\0132\033.fields." +
-      "StaffFirstnameField\022,\n\010lastname\030\004 \001(\0132\032." +
-      "fields.StaffLastnameField\022&\n\006gender\030\005 \001(" +
-      "\0162\026.constants.StaffGender\022&\n\006status\030\006 \001(" +
-      "\0162\026.constants.StaffStatusB\033\n\027grpc.staff." +
-      "dto.responseP\001b\006proto3"
+      "o\032$staff/fields/staff_email_field.proto\032" +
+      ")staff/fields/staff_avatar_url_field.pro" +
+      "to\"\270\002\n\rStaffResponse\022 \n\002id\030\001 \001(\0132\024.field" +
+      "s.StaffIdField\022&\n\005email\030\002 \001(\0132\027.fields.S" +
+      "taffEmailField\022.\n\tfirstname\030\003 \001(\0132\033.fiel" +
+      "ds.StaffFirstnameField\022,\n\010lastname\030\004 \001(\013" +
+      "2\032.fields.StaffLastnameField\022&\n\006gender\030\005" +
+      " \001(\0162\026.constants.StaffGender\022&\n\006status\030\006" +
+      " \001(\0162\026.constants.StaffStatus\022/\n\navatar_u" +
+      "rl\030\007 \001(\0132\033.fields.StaffAvatarUrlFieldB\033\n" +
+      "\027grpc.staff.dto.responseP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -54,19 +56,21 @@ public final class StaffResponseOuterClass {
           grpc.staff.constants.type.StaffStatusOuterClass.getDescriptor(),
           grpc.staff.fields.StaffIdFieldOuterClass.getDescriptor(),
           grpc.staff.fields.StaffEmailFieldOuterClass.getDescriptor(),
+          grpc.staff.fields.StaffAvatarUrlFieldOuterClass.getDescriptor(),
         });
     internal_static_response_StaffResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_response_StaffResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_response_StaffResponse_descriptor,
-        new String[] { "Id", "Email", "Firstname", "Lastname", "Gender", "Status", });
+        new String[] { "Id", "Email", "Firstname", "Lastname", "Gender", "Status", "AvatarUrl", });
     grpc.staff.fields.StaffFirstnameFieldOuterClass.getDescriptor();
     grpc.staff.fields.StaffLastnameFieldOuterClass.getDescriptor();
     grpc.staff.constants.type.StaffGenderOuterClass.getDescriptor();
     grpc.staff.constants.type.StaffStatusOuterClass.getDescriptor();
     grpc.staff.fields.StaffIdFieldOuterClass.getDescriptor();
     grpc.staff.fields.StaffEmailFieldOuterClass.getDescriptor();
+    grpc.staff.fields.StaffAvatarUrlFieldOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

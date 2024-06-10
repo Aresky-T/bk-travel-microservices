@@ -182,6 +182,32 @@ private static final long serialVersionUID = 0L;
     return result == null ? grpc.staff.constants.type.StaffStatus.UNRECOGNIZED : result;
   }
 
+  public static final int AVATAR_URL_FIELD_NUMBER = 7;
+  private grpc.staff.fields.StaffAvatarUrlField avatarUrl_;
+  /**
+   * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+   * @return Whether the avatarUrl field is set.
+   */
+  @Override
+  public boolean hasAvatarUrl() {
+    return ((bitField0_ & 0x00000010) != 0);
+  }
+  /**
+   * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+   * @return The avatarUrl.
+   */
+  @Override
+  public grpc.staff.fields.StaffAvatarUrlField getAvatarUrl() {
+    return avatarUrl_ == null ? grpc.staff.fields.StaffAvatarUrlField.getDefaultInstance() : avatarUrl_;
+  }
+  /**
+   * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+   */
+  @Override
+  public grpc.staff.fields.StaffAvatarUrlFieldOrBuilder getAvatarUrlOrBuilder() {
+    return avatarUrl_ == null ? grpc.staff.fields.StaffAvatarUrlField.getDefaultInstance() : avatarUrl_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @Override
   public final boolean isInitialized() {
@@ -213,6 +239,9 @@ private static final long serialVersionUID = 0L;
     }
     if (status_ != grpc.staff.constants.type.StaffStatus.ACTIVE.getNumber()) {
       output.writeEnum(6, status_);
+    }
+    if (((bitField0_ & 0x00000010) != 0)) {
+      output.writeMessage(7, getAvatarUrl());
     }
     getUnknownFields().writeTo(output);
   }
@@ -246,6 +275,10 @@ private static final long serialVersionUID = 0L;
     if (status_ != grpc.staff.constants.type.StaffStatus.ACTIVE.getNumber()) {
       size += com.google.protobuf.CodedOutputStream
         .computeEnumSize(6, status_);
+    }
+    if (((bitField0_ & 0x00000010) != 0)) {
+      size += com.google.protobuf.CodedOutputStream
+              .computeMessageSize(7, getAvatarUrl());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -284,6 +317,11 @@ private static final long serialVersionUID = 0L;
     }
     if (gender_ != other.gender_) return false;
     if (status_ != other.status_) return false;
+    if (hasAvatarUrl() != other.hasAvatarUrl()) return false;
+    if (hasAvatarUrl()) {
+      if (!getAvatarUrl()
+              .equals(other.getAvatarUrl())) return false;
+    }
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -315,6 +353,10 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + gender_;
     hash = (37 * hash) + STATUS_FIELD_NUMBER;
     hash = (53 * hash) + status_;
+    if (hasAvatarUrl()) {
+      hash = (37 * hash) + AVATAR_URL_FIELD_NUMBER;
+      hash = (53 * hash) + getAvatarUrl().hashCode();
+    }
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -449,6 +491,7 @@ private static final long serialVersionUID = 0L;
         getEmailFieldBuilder();
         getFirstnameFieldBuilder();
         getLastnameFieldBuilder();
+        getAvatarUrlFieldBuilder();
       }
     }
     @Override
@@ -477,6 +520,11 @@ private static final long serialVersionUID = 0L;
       }
       gender_ = 0;
       status_ = 0;
+      avatarUrl_ = null;
+      if (avatarUrlBuilder_ != null) {
+        avatarUrlBuilder_.dispose();
+        avatarUrlBuilder_ = null;
+      }
       return this;
     }
 
@@ -540,6 +588,12 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000020) != 0)) {
         result.status_ = status_;
+      }
+      if (((from_bitField0_ & 0x00000040) != 0)) {
+        result.avatarUrl_ = avatarUrlBuilder_ == null
+                ? avatarUrl_
+                : avatarUrlBuilder_.build();
+        to_bitField0_ |= 0x00000010;
       }
       result.bitField0_ |= to_bitField0_;
     }
@@ -606,6 +660,9 @@ private static final long serialVersionUID = 0L;
       if (other.status_ != 0) {
         setStatusValue(other.getStatusValue());
       }
+      if (other.hasAvatarUrl()) {
+        mergeAvatarUrl(other.getAvatarUrl());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -670,6 +727,13 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000020;
               break;
             } // case 48
+            case 58: {
+              input.readMessage(
+                      getAvatarUrlFieldBuilder().getBuilder(),
+                      extensionRegistry);
+              bitField0_ |= 0x00000040;
+              break;
+            } // case 58
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -1276,15 +1340,136 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
+    private grpc.staff.fields.StaffAvatarUrlField avatarUrl_;
+    private com.google.protobuf.SingleFieldBuilderV3<
+            grpc.staff.fields.StaffAvatarUrlField, grpc.staff.fields.StaffAvatarUrlField.Builder, grpc.staff.fields.StaffAvatarUrlFieldOrBuilder> avatarUrlBuilder_;
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     * @return Whether the avatarUrl field is set.
+     */
+    public boolean hasAvatarUrl() {
+      return ((bitField0_ & 0x00000040) != 0);
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     * @return The avatarUrl.
+     */
+    public grpc.staff.fields.StaffAvatarUrlField getAvatarUrl() {
+      if (avatarUrlBuilder_ == null) {
+        return avatarUrl_ == null ? grpc.staff.fields.StaffAvatarUrlField.getDefaultInstance() : avatarUrl_;
+      } else {
+        return avatarUrlBuilder_.getMessage();
+      }
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    public Builder setAvatarUrl(grpc.staff.fields.StaffAvatarUrlField value) {
+      if (avatarUrlBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        avatarUrl_ = value;
+      } else {
+        avatarUrlBuilder_.setMessage(value);
+      }
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    public Builder setAvatarUrl(
+            grpc.staff.fields.StaffAvatarUrlField.Builder builderForValue) {
+      if (avatarUrlBuilder_ == null) {
+        avatarUrl_ = builderForValue.build();
+      } else {
+        avatarUrlBuilder_.setMessage(builderForValue.build());
+      }
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    public Builder mergeAvatarUrl(grpc.staff.fields.StaffAvatarUrlField value) {
+      if (avatarUrlBuilder_ == null) {
+        if (((bitField0_ & 0x00000040) != 0) &&
+                avatarUrl_ != null &&
+                avatarUrl_ != grpc.staff.fields.StaffAvatarUrlField.getDefaultInstance()) {
+          getAvatarUrlBuilder().mergeFrom(value);
+        } else {
+          avatarUrl_ = value;
+        }
+      } else {
+        avatarUrlBuilder_.mergeFrom(value);
+      }
+      if (avatarUrl_ != null) {
+        bitField0_ |= 0x00000040;
+        onChanged();
+      }
+      return this;
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    public Builder clearAvatarUrl() {
+      bitField0_ = (bitField0_ & ~0x00000040);
+      avatarUrl_ = null;
+      if (avatarUrlBuilder_ != null) {
+        avatarUrlBuilder_.dispose();
+        avatarUrlBuilder_ = null;
+      }
+      onChanged();
+      return this;
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    public grpc.staff.fields.StaffAvatarUrlField.Builder getAvatarUrlBuilder() {
+      bitField0_ |= 0x00000040;
+      onChanged();
+      return getAvatarUrlFieldBuilder().getBuilder();
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    public grpc.staff.fields.StaffAvatarUrlFieldOrBuilder getAvatarUrlOrBuilder() {
+      if (avatarUrlBuilder_ != null) {
+        return avatarUrlBuilder_.getMessageOrBuilder();
+      } else {
+        return avatarUrl_ == null ?
+                grpc.staff.fields.StaffAvatarUrlField.getDefaultInstance() : avatarUrl_;
+      }
+    }
+    /**
+     * <code>.fields.StaffAvatarUrlField avatar_url = 7;</code>
+     */
+    private com.google.protobuf.SingleFieldBuilderV3<
+            grpc.staff.fields.StaffAvatarUrlField, grpc.staff.fields.StaffAvatarUrlField.Builder, grpc.staff.fields.StaffAvatarUrlFieldOrBuilder>
+    getAvatarUrlFieldBuilder() {
+      if (avatarUrlBuilder_ == null) {
+        avatarUrlBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+                grpc.staff.fields.StaffAvatarUrlField, grpc.staff.fields.StaffAvatarUrlField.Builder, grpc.staff.fields.StaffAvatarUrlFieldOrBuilder>(
+                getAvatarUrl(),
+                getParentForChildren(),
+                isClean());
+        avatarUrl_ = null;
+      }
+      return avatarUrlBuilder_;
+    }
     @Override
     public final Builder setUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.setUnknownFields(unknownFields);
     }
 
     @Override
     public final Builder mergeUnknownFields(
-        final com.google.protobuf.UnknownFieldSet unknownFields) {
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
 
@@ -1303,12 +1488,12 @@ private static final long serialVersionUID = 0L;
   }
 
   private static final com.google.protobuf.Parser<StaffResponse>
-      PARSER = new com.google.protobuf.AbstractParser<StaffResponse>() {
+          PARSER = new com.google.protobuf.AbstractParser<StaffResponse>() {
     @Override
     public StaffResponse parsePartialFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       Builder builder = newBuilder();
       try {
         builder.mergeFrom(input, extensionRegistry);
@@ -1318,7 +1503,7 @@ private static final long serialVersionUID = 0L;
         throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(e)
-            .setUnfinishedMessage(builder.buildPartial());
+                .setUnfinishedMessage(builder.buildPartial());
       }
       return builder.buildPartial();
     }
