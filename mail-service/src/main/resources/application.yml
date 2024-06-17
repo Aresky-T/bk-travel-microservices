@@ -1,3 +1,38 @@
+server:
+  port: 8088
 spring:
   application:
     name: mail-service
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml
+    url: jdbc:mysql://mysql-server:3306/bk_travel_mail
+    user: root
+    password: root
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gr1projectmailhust@gmail.com
+    password: xutx mohn zokw nylp
+    properties:
+      mail:
+        debug: true
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+eureka:
+  instance:
+    appname: mail-service
+    hostname: mail-service
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+bk-travel:
+  database:
+    config:
+      server:
+        url: r2dbc:mysql://mysql-server:3306/bk_travel_mail
+        username: root
+        password: root
