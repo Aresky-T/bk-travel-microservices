@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table mail" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table mail already exist!">
+            <not>
+                <tableExists tableName="mail" />
+            </not>
+        </preConditions>
+        <createTable tableName="mail" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="subject" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="body" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="mail_box_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sent_at" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="ENUM('NEW', 'READ', 'REPLIED')" defaultValue="NEW">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+        <sql> ALTER TABLE `mail` ADD CONSTRAINT fk_mail_box_id FOREIGN KEY (`mail_box_id`)
+            REFERENCES `mail_box` (id) ON DELETE CASCADE; </sql>
+    </changeSet>
+</databaseChangeLog>
