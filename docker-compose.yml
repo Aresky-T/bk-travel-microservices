@@ -177,6 +177,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  mail-service:
+    container_name: mail-service
+    image: mail-service-image:v1.0.0
+    ports:
+      - "8088:8088"
+    depends_on:
+      - mysql-server
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./mail-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
