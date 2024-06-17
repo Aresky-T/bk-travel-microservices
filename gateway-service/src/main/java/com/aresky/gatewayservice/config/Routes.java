@@ -48,6 +48,10 @@ public class Routes {
                                 "/api/v1/chat/**"
                 };
 
+                String[] mailPaths = {
+                                "/api/v1/mail/**"
+                };
+
                 this.registerRoute(
                                 "auth-service",
                                 "lb://auth-service",
@@ -79,6 +83,9 @@ public class Routes {
                                 "chat-service",
                                 "lb://chat-service",
                                 chatPaths);
+                this.registerRoute("mail-service",
+                                "lb://mail-service",
+                                mailPaths);
         }
 
         public Route getRoute(String id) {
