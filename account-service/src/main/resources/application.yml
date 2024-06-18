@@ -15,24 +15,21 @@ spring:
       repositories:
         enabled: true
   r2dbc:
-    url: r2dbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account
-    username: ${mysql-server.user}
-    password: ${mysql-server.password}
+    url: r2dbc:mysql://mysql-server:3306/bk_travel_account
+    username: root
+    password: root
   liquibase:
-    url: jdbc:mysql://${mysql-server.hostname}:${mysql-server.port}/bk_travel_account
-    user: ${mysql-server.user}
-    password: ${mysql-server.password}
+    url: jdbc:mysql://mysql-server:3306/bk_travel_account
+    user: root
+    password: root
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: localhost
+    hostname: account-service
     appname: account-service
-  server:
-    hostname: discovery-server
-    port: 8761
   client:
     service-url:
-      defaultZone: http://${eureka.server.hostname}:${eureka.server.port}/eureka
+      defaultZone: http://discovery-server:8761/eureka
 mysql-server:
   hostname: mysql-server
   user: root
