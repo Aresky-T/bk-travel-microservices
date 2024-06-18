@@ -10,6 +10,7 @@ public interface SubTourIdRequestOrBuilder extends
 
   /**
    * <code>int32 id = 1;</code>
+   * 
    * @return The id.
    */
   int getId();
