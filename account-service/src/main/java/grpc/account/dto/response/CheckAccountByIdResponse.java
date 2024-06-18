@@ -11,29 +11,29 @@ public final class CheckAccountByIdResponse extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:response.CheckAccountByIdResponse)
     CheckAccountByIdResponseOrBuilder {
-private static final long serialVersionUID = 0L;
+  private static final long serialVersionUID = 0L;
+
   // Use CheckAccountByIdResponse.newBuilder() to construct.
   private CheckAccountByIdResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
+
   private CheckAccountByIdResponse() {
   }
 
   @Override
-  @SuppressWarnings({"unused"})
+  @SuppressWarnings({ "unused" })
   protected Object newInstance(
       UnusedPrivateParameter unused) {
     return new CheckAccountByIdResponse();
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
+  public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
     return CheckAccountByIdResponseOuterClass.internal_static_response_CheckAccountByIdResponse_descriptor;
   }
 
   @Override
-  protected FieldAccessorTable
-      internalGetFieldAccessorTable() {
+  protected FieldAccessorTable internalGetFieldAccessorTable() {
     return CheckAccountByIdResponseOuterClass.internal_static_response_CheckAccountByIdResponse_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             CheckAccountByIdResponse.class, Builder.class);
@@ -42,8 +42,10 @@ private static final long serialVersionUID = 0L;
   private int bitField0_;
   public static final int IS_EXISTS_FIELD_NUMBER = 1;
   private boolean isExists_ = false;
+
   /**
    * <code>bool is_exists = 1;</code>
+   * 
    * @return The isExists.
    */
   @Override
@@ -53,22 +55,27 @@ private static final long serialVersionUID = 0L;
 
   public static final int ACCOUNT_FIELD_NUMBER = 2;
   private AccountResponse account_;
+
   /**
    * <code>.response.AccountResponse account = 2;</code>
+   * 
    * @return Whether the account field is set.
    */
   @Override
   public boolean hasAccount() {
     return ((bitField0_ & 0x00000001) != 0);
   }
+
   /**
    * <code>.response.AccountResponse account = 2;</code>
+   * 
    * @return The account.
    */
   @Override
   public AccountResponse getAccount() {
     return account_ == null ? AccountResponse.getDefaultInstance() : account_;
   }
+
   /**
    * <code>.response.AccountResponse account = 2;</code>
    */
@@ -78,11 +85,14 @@ private static final long serialVersionUID = 0L;
   }
 
   private byte memoizedIsInitialized = -1;
+
   @Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized == 1)
+      return true;
+    if (isInitialized == 0)
+      return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -90,7 +100,7 @@ private static final long serialVersionUID = 0L;
 
   @Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
-                      throws java.io.IOException {
+      throws java.io.IOException {
     if (isExists_ != false) {
       output.writeBool(1, isExists_);
     }
@@ -103,16 +113,17 @@ private static final long serialVersionUID = 0L;
   @Override
   public int getSerializedSize() {
     int size = memoizedSize;
-    if (size != -1) return size;
+    if (size != -1)
+      return size;
 
     size = 0;
     if (isExists_ != false) {
       size += com.google.protobuf.CodedOutputStream
-        .computeBoolSize(1, isExists_);
+          .computeBoolSize(1, isExists_);
     }
     if (((bitField0_ & 0x00000001) != 0)) {
       size += com.google.protobuf.CodedOutputStream
-        .computeMessageSize(2, getAccount());
+          .computeMessageSize(2, getAccount());
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -122,24 +133,28 @@ private static final long serialVersionUID = 0L;
   @Override
   public boolean equals(final Object obj) {
     if (obj == this) {
-     return true;
+      return true;
     }
     if (!(obj instanceof CheckAccountByIdResponse)) {
       return super.equals(obj);
     }
     CheckAccountByIdResponse other = (CheckAccountByIdResponse) obj;
 
-    if (getIsExists()
-        != other.getIsExists()) return false;
-    if (hasAccount() != other.hasAccount()) return false;
+    if (getIsExists() != other.getIsExists())
+      return false;
+    if (hasAccount() != other.hasAccount())
+      return false;
     if (hasAccount()) {
       if (!getAccount()
-          .equals(other.getAccount())) return false;
+          .equals(other.getAccount()))
+        return false;
     }
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields()))
+      return false;
     return true;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
@@ -164,38 +179,45 @@ private static final long serialVersionUID = 0L;
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static CheckAccountByIdResponse parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static CheckAccountByIdResponse parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -217,12 +239,14 @@ private static final long serialVersionUID = 0L;
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static CheckAccountByIdResponse parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -232,17 +256,23 @@ private static final long serialVersionUID = 0L;
   }
 
   @Override
-  public Builder newBuilderForType() { return newBuilder(); }
+  public Builder newBuilderForType() {
+    return newBuilder();
+  }
+
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
+
   public static Builder newBuilder(CheckAccountByIdResponse prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
+
   @Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder()
+        : new Builder().mergeFrom(this);
   }
 
   @Override
@@ -251,6 +281,7 @@ private static final long serialVersionUID = 0L;
     Builder builder = new Builder(parent);
     return builder;
   }
+
   /**
    * Protobuf type {@code response.CheckAccountByIdResponse}
    */
@@ -258,20 +289,19 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:response.CheckAccountByIdResponse)
       CheckAccountByIdResponseOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return CheckAccountByIdResponseOuterClass.internal_static_response_CheckAccountByIdResponse_descriptor;
     }
 
     @Override
-    protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    protected FieldAccessorTable internalGetFieldAccessorTable() {
       return CheckAccountByIdResponseOuterClass.internal_static_response_CheckAccountByIdResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               CheckAccountByIdResponse.class, Builder.class);
     }
 
-    // Construct using grpc.account.dto.response.CheckAccountByIdResponse.newBuilder()
+    // Construct using
+    // grpc.account.dto.response.CheckAccountByIdResponse.newBuilder()
     private Builder() {
       maybeForceBuilderInitialization();
     }
@@ -281,12 +311,13 @@ private static final long serialVersionUID = 0L;
       super(parent);
       maybeForceBuilderInitialization();
     }
+
     private void maybeForceBuilderInitialization() {
-      if (com.google.protobuf.GeneratedMessageV3
-              .alwaysUseFieldBuilders) {
+      if (com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders) {
         getAccountFieldBuilder();
       }
     }
+
     @Override
     public Builder clear() {
       super.clear();
@@ -301,8 +332,7 @@ private static final long serialVersionUID = 0L;
     }
 
     @Override
-    public com.google.protobuf.Descriptors.Descriptor
-        getDescriptorForType() {
+    public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
       return CheckAccountByIdResponseOuterClass.internal_static_response_CheckAccountByIdResponse_descriptor;
     }
 
@@ -323,7 +353,9 @@ private static final long serialVersionUID = 0L;
     @Override
     public CheckAccountByIdResponse buildPartial() {
       CheckAccountByIdResponse result = new CheckAccountByIdResponse(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
+      if (bitField0_ != 0) {
+        buildPartial0(result);
+      }
       onBuilt();
       return result;
     }
@@ -347,38 +379,44 @@ private static final long serialVersionUID = 0L;
     public Builder clone() {
       return super.clone();
     }
+
     @Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         Object value) {
       return super.setField(field, value);
     }
+
     @Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
       return super.clearField(field);
     }
+
     @Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
       return super.clearOneof(oneof);
     }
+
     @Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, Object value) {
       return super.setRepeatedField(field, index, value);
     }
+
     @Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         Object value) {
       return super.addRepeatedField(field, value);
     }
+
     @Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof CheckAccountByIdResponse) {
-        return mergeFrom((CheckAccountByIdResponse)other);
+        return mergeFrom((CheckAccountByIdResponse) other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -386,7 +424,8 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(CheckAccountByIdResponse other) {
-      if (other == CheckAccountByIdResponse.getDefaultInstance()) return this;
+      if (other == CheckAccountByIdResponse.getDefaultInstance())
+        return this;
       if (other.getIsExists() != false) {
         setIsExists(other.getIsExists());
       }
@@ -446,19 +485,24 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+
     private int bitField0_;
 
-    private boolean isExists_ ;
+    private boolean isExists_;
+
     /**
      * <code>bool is_exists = 1;</code>
+     * 
      * @return The isExists.
      */
     @Override
     public boolean getIsExists() {
       return isExists_;
     }
+
     /**
      * <code>bool is_exists = 1;</code>
+     * 
      * @param value The isExists to set.
      * @return This builder for chaining.
      */
@@ -469,8 +513,10 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>bool is_exists = 1;</code>
+     * 
      * @return This builder for chaining.
      */
     public Builder clearIsExists() {
@@ -481,17 +527,20 @@ private static final long serialVersionUID = 0L;
     }
 
     private AccountResponse account_;
-    private com.google.protobuf.SingleFieldBuilderV3<
-        AccountResponse, AccountResponse.Builder, AccountResponseOrBuilder> accountBuilder_;
+    private com.google.protobuf.SingleFieldBuilderV3<AccountResponse, AccountResponse.Builder, AccountResponseOrBuilder> accountBuilder_;
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
+     * 
      * @return Whether the account field is set.
      */
     public boolean hasAccount() {
       return ((bitField0_ & 0x00000002) != 0);
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
+     * 
      * @return The account.
      */
     public AccountResponse getAccount() {
@@ -501,6 +550,7 @@ private static final long serialVersionUID = 0L;
         return accountBuilder_.getMessage();
       }
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
@@ -517,6 +567,7 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
@@ -531,14 +582,15 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
     public Builder mergeAccount(AccountResponse value) {
       if (accountBuilder_ == null) {
         if (((bitField0_ & 0x00000002) != 0) &&
-          account_ != null &&
-          account_ != AccountResponse.getDefaultInstance()) {
+            account_ != null &&
+            account_ != AccountResponse.getDefaultInstance()) {
           getAccountBuilder().mergeFrom(value);
         } else {
           account_ = value;
@@ -552,6 +604,7 @@ private static final long serialVersionUID = 0L;
       }
       return this;
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
@@ -565,6 +618,7 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
@@ -573,6 +627,7 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return getAccountFieldBuilder().getBuilder();
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
@@ -580,26 +635,24 @@ private static final long serialVersionUID = 0L;
       if (accountBuilder_ != null) {
         return accountBuilder_.getMessageOrBuilder();
       } else {
-        return account_ == null ?
-            AccountResponse.getDefaultInstance() : account_;
+        return account_ == null ? AccountResponse.getDefaultInstance() : account_;
       }
     }
+
     /**
      * <code>.response.AccountResponse account = 2;</code>
      */
-    private com.google.protobuf.SingleFieldBuilderV3<
-        AccountResponse, AccountResponse.Builder, AccountResponseOrBuilder>
-        getAccountFieldBuilder() {
+    private com.google.protobuf.SingleFieldBuilderV3<AccountResponse, AccountResponse.Builder, AccountResponseOrBuilder> getAccountFieldBuilder() {
       if (accountBuilder_ == null) {
-        accountBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-            AccountResponse, AccountResponse.Builder, AccountResponseOrBuilder>(
-                getAccount(),
-                getParentForChildren(),
-                isClean());
+        accountBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<AccountResponse, AccountResponse.Builder, AccountResponseOrBuilder>(
+            getAccount(),
+            getParentForChildren(),
+            isClean());
         account_ = null;
       }
       return accountBuilder_;
     }
+
     @Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -611,7 +664,6 @@ private static final long serialVersionUID = 0L;
         final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
-
 
     // @@protoc_insertion_point(builder_scope:response.CheckAccountByIdResponse)
   }
@@ -626,8 +678,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<CheckAccountByIdResponse>
-      PARSER = new com.google.protobuf.AbstractParser<CheckAccountByIdResponse>() {
+  private static final com.google.protobuf.Parser<CheckAccountByIdResponse> PARSER = new com.google.protobuf.AbstractParser<CheckAccountByIdResponse>() {
     @Override
     public CheckAccountByIdResponse parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
@@ -663,4 +714,3 @@ private static final long serialVersionUID = 0L;
   }
 
 }
-

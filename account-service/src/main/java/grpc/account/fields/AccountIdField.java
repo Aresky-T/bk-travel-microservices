@@ -11,29 +11,29 @@ public final class AccountIdField extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:fields.AccountIdField)
     AccountIdFieldOrBuilder {
-private static final long serialVersionUID = 0L;
+  private static final long serialVersionUID = 0L;
+
   // Use AccountIdField.newBuilder() to construct.
   private AccountIdField(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
+
   private AccountIdField() {
   }
 
   @Override
-  @SuppressWarnings({"unused"})
+  @SuppressWarnings({ "unused" })
   protected Object newInstance(
       UnusedPrivateParameter unused) {
     return new AccountIdField();
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
+  public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
     return AccountIdFieldOuterClass.internal_static_fields_AccountIdField_descriptor;
   }
 
   @Override
-  protected FieldAccessorTable
-      internalGetFieldAccessorTable() {
+  protected FieldAccessorTable internalGetFieldAccessorTable() {
     return AccountIdFieldOuterClass.internal_static_fields_AccountIdField_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             AccountIdField.class, Builder.class);
@@ -41,8 +41,10 @@ private static final long serialVersionUID = 0L;
 
   public static final int ID_FIELD_NUMBER = 1;
   private int id_ = 0;
+
   /**
    * <code>int32 id = 1;</code>
+   * 
    * @return The id.
    */
   @Override
@@ -51,11 +53,14 @@ private static final long serialVersionUID = 0L;
   }
 
   private byte memoizedIsInitialized = -1;
+
   @Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized == 1)
+      return true;
+    if (isInitialized == 0)
+      return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -63,7 +68,7 @@ private static final long serialVersionUID = 0L;
 
   @Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
-                      throws java.io.IOException {
+      throws java.io.IOException {
     if (id_ != 0) {
       output.writeInt32(1, id_);
     }
@@ -73,12 +78,13 @@ private static final long serialVersionUID = 0L;
   @Override
   public int getSerializedSize() {
     int size = memoizedSize;
-    if (size != -1) return size;
+    if (size != -1)
+      return size;
 
     size = 0;
     if (id_ != 0) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt32Size(1, id_);
+          .computeInt32Size(1, id_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -88,19 +94,21 @@ private static final long serialVersionUID = 0L;
   @Override
   public boolean equals(final Object obj) {
     if (obj == this) {
-     return true;
+      return true;
     }
     if (!(obj instanceof AccountIdField)) {
       return super.equals(obj);
     }
     AccountIdField other = (AccountIdField) obj;
 
-    if (getId()
-        != other.getId()) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+    if (getId() != other.getId())
+      return false;
+    if (!getUnknownFields().equals(other.getUnknownFields()))
+      return false;
     return true;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
@@ -120,38 +128,45 @@ private static final long serialVersionUID = 0L;
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static AccountIdField parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static AccountIdField parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static AccountIdField parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static AccountIdField parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static AccountIdField parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static AccountIdField parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static AccountIdField parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -173,12 +188,14 @@ private static final long serialVersionUID = 0L;
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
+
   public static AccountIdField parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static AccountIdField parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -188,17 +205,23 @@ private static final long serialVersionUID = 0L;
   }
 
   @Override
-  public Builder newBuilderForType() { return newBuilder(); }
+  public Builder newBuilderForType() {
+    return newBuilder();
+  }
+
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
+
   public static Builder newBuilder(AccountIdField prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
+
   @Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder()
+        : new Builder().mergeFrom(this);
   }
 
   @Override
@@ -207,6 +230,7 @@ private static final long serialVersionUID = 0L;
     Builder builder = new Builder(parent);
     return builder;
   }
+
   /**
    * Protobuf type {@code fields.AccountIdField}
    */
@@ -214,14 +238,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:fields.AccountIdField)
       AccountIdFieldOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return AccountIdFieldOuterClass.internal_static_fields_AccountIdField_descriptor;
     }
 
     @Override
-    protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    protected FieldAccessorTable internalGetFieldAccessorTable() {
       return AccountIdFieldOuterClass.internal_static_fields_AccountIdField_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               AccountIdField.class, Builder.class);
@@ -237,6 +259,7 @@ private static final long serialVersionUID = 0L;
       super(parent);
 
     }
+
     @Override
     public Builder clear() {
       super.clear();
@@ -246,8 +269,7 @@ private static final long serialVersionUID = 0L;
     }
 
     @Override
-    public com.google.protobuf.Descriptors.Descriptor
-        getDescriptorForType() {
+    public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
       return AccountIdFieldOuterClass.internal_static_fields_AccountIdField_descriptor;
     }
 
@@ -268,7 +290,9 @@ private static final long serialVersionUID = 0L;
     @Override
     public AccountIdField buildPartial() {
       AccountIdField result = new AccountIdField(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
+      if (bitField0_ != 0) {
+        buildPartial0(result);
+      }
       onBuilt();
       return result;
     }
@@ -284,38 +308,44 @@ private static final long serialVersionUID = 0L;
     public Builder clone() {
       return super.clone();
     }
+
     @Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         Object value) {
       return super.setField(field, value);
     }
+
     @Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
       return super.clearField(field);
     }
+
     @Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
       return super.clearOneof(oneof);
     }
+
     @Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, Object value) {
       return super.setRepeatedField(field, index, value);
     }
+
     @Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         Object value) {
       return super.addRepeatedField(field, value);
     }
+
     @Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof AccountIdField) {
-        return mergeFrom((AccountIdField)other);
+        return mergeFrom((AccountIdField) other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -323,7 +353,8 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(AccountIdField other) {
-      if (other == AccountIdField.getDefaultInstance()) return this;
+      if (other == AccountIdField.getDefaultInstance())
+        return this;
       if (other.getId() != 0) {
         setId(other.getId());
       }
@@ -373,19 +404,24 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+
     private int bitField0_;
 
-    private int id_ ;
+    private int id_;
+
     /**
      * <code>int32 id = 1;</code>
+     * 
      * @return The id.
      */
     @Override
     public int getId() {
       return id_;
     }
+
     /**
      * <code>int32 id = 1;</code>
+     * 
      * @param value The id to set.
      * @return This builder for chaining.
      */
@@ -396,8 +432,10 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>int32 id = 1;</code>
+     * 
      * @return This builder for chaining.
      */
     public Builder clearId() {
@@ -406,6 +444,7 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     @Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -417,7 +456,6 @@ private static final long serialVersionUID = 0L;
         final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
-
 
     // @@protoc_insertion_point(builder_scope:fields.AccountIdField)
   }
@@ -432,8 +470,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<AccountIdField>
-      PARSER = new com.google.protobuf.AbstractParser<AccountIdField>() {
+  private static final com.google.protobuf.Parser<AccountIdField> PARSER = new com.google.protobuf.AbstractParser<AccountIdField>() {
     @Override
     public AccountIdField parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
@@ -469,4 +506,3 @@ private static final long serialVersionUID = 0L;
   }
 
 }
-

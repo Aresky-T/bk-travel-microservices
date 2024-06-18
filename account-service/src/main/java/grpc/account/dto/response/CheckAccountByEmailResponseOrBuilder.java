@@ -10,20 +10,25 @@ public interface CheckAccountByEmailResponseOrBuilder extends
 
   /**
    * <code>bool is_exists = 1;</code>
+   * 
    * @return The isExists.
    */
   boolean getIsExists();
 
   /**
    * <code>.response.AccountResponse account = 2;</code>
+   * 
    * @return Whether the account field is set.
    */
   boolean hasAccount();
+
   /**
    * <code>.response.AccountResponse account = 2;</code>
+   * 
    * @return The account.
    */
   AccountResponse getAccount();
+
   /**
    * <code>.response.AccountResponse account = 2;</code>
    */
