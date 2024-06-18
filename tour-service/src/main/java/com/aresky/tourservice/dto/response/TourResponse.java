@@ -36,6 +36,7 @@ public class TourResponse {
                 .adultPrice(tour.getAdultPrice())
                 .childrenPrice(tour.getChildrenPrice())
                 .babyPrice(tour.getBabyPrice())
+                .totalSubTours(tour.getTotalSubTours())
                 .createdTime(Date.from(tour.getCreatedTime().toInstant()).toString())
                 .build();
     }

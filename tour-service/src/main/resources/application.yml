@@ -29,13 +29,11 @@ spring:
 # ---------------
 eureka:
   instance:
-    hostname: localhost
-  server:
-    host: discovery-server
-    port: 8761
+    appname: tour-service
+    hostname: tour-service
   client:
     service-url:
-      defaultZone: http://${eureka.server.host}:${eureka.server.port}/eureka
+      defaultZone: http://discovery-server:8761/eureka
 # ---------------
 # Euraka config
 # ---------------

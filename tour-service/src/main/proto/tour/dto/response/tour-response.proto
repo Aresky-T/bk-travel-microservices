@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package response;
+
+option java_multiple_files = true;
+option java_package = "grpc.tour.dto.response";
+
+message TourResponse {
+   int32 id = 1;
+   string title = 2;
+   string duration = 3;
+   string departure_location = 4;
+   string vehicle = 5;
+   int32 total_seats = 6;
+   int32 adult_price = 7;
+   int32 children_price = 8;
+   int32 baby_price = 9;
+   int32 total_sub_tours = 10;
+   string created_time = 11;
+}
