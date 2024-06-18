@@ -45,7 +45,28 @@ public class ProfileServiceImp implements IProfileService {
     }
 
     @Override
-    public Mono<ProfileResponse> findByAccountId(int accountId) {
+    public Mono<Profile> findByAccountId(int accountId) {
+        return accountRepository.existsById(accountId)
+                .flatMap(existsAccount -> {
+                    if(!existsAccount){
+                        return Mono.empty();
+                    }
+
+                    return  profileRepository.findByAccountId(accountId)
+                            .switchIfEmpty(profileRepository.save(new Profile(accountId)));
+                });
+    }
+
+    @Override
+    public Mono<Profile> findByAccountEmail(String email) {
+        return accountRepository.findByEmail(email)
+                .switchIfEmpty(Mono.empty())
+                .flatMap(account -> profileRepository.findByAccountId(account.getId())
+                        .switchIfEmpty(profileRepository.save(new Profile(account.getId()))));
+    }
+
+    @Override
+    public Mono<ProfileResponse> findProfileResponseByAccountId(int accountId) {
         return accountRepository.findById(accountId)
                 .flatMap(account -> profileRepository.findByAccountId(accountId)
                         .map(profile -> ProfileResponse.toDTO(profile, account))
