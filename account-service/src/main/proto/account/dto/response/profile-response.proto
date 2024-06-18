@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package response;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.dto.response";
+
+message ProfileResponse {
+  int32 id = 1;
+  string full_name = 2;
+  string date_of_birth = 3;
+  string gender = 4;
+  string phone = 5;
+  string address = 6;
+  string avatar_url = 7;
+}

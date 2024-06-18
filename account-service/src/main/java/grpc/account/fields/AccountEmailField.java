@@ -11,30 +11,30 @@ public final class AccountEmailField extends
     com.google.protobuf.GeneratedMessageV3 implements
     // @@protoc_insertion_point(message_implements:fields.AccountEmailField)
     AccountEmailFieldOrBuilder {
-private static final long serialVersionUID = 0L;
+  private static final long serialVersionUID = 0L;
+
   // Use AccountEmailField.newBuilder() to construct.
   private AccountEmailField(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
     super(builder);
   }
+
   private AccountEmailField() {
     email_ = "";
   }
 
   @Override
-  @SuppressWarnings({"unused"})
+  @SuppressWarnings({ "unused" })
   protected Object newInstance(
       UnusedPrivateParameter unused) {
     return new AccountEmailField();
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor
-      getDescriptor() {
+  public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
     return AccountEmailFieldOuterClass.internal_static_fields_AccountEmailField_descriptor;
   }
 
   @Override
-  protected FieldAccessorTable
-      internalGetFieldAccessorTable() {
+  protected FieldAccessorTable internalGetFieldAccessorTable() {
     return AccountEmailFieldOuterClass.internal_static_fields_AccountEmailField_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             AccountEmailField.class, Builder.class);
@@ -43,8 +43,10 @@ private static final long serialVersionUID = 0L;
   public static final int EMAIL_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
   private volatile Object email_ = "";
+
   /**
    * <code>string email = 1;</code>
+   * 
    * @return The email.
    */
   @Override
@@ -53,25 +55,24 @@ private static final long serialVersionUID = 0L;
     if (ref instanceof String) {
       return (String) ref;
     } else {
-      com.google.protobuf.ByteString bs = 
-          (com.google.protobuf.ByteString) ref;
+      com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
       String s = bs.toStringUtf8();
       email_ = s;
       return s;
     }
   }
+
   /**
    * <code>string email = 1;</code>
+   * 
    * @return The bytes for email.
    */
   @Override
-  public com.google.protobuf.ByteString
-      getEmailBytes() {
+  public com.google.protobuf.ByteString getEmailBytes() {
     Object ref = email_;
     if (ref instanceof String) {
-      com.google.protobuf.ByteString b = 
-          com.google.protobuf.ByteString.copyFromUtf8(
-              (String) ref);
+      com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8(
+          (String) ref);
       email_ = b;
       return b;
     } else {
@@ -80,11 +81,14 @@ private static final long serialVersionUID = 0L;
   }
 
   private byte memoizedIsInitialized = -1;
+
   @Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1) return true;
-    if (isInitialized == 0) return false;
+    if (isInitialized == 1)
+      return true;
+    if (isInitialized == 0)
+      return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -92,7 +96,7 @@ private static final long serialVersionUID = 0L;
 
   @Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
-                      throws java.io.IOException {
+      throws java.io.IOException {
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(email_)) {
       com.google.protobuf.GeneratedMessageV3.writeString(output, 1, email_);
     }
@@ -102,7 +106,8 @@ private static final long serialVersionUID = 0L;
   @Override
   public int getSerializedSize() {
     int size = memoizedSize;
-    if (size != -1) return size;
+    if (size != -1)
+      return size;
 
     size = 0;
     if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(email_)) {
@@ -116,7 +121,7 @@ private static final long serialVersionUID = 0L;
   @Override
   public boolean equals(final Object obj) {
     if (obj == this) {
-     return true;
+      return true;
     }
     if (!(obj instanceof AccountEmailField)) {
       return super.equals(obj);
@@ -124,11 +129,14 @@ private static final long serialVersionUID = 0L;
     AccountEmailField other = (AccountEmailField) obj;
 
     if (!getEmail()
-        .equals(other.getEmail())) return false;
-    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+        .equals(other.getEmail()))
+      return false;
+    if (!getUnknownFields().equals(other.getUnknownFields()))
+      return false;
     return true;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public int hashCode() {
     if (memoizedHashCode != 0) {
@@ -148,38 +156,45 @@ private static final long serialVersionUID = 0L;
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static AccountEmailField parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static AccountEmailField parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static AccountEmailField parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static AccountEmailField parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
+
   public static AccountEmailField parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
+
   public static AccountEmailField parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static AccountEmailField parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -201,12 +216,14 @@ private static final long serialVersionUID = 0L;
     return com.google.protobuf.GeneratedMessageV3
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
+
   public static AccountEmailField parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessageV3
         .parseWithIOException(PARSER, input);
   }
+
   public static AccountEmailField parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -216,17 +233,23 @@ private static final long serialVersionUID = 0L;
   }
 
   @Override
-  public Builder newBuilderForType() { return newBuilder(); }
+  public Builder newBuilderForType() {
+    return newBuilder();
+  }
+
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
+
   public static Builder newBuilder(AccountEmailField prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
+
   @Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-        ? new Builder() : new Builder().mergeFrom(this);
+        ? new Builder()
+        : new Builder().mergeFrom(this);
   }
 
   @Override
@@ -235,6 +258,7 @@ private static final long serialVersionUID = 0L;
     Builder builder = new Builder(parent);
     return builder;
   }
+
   /**
    * Protobuf type {@code fields.AccountEmailField}
    */
@@ -242,14 +266,12 @@ private static final long serialVersionUID = 0L;
       com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:fields.AccountEmailField)
       AccountEmailFieldOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
       return AccountEmailFieldOuterClass.internal_static_fields_AccountEmailField_descriptor;
     }
 
     @Override
-    protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    protected FieldAccessorTable internalGetFieldAccessorTable() {
       return AccountEmailFieldOuterClass.internal_static_fields_AccountEmailField_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               AccountEmailField.class, Builder.class);
@@ -265,6 +287,7 @@ private static final long serialVersionUID = 0L;
       super(parent);
 
     }
+
     @Override
     public Builder clear() {
       super.clear();
@@ -274,8 +297,7 @@ private static final long serialVersionUID = 0L;
     }
 
     @Override
-    public com.google.protobuf.Descriptors.Descriptor
-        getDescriptorForType() {
+    public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
       return AccountEmailFieldOuterClass.internal_static_fields_AccountEmailField_descriptor;
     }
 
@@ -296,7 +318,9 @@ private static final long serialVersionUID = 0L;
     @Override
     public AccountEmailField buildPartial() {
       AccountEmailField result = new AccountEmailField(this);
-      if (bitField0_ != 0) { buildPartial0(result); }
+      if (bitField0_ != 0) {
+        buildPartial0(result);
+      }
       onBuilt();
       return result;
     }
@@ -312,38 +336,44 @@ private static final long serialVersionUID = 0L;
     public Builder clone() {
       return super.clone();
     }
+
     @Override
     public Builder setField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         Object value) {
       return super.setField(field, value);
     }
+
     @Override
     public Builder clearField(
         com.google.protobuf.Descriptors.FieldDescriptor field) {
       return super.clearField(field);
     }
+
     @Override
     public Builder clearOneof(
         com.google.protobuf.Descriptors.OneofDescriptor oneof) {
       return super.clearOneof(oneof);
     }
+
     @Override
     public Builder setRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         int index, Object value) {
       return super.setRepeatedField(field, index, value);
     }
+
     @Override
     public Builder addRepeatedField(
         com.google.protobuf.Descriptors.FieldDescriptor field,
         Object value) {
       return super.addRepeatedField(field, value);
     }
+
     @Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof AccountEmailField) {
-        return mergeFrom((AccountEmailField)other);
+        return mergeFrom((AccountEmailField) other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -351,7 +381,8 @@ private static final long serialVersionUID = 0L;
     }
 
     public Builder mergeFrom(AccountEmailField other) {
-      if (other == AccountEmailField.getDefaultInstance()) return this;
+      if (other == AccountEmailField.getDefaultInstance())
+        return this;
       if (!other.getEmail().isEmpty()) {
         email_ = other.email_;
         bitField0_ |= 0x00000001;
@@ -403,18 +434,20 @@ private static final long serialVersionUID = 0L;
       } // finally
       return this;
     }
+
     private int bitField0_;
 
     private Object email_ = "";
+
     /**
      * <code>string email = 1;</code>
+     * 
      * @return The email.
      */
     public String getEmail() {
       Object ref = email_;
       if (!(ref instanceof String)) {
-        com.google.protobuf.ByteString bs =
-            (com.google.protobuf.ByteString) ref;
+        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         email_ = s;
         return s;
@@ -422,38 +455,44 @@ private static final long serialVersionUID = 0L;
         return (String) ref;
       }
     }
+
     /**
      * <code>string email = 1;</code>
+     * 
      * @return The bytes for email.
      */
-    public com.google.protobuf.ByteString
-        getEmailBytes() {
+    public com.google.protobuf.ByteString getEmailBytes() {
       Object ref = email_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
+        com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8(
+            (String) ref);
         email_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
+
     /**
      * <code>string email = 1;</code>
+     * 
      * @param value The email to set.
      * @return This builder for chaining.
      */
     public Builder setEmail(
         String value) {
-      if (value == null) { throw new NullPointerException(); }
+      if (value == null) {
+        throw new NullPointerException();
+      }
       email_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
+
     /**
      * <code>string email = 1;</code>
+     * 
      * @return This builder for chaining.
      */
     public Builder clearEmail() {
@@ -462,20 +501,25 @@ private static final long serialVersionUID = 0L;
       onChanged();
       return this;
     }
+
     /**
      * <code>string email = 1;</code>
+     * 
      * @param value The bytes for email to set.
      * @return This builder for chaining.
      */
     public Builder setEmailBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) { throw new NullPointerException(); }
+      if (value == null) {
+        throw new NullPointerException();
+      }
       checkByteStringIsUtf8(value);
       email_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
+
     @Override
     public final Builder setUnknownFields(
         final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -487,7 +531,6 @@ private static final long serialVersionUID = 0L;
         final com.google.protobuf.UnknownFieldSet unknownFields) {
       return super.mergeUnknownFields(unknownFields);
     }
-
 
     // @@protoc_insertion_point(builder_scope:fields.AccountEmailField)
   }
@@ -502,8 +545,7 @@ private static final long serialVersionUID = 0L;
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<AccountEmailField>
-      PARSER = new com.google.protobuf.AbstractParser<AccountEmailField>() {
+  private static final com.google.protobuf.Parser<AccountEmailField> PARSER = new com.google.protobuf.AbstractParser<AccountEmailField>() {
     @Override
     public AccountEmailField parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
@@ -539,4 +581,3 @@ private static final long serialVersionUID = 0L;
   }
 
 }
-

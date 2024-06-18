@@ -5,7 +5,9 @@
 package grpc.account.dto.response;
 
 public final class CheckAccountByIdResponseOuterClass {
-  private CheckAccountByIdResponseOuterClass() {}
+  private CheckAccountByIdResponseOuterClass() {
+  }
+
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
@@ -15,37 +17,32 @@ public final class CheckAccountByIdResponseOuterClass {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_response_CheckAccountByIdResponse_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_response_CheckAccountByIdResponse_fieldAccessorTable;
 
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
+  static final com.google.protobuf.Descriptors.Descriptor internal_static_response_CheckAccountByIdResponse_descriptor;
+  static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable internal_static_response_CheckAccountByIdResponse_fieldAccessorTable;
+
+  public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
     return descriptor;
   }
-  private static  com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
+
+  private static com.google.protobuf.Descriptors.FileDescriptor descriptor;
   static {
     String[] descriptorData = {
-      "\n7account/dto/response/check-account-by-" +
-      "id-response.proto\022\010response\032+account/dto" +
-      "/response/account-response.proto\"Y\n\030Chec" +
-      "kAccountByIdResponse\022\021\n\tis_exists\030\001 \001(\010\022" +
-      "*\n\007account\030\002 \001(\0132\031.response.AccountRespo" +
-      "nseB\035\n\031grpc.account.dto.responseP\001b\006prot" +
-      "o3"
+        "\n7account/dto/response/check-account-by-" +
+            "id-response.proto\022\010response\032+account/dto" +
+            "/response/account-response.proto\"Y\n\030Chec" +
+            "kAccountByIdResponse\022\021\n\tis_exists\030\001 \001(\010\022" +
+            "*\n\007account\030\002 \001(\0132\031.response.AccountRespo" +
+            "nseB\035\n\031grpc.account.dto.responseP\001b\006prot" +
+            "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-          AccountResponseOuterClass.getDescriptor(),
-        });
-    internal_static_response_CheckAccountByIdResponse_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_response_CheckAccountByIdResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        .internalBuildGeneratedFileFrom(descriptorData,
+            new com.google.protobuf.Descriptors.FileDescriptor[] {
+                AccountResponseOuterClass.getDescriptor(),
+            });
+    internal_static_response_CheckAccountByIdResponse_descriptor = getDescriptor().getMessageTypes().get(0);
+    internal_static_response_CheckAccountByIdResponse_fieldAccessorTable = new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_response_CheckAccountByIdResponse_descriptor,
         new String[] { "IsExists", "Account", });
     AccountResponseOuterClass.getDescriptor();

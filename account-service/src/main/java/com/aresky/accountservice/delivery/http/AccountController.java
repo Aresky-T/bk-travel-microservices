@@ -105,7 +105,7 @@ public class AccountController {
 
     @GetMapping("/profile")
     Mono<ResponseEntity<ProfileResponse>> getProfileByAccountId(@RequestParam Integer accountId) {
-        return profileService.findByAccountId(accountId).map(ResponseEntity::ok);
+        return profileService.findProfileResponseByAccountId(accountId).map(ResponseEntity::ok);
     }
 
     @PostMapping("/profile")

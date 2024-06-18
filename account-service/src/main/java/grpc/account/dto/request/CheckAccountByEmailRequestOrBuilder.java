@@ -10,14 +10,18 @@ public interface CheckAccountByEmailRequestOrBuilder extends
 
   /**
    * <code>.fields.AccountEmailField account_email = 1;</code>
+   * 
    * @return Whether the accountEmail field is set.
    */
   boolean hasAccountEmail();
+
   /**
    * <code>.fields.AccountEmailField account_email = 1;</code>
+   * 
    * @return The accountEmail.
    */
   grpc.account.fields.AccountEmailField getAccountEmail();
+
   /**
    * <code>.fields.AccountEmailField account_email = 1;</code>
    */
