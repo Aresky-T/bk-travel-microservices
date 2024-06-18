@@ -8,8 +8,10 @@ import io.grpc.ServerCall;
 import lombok.extern.slf4j.Slf4j;
 import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
+import net.devh.boot.grpc.server.interceptor.GrpcGlobalServerInterceptor;
 
 @Slf4j
+@GrpcGlobalServerInterceptor
 public class TourGrpcInterceptor implements ServerInterceptor {
 
     @VisibleForTesting

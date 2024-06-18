@@ -16,7 +16,7 @@ import io.grpc.Status.Code;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 
-@GrpcService(interceptors = { TourGrpcInterceptor.class })
+@GrpcService
 public class TourGrpcProvider extends TourServiceImplBase {
 
     @Autowired
