@@ -193,6 +193,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  review-service:
+    container_name: review-service
+    image: review-service-image:v1.0.0
+    ports:
+      - "8089:8089"
+    depends_on:
+      - mysql-server
+    build:
+      context: ./review-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./review-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
