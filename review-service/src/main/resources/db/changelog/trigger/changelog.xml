@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create trigger for bk_travel_review" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Create trigger for bk_travel_review failed!">
+            <and>
+                <tableExists tableName="review"/>
+                <tableExists tableName="review_statistic"/>
+            </and>
+        </preConditions>
+        <sql>
+            DROP TRIGGER IF EXISTS update_review_statistic_after_insert_on_review;
+            DROP TRIGGER IF EXISTS update_review_statistic_after_update_on_review;
+        </sql>
+        <sql endDelimiter="$$">
+            CREATE TRIGGER update_review_statistic_after_insert_on_review
+            AFTER INSERT ON `review`
+            FOR EACH ROW
+            BEGIN
+            INSERT INTO `review_statistic` ( tour_id, number_of_reviews, stars_average )
+            VALUES (NEW.tour_id, 1, NEW.stars)
+            ON DUPLICATE KEY UPDATE
+            number_of_reviews = (
+            SELECT COUNT(*) FROM review
+            WHERE tour_id = NEW.tour_id
+            GROUP BY tour_id
+            ),
+            stars_average = (
+            SELECT AVG(stars)
+            FROM review
+            WHERE tour_id = NEW.tour_id
+            GROUP BY tour_id
+            );
+            END;
+        </sql>
+        <sql endDelimiter="$$">
+            CREATE TRIGGER update_review_statistic_after_update_on_review
+            AFTER UPDATE ON review
+            FOR EACH ROW
+            BEGIN
+            UPDATE review_statistic AS rs
+            SET rs.stars_average = (
+            SELECT AVG(stars)
+            FROM review
+            WHERE tour_id = NEW.tour_id
+            )
+            WHERE rs.tour_id = NEW.tour_id;
+            END;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

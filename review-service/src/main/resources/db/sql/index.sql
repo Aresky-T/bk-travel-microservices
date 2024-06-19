@@ -1,15 +1,31 @@
-DROP TABLE IF EXISTS review;
+--
+-- Table structure for table `reviewer`
+--
+DROP TABLE IF EXISTS reviewer;
+CREATE TABLE reviewer (
+	`id` INT NOT NULL AUTO_INCREMENT,
+    `full_name` VARCHAR(100) NOT NULL,
+    `avatar_url` VARCHAR(255) NOT NULL,
+    `account_id` INT NOT NULL UNIQUE,
+    PRIMARY KEY(id)
+);
 
+--
+-- Table structure for table `review`
+--
+DROP TABLE IF EXISTS review;
 CREATE TABLE review (
     id INT NOT NULL AUTO_INCREMENT,
-    `account_id` INT NOT NULL,
+    `reviewer_id` INT NOT NULL,
     `sub_tour_id` INT NOT NULL,
     `tour_id` INT NOT NULL,
     `stars` INT NOT NULL,
     `comment` TEXT NOT NULL,
     `review_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `edited_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE KEY uk_account_sub_tour (`sub_tour_id`, `account_id`),
+    UNIQUE KEY uk_account_sub_tour (`reviewer_id`, `sub_tour_id`),
+  	CONSTRAINT fk_reviewer_id FOREIGN KEY (`reviewer_id`) REFERENCES reviewer(id) ON DELETE CASCADE,
     CONSTRAINT ck_stars CHECK ((`stars` between 1 and 5))
 );
 
@@ -21,9 +37,9 @@ CREATE INDEX idx_tour_id ON review (tour_id);
 DROP TABLE IF EXISTS review_statistic;
 
 CREATE TABLE review_statistic (
-    tour_id INT NOT NULL,
-    number_of_reviews INT NOT NULL DEFAULT 0,
-    stars_average DECIMAL(3, 2) NOT NULL DEFAULT 0.0,
+    `tour_id` INT NOT NULL,
+    `number_of_reviews` INT NOT NULL DEFAULT 0,
+    `stars_average` DECIMAL(3, 2) NOT NULL DEFAULT 0.0,
     PRIMARY KEY (tour_id),
     CONSTRAINT ck_stars_average check (stars_average >= 0.0),
     CONSTRAINT ck_number_of_reviews check (number_of_reviews >= 0)

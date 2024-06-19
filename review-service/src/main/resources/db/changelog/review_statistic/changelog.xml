@@ -4,5 +4,31 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
 >
+    <changeSet id="Create table review_statistic" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table review_statistic already exist!">
+            <not>
+                <tableExists tableName="review_statistic"/>
+            </not>
+        </preConditions>
+        <createTable tableName="review_statistic">
+            <column name="tour_id" type="INT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="number_of_reviews" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stars_average" type="DECIMAL(3,2)" defaultValueNumeric="0.0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE review_statistic
+            ADD CONSTRAINT ck_stars_average CHECK (stars_average >= 0.0);
+        </sql>
+        <sql>
+            ALTER TABLE review_statistic
+            ADD CONSTRAINT ck_number_of_reviews CHECK (number_of_reviews >= 0);
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
