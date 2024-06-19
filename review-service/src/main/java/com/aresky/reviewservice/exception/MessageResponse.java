@@ -1,9 +1,7 @@
 package com.aresky.reviewservice.exception;
 
-import com.aresky.reviewservice.entity.Reviewer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import reactor.core.publisher.Mono;
 
 @Data
 @NoArgsConstructor
