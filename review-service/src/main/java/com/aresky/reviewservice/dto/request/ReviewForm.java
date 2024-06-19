@@ -1,7 +1,7 @@
 package com.aresky.reviewservice.dto.request;
 
-import com.aresky.reviewservice.entity.Review;
-
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,15 +10,10 @@ import lombok.NoArgsConstructor;
 public class ReviewForm {
     private Integer accountId;
     private Integer subTourId;
-    private Integer stars;
-    private String comment;
 
-    public Review buildEntity() {
-        return Review.builder()
-                .accountId(accountId)
-                .subTourId(subTourId)
-                .stars(stars)
-                .comment(comment)
-                .build();
-    }
+    @Min(value = 1, message = "Số sao phải lớn hơn 0")
+    private Integer stars;
+
+    @NotBlank(message = "Comment không được để trống")
+    private String comment;
 }
