@@ -1,5 +1,9 @@
 package com.aresky.reviewservice.service.account;
 
-public interface IAccountService {
+import grpc.account.dto.response.ProfileResponse;
+import reactor.core.publisher.Mono;
 
+public interface IAccountService {
+    Mono<Boolean> checkExistsAccountById(Integer accountId);
+    Mono<ProfileResponse> getProfileById(Integer accountId);
 }
