@@ -23,5 +23,5 @@ public class ReviewStatistic {
     private Integer numberOfReviews;
 
     @Column("stars_average")
-    private Integer starsAverage;
+    private Float starsAverage;
 }

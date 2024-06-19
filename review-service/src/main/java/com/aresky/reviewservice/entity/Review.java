@@ -3,6 +3,7 @@ package com.aresky.reviewservice.entity;
 import java.time.ZonedDateTime;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -21,8 +22,8 @@ public class Review {
     @Column("id")
     private Integer id;
 
-    @Column("account_id")
-    private Integer accountId;
+    @Column("reviewer_id")
+    private Integer reviewerId;
 
     @Column("tour_id")
     private Integer tourId;
@@ -38,4 +39,10 @@ public class Review {
 
     @Column("review_at")
     private ZonedDateTime reviewAt;
+
+    @Column("edited_at")
+    private ZonedDateTime editedAt;
+
+    @Transient
+    private Reviewer reviewer;
 }

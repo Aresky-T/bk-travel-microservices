@@ -1,48 +1,54 @@
 package com.aresky.reviewservice.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.aresky.reviewservice.dto.response.CustomerReview;
+import com.aresky.reviewservice.dto.response.StatisticResponse;
+import com.aresky.reviewservice.service.review.IReviewService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.aresky.reviewservice.dto.request.ReviewForm;
 import com.aresky.reviewservice.dto.response.TourReviews;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import reactor.core.publisher.Mono;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/api/v1/review")
 public class ReviewController {
 
+    @Autowired
+    private IReviewService reviewService;
+
     @GetMapping("/one-for-customer")
-    public Mono<ResponseEntity<TourReviews>> getReviewsForTour(
+    public Mono<ResponseEntity<CustomerReview>> getReviewsForTour(
             @RequestParam Integer accountId,
-            @RequestParam Integer tourId) {
-        return null;
+            @RequestParam Integer subTourId) {
+        return reviewService.getReviewForCustomer(accountId, subTourId).map(ResponseEntity::ok);
     }
 
-    @GetMapping("/all-for-tour")
-    public Mono<ResponseEntity<TourReviews>> getReviewsForTour(@RequestParam Integer tourId) {
-        return null;
+    @GetMapping("/all-reviews-with-statistic-for-tour")
+    public Mono<ResponseEntity<TourReviews>> getReviewsWithStatisticForTour(
+            @RequestParam Integer tourId,
+            @RequestParam Integer limit,
+            @RequestParam Integer offset
+    ) {
+        return reviewService.getAllReviewsWithStatisticForTour(tourId, limit, offset).map(ResponseEntity::ok);
     }
 
     @GetMapping("/statistic")
-    public Mono<ResponseEntity<?>> getStatisticForTour(@RequestParam Integer tourId) {
-        return null;
+    public Mono<ResponseEntity<StatisticResponse>> getStatisticForTour(@RequestParam Integer tourId) {
+        return reviewService.getStatisticForTour(tourId).map(ResponseEntity::ok);
     }
 
     @PostMapping
-    public Mono<ResponseEntity<?>> review(@RequestBody ReviewForm form) {
-        return null;
+    public Mono<ResponseEntity<CustomerReview>> review(@Validated @RequestBody ReviewForm form) {
+        return reviewService.review(form).map(ResponseEntity::ok);
     }
 
     @PatchMapping
     public Mono<ResponseEntity<?>> updateReview() {
-        return null;
+        return Mono.just(ResponseEntity.ok("Coming soon"));
     }
 }

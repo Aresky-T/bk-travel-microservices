@@ -4,6 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
 >
+    <include file="/db/changelog/reviewer/changelog.xml" />
     <include file="/db/changelog/review/changelog.xml" />
-    <include file="/db/changelog/review_statistic/changelog/xml" />
+    <include file="/db/changelog/review_statistic/changelog.xml" />
+    <include file="/db/changelog/trigger/changelog.xml" />
 </databaseChangeLog>
