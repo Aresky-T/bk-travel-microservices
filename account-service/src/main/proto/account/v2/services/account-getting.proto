@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package service;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.v2.service";
+
+import "account/v2/dto/request/get-account-by-id-request.proto";
+import "account/v2/dto/request/get-account-by-email-request.proto";
+import "account/v2/dto/request/get-account-by-username-and-password-request.proto";
+import "account/v2/dto/request/get-profile-by-account-id-request.proto";
+import "account/v2/dto/request/get-profile-by-email-request.proto";
+
+import "account/v2/dto/response/get-account-by-id-response.proto";
+import "account/v2/dto/response/get-account-by-email-response.proto";
+import "account/v2/dto/response/get-account-by-username-and-password-response.proto";
+import "account/v2/dto/response/get-profile-by-account-id-response.proto";
+import "account/v2/dto/response/get-profile-by-email-response.proto";
+
+service AccountGettingService {
+  rpc GetAccountById(request.GetAccountByIdRequest) returns (response.GetAccountByIdResponse){};
+  rpc GetAccountByEmail(request.GetAccountByEmailRequest) returns (response.GetAccountByEmailResponse){};
+  rpc GetAccountByUsernameAndPassword(request.GetAccountByUsernameAndPasswordRequest) returns (response.GetAccountByUsernameAndPasswordResponse){};
+  rpc GetProfileByAccountId(request.GetProfileByAccountIdRequest) returns (response.GetProfileByAccountIdResponse){};
+  rpc GetProfileByEmail(request.GetProfileByEmailRequest) returns (response.GetProfileByEmailResponse){};
+}
