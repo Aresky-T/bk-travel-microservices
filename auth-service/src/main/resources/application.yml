@@ -26,17 +26,11 @@ eureka:
     hostname: discovery-server
     port: 8761
   instance:
-    hostname: localhost
+    hostname: auth-service
+    appname: auth-service
   client:
     service-url:
       defaultZone: http://${eureka.server.hostname}:${eureka.server.port}/eureka
-springdoc:
-  packages-to-scan: com.aresky.authservice.controller
-  swagger-ui:
-    enabled: true
-    path: "/swagger-ui.auth.html"
-  api-docs:
-    path: /api-docs
 auth:
   jwt:
     header: Authorization
