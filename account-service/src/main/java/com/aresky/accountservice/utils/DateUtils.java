@@ -10,6 +10,18 @@ public class DateUtils {
     public static final DateTimeFormatter INSTANT_FORMATTER = DateTimeFormatter.ISO_INSTANT;
     public static final DateTimeFormatter LOCAL_DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
+    public static ZonedDateTime now() {
+        return ZonedDateTime.now(ZoneId.systemDefault());
+    }
+
+    public static ZonedDateTime convertToZonedDateTime(String str) {
+        return ZonedDateTime.parse(str, DateTimeFormatter.ISO_INSTANT);
+    }
+
+    public static LocalDate convertToLocalDate(String str) {
+        return LocalDate.parse(str);
+    }
+
     public static String formatDateTime(ZonedDateTime date){
         return INSTANT_FORMATTER.format(date);
     }

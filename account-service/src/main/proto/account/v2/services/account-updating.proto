@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package service;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.v2.service";
+
+import "account/v2/dto/request/reset-password-request.proto";
+import "account/v2/dto/response/reset-password-response.proto";
+
+service AccountUpdatingService {
+  rpc ResetPassword(request.ResetPasswordRequest) returns (response.ResetPasswordResponse){};
+}
