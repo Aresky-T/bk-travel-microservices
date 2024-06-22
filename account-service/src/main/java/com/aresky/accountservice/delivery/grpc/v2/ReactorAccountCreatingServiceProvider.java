@@ -34,7 +34,7 @@ public class ReactorAccountCreatingServiceProvider
         return request.flatMap(reqVal -> {
             String username = reqVal.getUsername();
             String email = reqVal.getEmail();
-            String password = reqVal.getUsername();
+            String password = reqVal.getPassword();
 
             Mono<Boolean> usernameExistsMono = accountRepository.existsByUsername(username);
             Mono<Boolean> emailExistsMono = accountRepository.existsByEmail(email);
