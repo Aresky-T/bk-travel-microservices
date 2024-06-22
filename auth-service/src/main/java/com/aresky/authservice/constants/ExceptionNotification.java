@@ -1,6 +1,7 @@
 package com.aresky.authservice.constants;
 
 public class ExceptionNotification {
+    public static final String ACCOUNT_ALREADY_EXISTS = "Tài khoản đã tồn tại";
     public static final String ACCOUNT_NOT_EXISTS = "Tài khoản không tồn tại";
     public static final String ACCOUNT_HAS_LOCKED = "Tài khoản này đã bị khóa!";
     public static final String ACCOUNT_HAS_ACTIVATED = "Tài khoản này đã được kích hoạt!";
