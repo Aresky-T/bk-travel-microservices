@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table marked_tours" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table marked_tours already exist!">
+            <not>
+                <tableExists tableName="marked_tours"/>
+            </not>
+        </preConditions>
+        <createTable tableName="marked_tours" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="account_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tour_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="marked_at" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE marked_tours
+            ADD CONSTRAINT `uk_account_and_tour` UNIQUE (`account_id`, `sub_tour_id`);
+        </sql>
+    </changeSet>
+    <changeSet id="Create index idx_tour_id for table marked_tours" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table marked_tours index idx_tour_id already exist!">
+            <not>
+                <indexExists tableName="marked_tours" indexName="idx_tour_id"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="marked_tours" indexName="idx_tour_id">
+            <column name="tour_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="Create table marked_tours_statistics" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table marked_tours_statistics already exist!">
+            <not>
+                <tableExists tableName="marked_tours_statistics"/>
+            </not>
+        </preConditions>
+        <createTable tableName="marked_tours_statistics" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="tour_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="marks" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="month" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE marked_tours_statistics
+            ADD CONSTRAINT uk_tour_month_year UNIQUE (tour_id, sub_tour_id, month, year);
+        </sql>
+        <sql>
+            ALTER TABLE marked_tours_statistics
+            ADD CONSTRAINT ck_marks CHECK (marks >= 0);
+        </sql>
+
+        <sql>
+            <![CDATA[
+            ALTER TABLE marked_tours_statistics
+            ADD CONSTRAINT ck_month CHECK (month >= 1 AND month <= 12);
+            ]]>
+        </sql>
+        <sql>
+            <![CDATA[
+            ALTER TABLE marked_tours_statistics
+            ADD CONSTRAINT ck_year CHECK (year >= 1900 AND year <= 2999);
+            ]]>
+        </sql>
+        <sql>
+            CREATE INDEX idx_tour_id ON marked_tours_statistics (tour_id);
+        </sql>
+
+        <sql>
+            CREATE INDEX idx_sub_tour_id ON marked_tours_statistics (sub_tour_id);
+        </sql>
+
+        <sql>
+            CREATE INDEX idx_month_year ON marked_tours_statistics (month, year);
+        </sql>
+
+        <sql>
+            CREATE INDEX idx_tour_id_month_year ON marked_tours_statistics (tour_id, month, year);
+        </sql>
+
+        <sql>
+            CREATE INDEX idx_sub_tour_month_year ON marked_tours_statistics (sub_tour_id, month, year);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
