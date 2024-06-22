@@ -30,8 +30,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Mono<ResponseEntity<LoginResponse>> login(@RequestBody LoginForm form) {
-        return authService.handleLogin(form)
-                .flatMap(res -> Mono.just(ResponseEntity.ok(res)));
+        return authService.handleLogin(form).map(ResponseEntity::ok);
     }
 
     @PostMapping("/signup")
@@ -40,8 +39,8 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
-        return ResponseEntity.ok("success");
+    public Mono<ResponseEntity<?>> forgotPassword(@RequestParam String email) {
+        return authService.handleForgotPassword(email).map(ResponseEntity::ok);
     }
 
 }
