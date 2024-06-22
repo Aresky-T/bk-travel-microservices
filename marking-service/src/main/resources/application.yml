@@ -10,7 +10,7 @@ spring:
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: localhost
+    hostname: marking-service
     appname: marking-service
   client:
     service-url:
