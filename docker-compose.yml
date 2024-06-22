@@ -209,6 +209,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  marking-service:
+    container_name: marking-service
+    image: marking-service-image:v1.0.0
+    ports:
+      - "8091:8091"
+    depends_on:
+      - mysql-server
+    build:
+      context: ./marking-service
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./marking-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
