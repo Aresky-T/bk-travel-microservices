@@ -21,4 +21,6 @@ public interface IAuthService {
     Mono<LoginResponse> handleLogin(LoginForm form);
 
     Mono<Boolean> isValidAccessToken(String token);
+
+    Mono<String> handleForgotPassword(String email);
 }

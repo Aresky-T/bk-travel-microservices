@@ -1,8 +1,5 @@
 package com.aresky.authservice.service.auth;
 
-import com.aresky.authservice.constants.ExceptionNotification;
-
-import com.aresky.authservice.service.account.IAccountService;
 import io.r2dbc.spi.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -16,6 +13,8 @@ import com.aresky.authservice.entity.Auth;
 import com.aresky.authservice.exception.AuthException;
 import com.aresky.authservice.jwt.JwtUtils;
 import com.aresky.authservice.repository.AuthRepository;
+import com.aresky.authservice.constants.ExceptionNotification;
+import com.aresky.authservice.service.account.IAccountGrpcService;
 
 import reactor.core.publisher.Mono;
 
@@ -26,7 +25,7 @@ public class AuthServiceImp implements IAuthService {
     private AuthRepository authRepository;
 
     @Autowired
-    private IAccountService accountService;
+    private IAccountGrpcService accountGrpcService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -37,23 +36,29 @@ public class AuthServiceImp implements IAuthService {
     @Transactional
     @Override
     public Mono<LoginResponse> handleLogin(LoginForm form) {
-        return accountService.findByUsernameAndPassword(form)
-                .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.BAD_CREDENTIALS)))
-                .flatMap(accountResponse -> {
-                    String token = jwtUtils.generateToken(accountResponse.getUsername());
+        String username = form.getUsername();
+        String password = form.getPassword();
+
+        return accountGrpcService.checkAccountByUsername(form.getUsername())
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)))
+                .flatMap(existsAccount -> accountGrpcService.getAccountByUsernameAndPassword(username, password))
+                .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.INVALID_PASSWORD)))
+                .flatMap(account -> {
+                    String token = jwtUtils.generateToken(account.getUsername());
                     LoginResponse loginResponse = LoginResponse
                             .builder()
-                            .id(accountResponse.getId())
-                            .email(accountResponse.getEmail())
-                            .username(accountResponse.getUsername())
+                            .id(account.getId())
+                            .email(account.getEmail())
+                            .username(account.getUsername())
                             .type(jwtUtils.getPrefix())
                             .token(token)
-                            .role(accountResponse.getRole())
-                            .status(accountResponse.getStatus())
+                            .role(account.getRole())
+                            .status(account.getStatus())
                             .build();
 
-                    return this.findByAccountId(accountResponse.getId())
-                            .switchIfEmpty(authRepository.save(new Auth(accountResponse.getId(), token)))
+                    return this.findByAccountId(account.getId())
+                            .switchIfEmpty(authRepository.save(new Auth(account.getId(), token)))
                             .flatMap(auth -> {
                                 auth.setAccessToken(token);
                                 return authRepository.save(auth).then();
@@ -70,10 +75,13 @@ public class AuthServiceImp implements IAuthService {
     @Transactional
     @Override
     public Mono<String> handleSignup(SignupForm form) {
-        return accountService.onSignupAccount(form).thenReturn("success");
+        return accountGrpcService.createAccount(form.getUsername(), form.getEmail(), form.getPassword())
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_ALREADY_EXISTS)))
+                .thenReturn("success");
     }
 
-    public Mono<Auth> findByAccountId(int accountId){
+    public Mono<Auth> findByAccountId(int accountId) {
         String query = "SELECT * FROM auth WHERE account_id = :accountId";
         return databaseClient.sql(query).bind("accountId", accountId)
                 .map(((row, rowMetadata) -> mapRowToAuth(row)))
@@ -103,11 +111,16 @@ public class AuthServiceImp implements IAuthService {
         return Mono.just(false);
     }
 
-    private Auth mapRowToAuth(Row row){
+    private Auth mapRowToAuth(Row row) {
         Auth auth = new Auth();
         auth.setId(row.get("id", Integer.class));
         auth.setAccountId(row.get("account_id", Integer.class));
         auth.setAccessToken(row.get("access_token", String.class));
         return auth;
+    }
+
+    @Override
+    public Mono<String> handleForgotPassword(String email) {
+        return accountGrpcService.resetPassword(email);
     }
 }
