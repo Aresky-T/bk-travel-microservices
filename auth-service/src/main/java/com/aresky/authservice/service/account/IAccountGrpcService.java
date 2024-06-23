@@ -8,6 +8,8 @@ public interface IAccountGrpcService {
 
     Mono<Boolean> checkAccountByEmail(String email);
 
+    Mono<AccountResponse> getAccountByEmail(String email);
+
     Mono<AccountResponse> getAccountByUsernameAndPassword(String username, String password);
 
     Mono<Boolean> createAccount(String username, String email, String password);
