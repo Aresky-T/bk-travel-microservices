@@ -21,6 +21,20 @@ spring:
     user: root
     password: root
     change-log: classpath:db/changelog/changelog-master.xml
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gr1projectmailhust@gmail.com
+    password: xutx mohn zokw nylp
+    properties:
+      mail:
+        debug: true
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 eureka:
   server:
     hostname: discovery-server
