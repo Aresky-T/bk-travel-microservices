@@ -56,7 +56,7 @@ public class JwtUtils {
     }
 
     public String generateToken(Map<String, Object> props) {
-        return getBuilder().setClaims(props).compact();
+        return getBuilder().addClaims(props).compact();
     }
 
     public Claims getClaimsFromToken(String token) {
