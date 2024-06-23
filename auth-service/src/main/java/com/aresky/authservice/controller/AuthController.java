@@ -3,6 +3,7 @@ package com.aresky.authservice.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ public class AuthController {
 
     @GetMapping("/validate-token")
     public Mono<ResponseEntity<?>> validateAccessToken(@RequestParam String accessToken) {
-        return authService.isValidAccessToken(accessToken).map(ResponseEntity::ok);
+        return authService.validateAccessToken(accessToken).map(ResponseEntity::ok);
     };
 
     @PostMapping("/login")
@@ -38,7 +39,7 @@ public class AuthController {
         return authService.handleSignup(form).thenReturn(ResponseEntity.ok("success"));
     }
 
-    @PostMapping("/forgot-password")
+    @PatchMapping("/forgot-password")
     public Mono<ResponseEntity<?>> forgotPassword(@RequestParam String email) {
         return authService.handleForgotPassword(email).map(ResponseEntity::ok);
     }

@@ -7,12 +7,14 @@ import com.aresky.authservice.exception.AuthException;
 import grpc.account.v2.dto.request.CheckAccountByEmailRequest;
 import grpc.account.v2.dto.request.CheckAccountByUsernameRequest;
 import grpc.account.v2.dto.request.CreateAccountRequest;
+import grpc.account.v2.dto.request.GetAccountByEmailRequest;
 import grpc.account.v2.dto.request.GetAccountByUsernameAndPasswordRequest;
 import grpc.account.v2.dto.request.ResetPasswordRequest;
 import grpc.account.v2.dto.response.AccountResponse;
 import grpc.account.v2.dto.response.CheckAccountByEmailResponse;
 import grpc.account.v2.dto.response.CheckAccountByUsernameResponse;
 import grpc.account.v2.dto.response.CreateAccountResponse;
+import grpc.account.v2.dto.response.GetAccountByEmailResponse;
 import grpc.account.v2.dto.response.GetAccountByUsernameAndPasswordResponse;
 import grpc.account.v2.dto.response.ResetPasswordResponse;
 import grpc.account.v2.service.ReactorAccountCheckingServiceGrpc;
@@ -78,6 +80,19 @@ public class AccountGrpcServiceImp implements IAccountGrpcService {
                 .filter(GetAccountByUsernameAndPasswordResponse::hasAccount)
                 .switchIfEmpty(Mono.empty())
                 .map(GetAccountByUsernameAndPasswordResponse::getAccount)
+                .onErrorResume(err -> Mono.error(new AuthException(err.getMessage())));
+    }
+
+    @Override
+    public Mono<AccountResponse> getAccountByEmail(String email) {
+        Mono<GetAccountByEmailRequest> request = Mono
+                .just(GetAccountByEmailRequest.newBuilder().setEmail(email).build());
+
+        return Mono.justOrEmpty(initGettingStub())
+                .flatMap(stub -> stub.getAccountByEmail(request))
+                .filter(GetAccountByEmailResponse::hasAccount)
+                .switchIfEmpty(Mono.empty())
+                .map(GetAccountByEmailResponse::getAccount)
                 .onErrorResume(err -> Mono.error(new AuthException(err.getMessage())));
     }
 
