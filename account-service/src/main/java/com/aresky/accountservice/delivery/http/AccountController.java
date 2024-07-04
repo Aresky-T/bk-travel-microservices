@@ -17,7 +17,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/accounts")
 public class AccountController {
