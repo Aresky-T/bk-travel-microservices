@@ -26,6 +26,7 @@ public class RouterConfig {
                 Route chatService = routes.getRoute("chat-service");
                 Route mailService = routes.getRoute("mail-service");
                 Route markingService = routes.getRoute("marking-service");
+                Route notificationService = routes.getRoute("notification-service");
 
                 return builder.routes()
                                 .route(authRoute.getId(), r -> r
@@ -55,6 +56,9 @@ public class RouterConfig {
                                 .route(markingService.getId(), r -> r
                                                 .path(markingService.getPaths())
                                                 .uri(markingService.getUri()))
+                                .route(notificationService.getId(), r -> r
+                                                .path(notificationService.getPaths())
+                                                .uri(notificationService.getUri()))
                                 .build();
         }
 }

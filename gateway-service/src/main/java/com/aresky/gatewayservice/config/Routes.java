@@ -56,6 +56,10 @@ public class Routes {
                                 "/api/v1/marking/**"
                 };
 
+                String[] notificationPaths = {
+                                "/api/v1/notifications"
+                };
+
                 this.registerRoute(
                                 "auth-service",
                                 "lb://auth-service",
@@ -93,6 +97,9 @@ public class Routes {
                 this.registerRoute("marking-service",
                                 "lb://marking-service",
                                 markingPaths);
+                this.registerRoute("notification-service",
+                                "lb://notification-service",
+                                notificationPaths);
         }
 
         public Route getRoute(String id) {
