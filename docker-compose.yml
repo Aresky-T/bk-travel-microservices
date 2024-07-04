@@ -225,6 +225,22 @@ services:
         target: /app
     networks:
       - bk-travel-ms-network
+  notification-service:
+    container_name: notification-service
+    image: notification-service-image:v1.0.0
+    ports:
+      - "8100:8100"
+    depends_on:
+      - mysql-server
+    build:
+      dockerfile: Dockerfile
+      context: ./notification-service
+    volumes:
+      - type: bind
+        source: ./notification-service
+        target: /app
+    networks:
+      - bk-travel-ms-network
 volumes:
   mysql-server-volume:
     name: mysql-server-volume
