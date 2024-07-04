@@ -1,0 +1,31 @@
+server:
+  port: 8100
+spring:
+  application:
+    name: notification-service
+  liquibase:
+    enabled: false
+    url: jdbc:mysql://mysql-server:3306/bk_travel_notification
+    user: root
+    password: root
+    change-log: classpath:db/changelog/changelog-master.xml
+eureka:
+  instance:
+    hostname: notification-service
+    appname: notification-service
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka
+bk-travel:
+  database:
+    config:
+      server:
+        url: r2dbc:mysql://mysql-server:3306/bk_travel_notification
+        username: root
+        password: root
+kafka:
+  bootstrap-servers:
+    url: http://kafka-broker-01:19092
+  consumer:
+    auto-offset-reset: latest
+    group-id: bk-travel-group
