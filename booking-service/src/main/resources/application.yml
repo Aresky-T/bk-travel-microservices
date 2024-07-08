@@ -10,7 +10,8 @@ spring:
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: localhost
+    hostname: booking-service
+    appname: booking-service
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka
