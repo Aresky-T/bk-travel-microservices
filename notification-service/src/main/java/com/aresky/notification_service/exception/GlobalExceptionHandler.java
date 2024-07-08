@@ -42,4 +42,10 @@ public class GlobalExceptionHandler {
         log.error("ValidationException occurred: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(new NotificationException.MessageResponse(ex.getMessage()));
     }
+
+    @ExceptionHandler(ClassCastException.class)
+    public ResponseEntity<NotificationException.MessageResponse> handlingClassCastException(ClassCastException ex){
+        log.error("ClassCastException occurred: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(new NotificationException.MessageResponse(ex.getLocalizedMessage()));
+    }
 }

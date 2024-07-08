@@ -19,6 +19,7 @@ public class NotificationException extends RuntimeException {
     public static final NotificationException KEYWORD_ALREADY_EXISTS = new NotificationException("This keyword already exists!");
 
     public static final NotificationException KEYWORD_NOT_FOUND = new NotificationException("Keyword not found!");
+    public static final NotificationException INVALID_PAGE_AND_SIZE = new NotificationException("Page and size must be greater than zero!");
 
     private MessageResponse response;
 
