@@ -36,6 +36,9 @@ public class Notification {
     @Column("is_read")
     private Boolean isRead;
 
+    @Column("is_new")
+    private Boolean isNew;
+
     @Column("created_at")
     private ZonedDateTime createdAt;
 
@@ -44,6 +47,16 @@ public class Notification {
 
     public Notification type(NotificationType type) {
         this.type = type;
+        return this;
+    }
+
+    public Notification isNew(Boolean isNew) {
+        this.isNew = isNew;
+        return this;
+    }
+
+    public Notification read(Boolean isRead) {
+        this.isRead = isRead;
         return this;
     }
 
