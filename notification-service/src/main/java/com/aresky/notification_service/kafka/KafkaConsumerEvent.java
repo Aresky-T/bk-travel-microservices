@@ -65,30 +65,11 @@ public class KafkaConsumerEvent {
                     String topic = rec.topic();
                     String message = rec.value();
                     Set<String> keys = new HashSet<>();
-                    NotificationRequest request = null;
+                    keys.add("userId");
+                    keys.add("entityId");
+                    keys.add("keywords");
 
-                    switch (topic) {
-                        case KafkaTopic.FIRST_TIME_LOGIN:
-                            keys.add("userId");
-                            break;
-                        case KafkaTopic.BOOKING_SUCCESS:
-                            keys.add("userId");
-                            keys.add("entityId");
-                            keys.add("keywords");
-                            break;
-                        case KafkaTopic.BOOKING_CANCEL_PENDING:
-                        case KafkaTopic.BOOKING_CANCEL_APPROVED:
-                        case KafkaTopic.TOUR_CANCELLED:
-                        case KafkaTopic.TOUR_DAILY_REMINDER:
-                        case KafkaTopic.MAIL_SENT:
-                        case KafkaTopic.MAIL_REPLIED:
-                        case KafkaTopic.CUSTOMER_MAIL_RECEIVED:
-                        case KafkaTopic.VNPAY_PAYMENT_SUCCESS:
-                        default:
-                            break;
-                    }
-
-                    request = buildNotificationRequest(message, keys);
+                    NotificationRequest request = buildNotificationRequest(message, keys);
 
                     if(request != null){
                         request.setTypeName(topic);
