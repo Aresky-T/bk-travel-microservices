@@ -57,7 +57,7 @@ public class Routes {
                 };
 
                 String[] notificationPaths = {
-                                "/api/v1/notifications"
+                                "/api/v1/notifications/**"
                 };
 
                 this.registerRoute(
