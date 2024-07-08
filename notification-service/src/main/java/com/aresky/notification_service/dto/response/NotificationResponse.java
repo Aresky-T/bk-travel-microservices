@@ -19,6 +19,7 @@ public class NotificationResponse {
     private Integer entityId;
     private String entityType;
     private Boolean isRead;
+    private Boolean isNew;
     private String createdAt;
 
     public static NotificationResponse fromNotification(Notification notification){
@@ -30,6 +31,7 @@ public class NotificationResponse {
                 .entityId(notification.getEntityId())
                 .entityType(notification.getType().getEntityType().name())
                 .isRead(notification.getIsRead())
+                .isNew(notification.getIsNew())
                 .createdAt(DateUtils.formatDateTime(notification.getCreatedAt()))
                 .build();
     }

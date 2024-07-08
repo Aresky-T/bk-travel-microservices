@@ -11,7 +11,7 @@ CREATE TABLE `notification_types` (
     `name` VARCHAR(100) NOT NULL UNIQUE,
     `description` VARCHAR(255) NOT NULL,
     `template` TEXT NOT NULL,
-    `entity_type` ENUM('AUTH', 'BOOKING', 'PAYMENT', 'MAIL', 'OTHER') NOT NULL,
+    `entity_type` ENUM('AUTH', 'ACCOUNT', 'TOUR', 'BOOKING', 'PAYMENT', 'MAIL', 'OTHER') NOT NULL,
     PRIMARY KEY (`id`)
 );
 
@@ -38,8 +38,9 @@ CREATE TABLE `notifications` (
     `type_id` INT NOT NULL,
     `entity_id` INT,
     `message` TEXT NOT NULL,
-    `is_read` BOOLEAN DEFAULT FALSE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `is_read` BOOLEAN NOT NULL DEFAULT FALSE,
+    `is_new` BOOLEAN NOT NULL DEFAULT TRUE,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     CONSTRAINT fk_type_id FOREIGN KEY (`type_id`) REFERENCES `notification_types`(`id`) ON DELETE CASCADE
 );

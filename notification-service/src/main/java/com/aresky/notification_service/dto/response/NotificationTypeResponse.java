@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.ArrayList;;
 
 @Data
 @Builder
@@ -21,17 +22,25 @@ public class NotificationTypeResponse {
     private String entityType;
     private List<Keyword> keywords;
 
-    public static NotificationTypeResponse fromNotificationType(NotificationType notificationType){
-        if (notificationType == null) return null;
+    public static NotificationTypeResponse fromNotificationType(NotificationType notificationType) {
+        if (notificationType == null)
+            return null;
 
-        return NotificationTypeResponse.builder()
+        NotificationTypeResponse response = NotificationTypeResponse.builder()
                 .id(notificationType.getId())
                 .name(notificationType.getName())
                 .description(notificationType.getDescription())
                 .template(notificationType.getTemplate())
                 .entityType(notificationType.getEntityType().name())
-                .keywords(notificationType.getKeywords().stream().map(Keyword::fromNotificationKeyword).toList())
+                .keywords(new ArrayList<>())
                 .build();
+
+        boolean isNullKeywords = notificationType.getKeywords() != null;
+        if (isNullKeywords) {
+            response.keywords = notificationType.getKeywords().stream().map(Keyword::fromNotificationKeyword).toList();
+        }
+
+        return response;
     }
 
     @Data
@@ -40,12 +49,12 @@ public class NotificationTypeResponse {
         private Integer id;
         private String keyword;
 
-        public Keyword(Integer id, String keyword){
+        public Keyword(Integer id, String keyword) {
             this.id = id;
             this.keyword = keyword;
         }
 
-        public static Keyword fromNotificationKeyword(NotificationKeyword keyword){
+        public static Keyword fromNotificationKeyword(NotificationKeyword keyword) {
             return new Keyword(keyword.getId(), keyword.getKeyword());
         }
     }
