@@ -1,6 +1,7 @@
 package com.aresky.markingservice.service.marking;
 
 import com.aresky.markingservice.dto.request.MarkedTourRequest;
+import com.aresky.markingservice.dto.response.MarkedTourResponse;
 import com.aresky.markingservice.entity.MarkedTour;
 import com.aresky.markingservice.exception.MarkingException;
 import com.aresky.markingservice.exception.MessageResponse;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 public class MarkingServiceImp implements IMarkingService {
@@ -59,6 +62,31 @@ public class MarkingServiceImp implements IMarkingService {
     @Override
     public Mono<Boolean> checkMarkedTour(Integer accountId, Integer subTourId) {
         return isMarkedTourBy(accountId, subTourId);
+    }
+
+    @Override
+    public Mono<Void> unmarkTour(Integer accountId, Integer subTourId) {
+        return Mono.zip(checkAccountBy(accountId), checkSubTourBy(subTourId))
+                .flatMap(tuple -> {
+                    return isMarkedTourBy(accountId, subTourId)
+                            .filter(Boolean.TRUE::equals)
+                            .switchIfEmpty(Mono.error(new MarkingException(MessageResponse.NOT_MARKED_THIS_TOUR)))
+                            .then(markedTourRepository.deleteByAccountIdAndSubTourId(accountId, subTourId))
+                            .then();
+                });
+    }
+
+    @Override
+    public Mono<List<MarkedTourResponse>> getAllMarkedTourResponses(Integer accountId) {
+        return checkAccountBy(accountId)
+                .flatMap(existsAccount -> markedTourRepository.findByAccountId(accountId)
+                        .flatMap(markedTour -> {
+                            MarkedTourResponse dto = MarkedTourResponse.toDto(markedTour);
+                            return tourService.getSubTourById(markedTour.getSubTourId())
+                                    .map(MarkedTourResponse.SubTour::fromGrpcSubTourResponse)
+                                    .map(dto::subTour);
+                        })
+                        .collectList());
     }
 
     private Mono<Boolean> isMarkedTourBy(Integer accountId, Integer subTourId) {
