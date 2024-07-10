@@ -1,7 +1,7 @@
 package com.aresky.bookingservice.exception;
 
 public class BookingException extends RuntimeException {
-    public static final String BOOKING_DOES_NOT_EXISTS = "This Booking info does not exist!";
+    public static final String BOOKING_DOES_NOT_EXISTS = "This booking does not exist!";
     public static final String BOOKING_ALREADY_EXISTS = "Bạn đã đặt tour này rồi, vui lòng kiểm tra trong hồ sơ của bạn!";
     public static final String BOOKING_NOT_FOUND = "Không tìm thấy hồ sơ đặt tour!";
     public static final String BOOKING_FAILED = "Đặt tour thất bại, vui lòng thử lại!";
@@ -27,6 +27,9 @@ public class BookingException extends RuntimeException {
     public static final String SUB_TOUR_NOT_FOUND = "SubTour was not found!";
 
     public static final String REQUIRED_BOOKING = "Required booking!";
+
+    public static final BookingException PERMISSION_DENIED = new BookingException("Permission denied!");
+    public static final BookingException CANCELLATION_REQUEST_DOES_NOT_EXIST = new BookingException("Cancellation request does not exist!");
 
     public BookingException(String message) {
         super(message);
