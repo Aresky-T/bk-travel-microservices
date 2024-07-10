@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+>
+    <changeSet id="Create table cancellation_requested" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Table cancellation_requested already exist!">
+            <not>
+                <tableExists tableName="cancellation_requested" />
+            </not>
+        </preConditions>
+        <createTable tableName="cancellation_requested" ifNotExists="true">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="booking_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="ENUM('PENDING', 'APPROVED', 'REJECTED')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            ALTER TABLE cancellation_requested
+            ADD CONSTRAINT fk_cr_booking_id FOREIGN KEY (booking_id) REFERENCES `booking`(id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

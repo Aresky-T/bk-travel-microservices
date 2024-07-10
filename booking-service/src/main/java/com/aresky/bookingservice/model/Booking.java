@@ -1,6 +1,7 @@
 package com.aresky.bookingservice.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -20,6 +21,9 @@ public class Booking {
 
     @Id
     private Integer id;
+
+    @Column("booking_code")
+    private String bookingCode;
 
     @Column("account_id")
     private Integer accountId;
@@ -66,6 +70,12 @@ public class Booking {
     @Column("status")
     private EBookingStatus status;
 
+    @Column("cancellation_requested")
+    private Boolean isCancellationRequested;
+
     @Column("form_of_payment")
     private EFormOfPayment formOfPayment;
+
+    @Transient
+    private CancellationRequested cancellationRequested;
 }

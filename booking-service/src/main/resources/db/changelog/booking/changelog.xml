@@ -16,6 +16,21 @@
             <column name="id" type="INT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" />
             </column>
+            <column name="booking_code" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="account_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="tour_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false" />
+            </column>
+            <column name="tour_code" type="VARCHAR(100)">
+                <constraints nullable="true" />
+            </column>
             <column name="full_name" type="VARCHAR(100)">
                 <constraints nullable="false" />
             </column>
@@ -50,33 +65,38 @@
             </column>
             <column name="form_of_payment"
                 type="ENUM('BANK_TRANSFER', 'CASH_PAYMENT', 'VNPAY_ON_WEBSITE')" />
-            <column name="account_id" type="INT">
-                <constraints nullable="false" />
-            </column>
-            <column name="tour_id" type="INT">
-                <constraints nullable="false" />
-            </column>
-            <column name="sub_tour_id" type="INT">
-                <constraints nullable="false" />
+            <column name="cancellation_requested" type="TINYINT(1)" defaultValue="0">
+                <constraints nullable="false"/>
             </column>
         </createTable>
-        <sql> ALTER TABLE booking ADD CONSTRAINT uk_account_id_sub_tour_id UNIQUE (account_id,
-            sub_tour_id); </sql>
-        <sql> ALTER TABLE booking ADD CONSTRAINT ck_adult_number CHECK (adult_number > 0); </sql>
-        <sql> ALTER TABLE booking ADD CONSTRAINT ck_children_number CHECK (children_number >= 0); </sql>
-        <sql>ALTER TABLE booking ADD CONSTRAINT ck_baby_number CHECK (baby_number >= 0); ALTER TABLE
-            booking ADD CONSTRAINT ck_amount CHECK (amount > 0);</sql>
+        <sql>
+            ALTER TABLE booking
+            ADD CONSTRAINT uk_account_id_sub_tour_id UNIQUE (account_id, sub_tour_id);
+        </sql>
+        <sql>
+            ALTER TABLE booking
+            ADD CONSTRAINT ck_adult_number CHECK (adult_number > 0);
+        </sql>
+        <sql>
+            ALTER TABLE booking ADD CONSTRAINT ck_children_number CHECK (children_number >= 0);
+        </sql>
+        <sql>
+            ALTER TABLE booking ADD CONSTRAINT ck_baby_number CHECK (baby_number >= 0);
+        </sql>
+        <sql>
+            ALTER TABLE booking ADD CONSTRAINT ck_amount CHECK (amount > 0);
+        </sql>
     </changeSet>
-    <changeSet id="Add column tour_code for table booking" author="Aresky" runAlways="true">
-        <preConditions onFail="CONTINUE" onFailMessage="Column tour_code already exist!">
-            <not>
-                <columnExists tableName="booking" columnName="tour_code" />
-            </not>
-        </preConditions>
-        <addColumn tableName="booking">
-            <column name="tour_code" type="VARCHAR(100)">
-                <constraints nullable="true" />
-            </column>
-        </addColumn>
-    </changeSet>
+<!--    <changeSet id="Add column tour_code for table booking" author="Aresky" runAlways="true">-->
+<!--        <preConditions onFail="CONTINUE" onFailMessage="Column tour_code already exist!">-->
+<!--            <not>-->
+<!--                <columnExists tableName="booking" columnName="tour_code" />-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <addColumn tableName="booking">-->
+<!--            <column name="tour_code" type="VARCHAR(100)">-->
+<!--                <constraints nullable="true" />-->
+<!--            </column>-->
+<!--        </addColumn>-->
+<!--    </changeSet>-->
 </databaseChangeLog>

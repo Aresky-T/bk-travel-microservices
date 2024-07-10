@@ -25,3 +25,11 @@ bk-travel:
 grpc:
   server:
     port: 50084
+kafka:
+  bootstrap-servers:
+    url: http://kafka-broker-01:19092
+  consumer:
+    group-id: bk-travel-group
+    auto-offset-reset: latest
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
