@@ -1,14 +1,24 @@
 package com.aresky.bookingservice.service.booking;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.aresky.bookingservice.dto.request.*;
-import com.aresky.bookingservice.dto.response.BookingDetails;
-import com.aresky.bookingservice.model.Tourist;
+import com.aresky.bookingservice.dto.response.*;
+import com.aresky.bookingservice.kafka.KafkaMessageType;
+import com.aresky.bookingservice.kafka.KafkaSenderEvent;
+import com.aresky.bookingservice.kafka.KafkaTopic;
+import com.aresky.bookingservice.model.*;
+import com.aresky.bookingservice.repository.CancellationRequestedRepository;
 import com.aresky.bookingservice.repository.TouristRepository;
 import com.aresky.bookingservice.service.account.AccountGrpcService;
+import com.aresky.bookingservice.service.account.IAccountGrpcService;
 import com.aresky.bookingservice.service.payment.IVnPayService;
+import com.aresky.bookingservice.util.DateUtils;
+import com.google.gson.Gson;
 import grpc.payment.vnpay.BookingInfoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,14 +26,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.aresky.bookingservice.dto.response.BookingResponse;
-import com.aresky.bookingservice.dto.response.SubTourResponse;
-import com.aresky.bookingservice.dto.response.VnPayTransactionInfo;
 import com.aresky.bookingservice.exception.BookingException;
-import com.aresky.bookingservice.model.Booking;
-import com.aresky.bookingservice.model.EBookingStatus;
-import com.aresky.bookingservice.model.EFormOfPayment;
-import com.aresky.bookingservice.model.EPaymentType;
 import com.aresky.bookingservice.repository.BookingRepository;
 import com.aresky.bookingservice.service.payment.PaymentService;
 import com.aresky.bookingservice.service.tour.TourGrpcService;
@@ -45,14 +48,8 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     @Autowired
     private TouristRepository touristRepository;
 
-    // @Autowired
-    // private TourService tourService;
-
-    // @Autowired
-    // private AccountService accountService;
-
     @Autowired
-    private AccountGrpcService accountGrpcService;
+    private IAccountGrpcService accountGrpcService;
 
     @Autowired
     private TourGrpcService tourGrpcService;
@@ -62,6 +59,16 @@ public class BookingDtoServiceImp implements IBookingDtoService {
 
     @Autowired
     private IVnPayService vnPayService;
+
+    @Autowired
+    private KafkaSenderEvent kafkaSenderEvent;
+
+    @Autowired
+    private CancellationRequestedRepository cancellationRequestedRepository;
+
+    private final Gson GSON = new Gson();
+
+    private final DateTimeFormatter VIETNAM_FORMATTER = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
 
     @Transactional
     @Override
@@ -82,7 +89,19 @@ public class BookingDtoServiceImp implements IBookingDtoService {
 
                     if(type.equals(EPaymentType.PAY_LATER)){
                         return createBookingMono
-                                .map(booking -> "Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!");
+                                .flatMap(booking -> {
+                                    KafkaMessageType.NotificationRequest notificationRequest = KafkaMessageType.NotificationRequest
+                                            .builder()
+                                            .userId(accountId)
+                                            .entityId(booking.getId())
+                                            .keyword("tourCode", booking.getTourCode())
+                                            .keyword("bookingCode", booking.getBookingCode())
+                                            .keyword("bookedTime", VIETNAM_FORMATTER.format(booking.getBookedTime()));
+
+                                    String message = GSON.toJson(notificationRequest);
+                                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, message);
+                                })
+                                .thenReturn("Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!");
                     }
 
                     if (type.equals(EPaymentType.VNPAY_ON_WEBSITE)){
@@ -249,6 +268,85 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                         .then());
     }
 
+    @Override
+    public Mono<Void> sendCancellationBookingRequest(Integer accountId, CreateCancelBookedTourForm form) {
+        return Mono.zip(validateAccount(accountId), bookingService.findBookingBy(form.getBookingId()))
+                .flatMap(tuple -> {
+                    CancellationRequested cancellationRequested = form.toCancellationRequested();
+
+                    Booking booking = tuple.getT2();
+
+                    if(!accountId.equals(booking.getAccountId())){
+                        return Mono.error(BookingException.PERMISSION_DENIED);
+                    }
+
+                    booking.setIsCancellationRequested(Boolean.TRUE);
+
+                    return cancellationRequestedRepository.save(cancellationRequested)
+                                    .then(bookingRepository.save(booking));
+                })
+                .flatMap(booking -> {
+                    KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
+                            .userId(accountId)
+                            .entityId(booking.getId())
+                            .keyword("tourCode", booking.getTourCode())
+                            .keyword("bookingCode", booking.getBookingCode());
+
+                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_CANCEL_PENDING, GSON.toJson(notificationReq)).then();
+                });
+    }
+
+    @Override
+    public Mono<List<CancellationRequestedResponse>> findAllCancellationRequested(Integer page, Integer size) {
+        return cancellationRequestedRepository.findAll()
+                .map(CancellationRequestedResponse::fromCancellationRequested)
+                .collectList();
+    }
+
+    @Override
+    public Mono<Void> approveCancellationBookingRequest(Integer requestId) {
+        return cancellationRequestedRepository.findById(requestId)
+                .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
+                .flatMap(request -> {
+                    request.setStatus(ERequestStatus.APPROVED);
+                    return cancellationRequestedRepository.save(request)
+                            .then(bookingRepository.findById(request.getBookingId()));
+                })
+                .flatMap(booking -> {
+                    booking.setStatus(EBookingStatus.REJECTED);
+                    return bookingRepository.save(booking);
+                })
+                .flatMap(booking -> {
+                    KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
+                            .userId(booking.getAccountId())
+                            .entityId(booking.getId())
+                            .keyword("tourCode", booking.getTourCode())
+                            .keyword("bookingCode", booking.getBookingCode());
+
+                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_CANCEL_APPROVED, GSON.toJson(notificationReq)).then();
+                });
+    }
+
+    @Override
+    public Mono<Void> rejectCancellationBookingRequest(Integer requestId) {
+        return cancellationRequestedRepository.findById(requestId)
+                .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
+                .flatMap(request -> {
+                    request.setStatus(ERequestStatus.APPROVED);
+                    return cancellationRequestedRepository.save(request)
+                            .then(bookingRepository.findById(request.getBookingId()));
+                })
+                .flatMap(booking -> {
+                    KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
+                            .userId(booking.getAccountId())
+                            .entityId(booking.getId())
+                            .keyword("tourCode", booking.getTourCode())
+                            .keyword("bookingCode", booking.getBookingCode());
+
+                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_CANCEL_REJECTED, GSON.toJson(notificationReq)).then();
+                });
+    }
+
     private Mono<List<Tourist>> findAllTourist(Integer bookingId) {
         return bookingService.findAllTourists(bookingId);
     }
@@ -259,7 +357,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     }
 
     private Mono<Boolean> validateAccount(Integer accountId) {
-        return accountGrpcService.validateAccount(accountId)
+        return accountGrpcService.checkAccountById(accountId)
                 .filter(Boolean.TRUE::equals)
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_ACCOUNT_ID)));
     }
@@ -294,6 +392,22 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                             .collectList()
                             .thenReturn(savedBooking);
                 });
+    }
+
+    private Mono<Void> sendNotification(Integer accountId, Booking booking){
+        DateTimeFormatter formatter = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
+
+        Map<String, Object> keywords = new HashMap<>();
+        keywords.put("tourCode", booking.getTourCode());
+        keywords.put("bookingCode", booking.getBookingCode());
+        keywords.put("bookedTime", formatter.format(booking.getBookedTime()));
+
+        KafkaMessageType.NotificationRequest request = new KafkaMessageType.NotificationRequest(accountId);
+        request.setEntityId(booking.getId());
+        request.setKeywords(keywords);
+
+        return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, "booking-service-key", GSON.toJson(request))
+                .then();
     }
 
     private void validateAmount(SubTourResponse subTour, CreateBookingForm form) {
