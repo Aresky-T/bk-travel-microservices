@@ -1,8 +1,9 @@
 package com.aresky.bookingservice.delivery.http;
 
 import com.aresky.bookingservice.dto.request.BookingFilter;
-import com.aresky.bookingservice.dto.request.VnPayReturn;
+import com.aresky.bookingservice.dto.request.CreateCancelBookedTourForm;
 import com.aresky.bookingservice.service.booking.IBookingDtoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,8 @@ public class BookingController {
     // POST - createBooking(CreateBookingForm form)
     @PostMapping
     public Mono<ResponseEntity<?>> createBooking(
-            @RequestBody CreateBookingForm form, @RequestParam EPaymentType type) {
+            @RequestParam EPaymentType type,
+            @Valid @RequestBody CreateBookingForm form) {
         return bookingService.handleBooking(form, type).map(ResponseEntity::ok);
     }
 
@@ -36,8 +38,10 @@ public class BookingController {
     // }
 
     // @PostMapping("/payment/vnpay-result")
-    // public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn vnPayReturn) {
-    //    return bookingService.handleBookingAfterPaymentWithVnPay(vnPayReturn).map(ResponseEntity::ok);
+    // public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn
+    // vnPayReturn) {
+    // return
+    // bookingService.handleBookingAfterPaymentWithVnPay(vnPayReturn).map(ResponseEntity::ok);
     // }
 
     // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)
@@ -87,10 +91,36 @@ public class BookingController {
         return bookingService.existsBy(accountId, subTourId).map(ResponseEntity::ok);
     }
 
+    @GetMapping("/cancellation-requested/all")
+    public Mono<ResponseEntity<?>> getAllCancellationRequested(
+            @RequestParam Integer page,
+            @RequestParam Integer size
+    ){
+        return bookingService.findAllCancellationRequested(page, size).map(ResponseEntity::ok);
+    }
+
     // PUT - updateBooking(int bookingId, UpdateBookingForm form)
     // PATCH - updateBooking(int bookingId, EFormOfPayment formOfPayment)
     // PATCH - updateBooking(int bookingId, EStatus status)
     // PATCH - updateRequestCancelBookedTour(int requestId, ERequestStatus status);
+
+    @PostMapping("/cancellation-requested")
+    public Mono<ResponseEntity<?>> sendRequestCancelBookedTour(
+            @RequestParam("accountId") Integer accountId,
+            @RequestBody CreateCancelBookedTourForm form
+    ){
+        return bookingService.sendCancellationBookingRequest(accountId, form).thenReturn(ResponseEntity.ok("success"));
+    }
+
+    @PatchMapping("/cancellation-requested/approve")
+    public Mono<ResponseEntity<?>> acceptRequestCancelBookedTour(@RequestParam Integer requestId){
+        return bookingService.approveCancellationBookingRequest(requestId).thenReturn(ResponseEntity.ok("success"));
+    }
+
+    @PatchMapping("/cancellation-requested/reject")
+    public Mono<ResponseEntity<?>> rejectRequestCancelBookedTour(@RequestParam Integer requestId){
+        return bookingService.rejectCancellationBookingRequest(requestId).thenReturn( ResponseEntity.ok("success"));
+    }
 
     // DELETE - deleteBooking(int bookingId)
     @DeleteMapping
