@@ -32,7 +32,9 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        <sql> ALTER TABLE tourist ADD CONSTRAINT FOREIGN KEY (booking_id) REFERENCES `booking`(id)
-            ON DELETE CASCADE; </sql>
+        <sql>
+            ALTER TABLE tourist
+            ADD CONSTRAINT fk_booking_id FOREIGN KEY (booking_id) REFERENCES `booking`(id) ON DELETE CASCADE;
+        </sql>
     </changeSet>
 </databaseChangeLog>

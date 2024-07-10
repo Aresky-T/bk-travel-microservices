@@ -7,5 +7,5 @@
     <include file="db/changelog/booking/changelog.xml" author="Aresky" />
     <include file="db/changelog/tourist/changelog.xml" author="Aresky" />
     <include file="db/changelog/booking-statistic/changelog.xml" author="Aresky" />
-    <include file="db/changelog/request-cancel-booking/changelog.xml" author="Aresky" />
+    <include file="db/changelog/cancellation-requested/changelog.xml" author="Aresky" />
 </databaseChangeLog>

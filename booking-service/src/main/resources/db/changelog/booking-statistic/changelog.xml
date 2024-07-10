@@ -13,37 +13,59 @@
             </not>
         </preConditions>
         <createTable tableName="booking_statistic" ifNotExists="true">
-            <column name="sub_tour_id" type="INT">
-                <constraints nullable="false" primaryKey="true" />
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="tour_id" type="INT">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
-            <column name="number_of_booking" type="INT" defaultValue="0">
+            <column name="sub_tour_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_bookings" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="successful_bookings" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cancelled_bookings" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="month" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <sql>
             ALTER TABLE booking_statistic
-            ADD CONSTRAINT ck_number_of_booking CHECK (number_of_booking >= 0);
+            ADD CONSTRAINT uk_tour_subtour_month_year UNIQUE(tour_id, sub_tour_id, month, year);
         </sql>
-    </changeSet>
-    <changeSet id="Add trigger update_booking_statistic_after_insert_info_booking_info" author="Aresky" runAlways="true">
         <sql>
-            DROP TRIGGER IF EXISTS update_booking_statistic_after_insert_info_booking;
-        </sql>
-        <sql endDelimiter="//">
-            CREATE TRIGGER update_booking_statistic_after_insert_info_booking
-            AFTER INSERT ON booking
-            FOR EACH ROW
-            BEGIN
-                IF NEW.status = 'PAY_UP' THEN
-                    INSERT INTO booking_statistic (tour_id, sub_tour_id, number_of_booking)
-                    VALUES (NEW.tour_id, NEW.sub_tour_id, 1)
-                    ON DUPLICATE KEY UPDATE
-                        number_of_booking = number_of_booking + 1;
-                END IF;
-            END;
+            ALTER TABLE booking_statistic
+            ADD CONSTRAINT ck_number_of_bookings CHECK (number_of_bookings >= 0);
         </sql>
     </changeSet>
+<!--    <changeSet id="Add trigger update_booking_statistic_after_insert_info_booking_info" author="Aresky" runAlways="true">-->
+<!--        <sql>-->
+<!--            DROP TRIGGER IF EXISTS update_booking_statistic_after_insert_info_booking;-->
+<!--        </sql>-->
+<!--        <sql endDelimiter="//">-->
+<!--            CREATE TRIGGER update_booking_statistic_after_insert_info_booking-->
+<!--            AFTER INSERT ON booking-->
+<!--            FOR EACH ROW-->
+<!--            BEGIN-->
+<!--                IF NEW.status = 'PAY_UP' THEN-->
+<!--                    INSERT INTO booking_statistic (tour_id, sub_tour_id, number_of_booking)-->
+<!--                    VALUES (NEW.tour_id, NEW.sub_tour_id, 1)-->
+<!--                    ON DUPLICATE KEY UPDATE-->
+<!--                        number_of_booking = number_of_booking + 1;-->
+<!--                END IF;-->
+<!--            END;-->
+<!--        </sql>-->
+<!--    </changeSet>-->
 </databaseChangeLog>
