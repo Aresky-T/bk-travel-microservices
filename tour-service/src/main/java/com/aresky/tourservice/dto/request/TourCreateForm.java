@@ -5,6 +5,7 @@ import com.aresky.tourservice.entity.Tour;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -13,16 +14,16 @@ public class TourCreateForm {
     private String title;
 
     @NotNull
-    private String image1;
+    private MultipartFile image1;
 
     @NotNull
-    private String image2;
+    private MultipartFile image2;
 
     @NotNull
-    private String image3;
+    private MultipartFile image3;
 
     @NotNull
-    private String image4;
+    private MultipartFile image4;
 
     @NotNull
     private String destinations;
@@ -54,10 +55,6 @@ public class TourCreateForm {
     public static Tour toEntity(TourCreateForm form) {
         return Tour.builder()
                 .title(form.title)
-                .image1(form.image1)
-                .image2(form.image2)
-                .image3(form.image3)
-                .image4(form.image4)
                 .destinations(form.destinations)
                 .duration(form.duration)
                 .departureLocation(form.departureLocation)
@@ -67,6 +64,7 @@ public class TourCreateForm {
                 .adultPrice(form.adultPrice)
                 .childrenPrice(form.childrenPrice)
                 .babyPrice(form.babyPrice)
+                .totalSubTours(0)
                 .build();
     }
 }
