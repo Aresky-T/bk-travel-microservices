@@ -55,6 +55,14 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+		<!--	For cloudinary	-->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>1.39.0</version>
+		</dependency>
+
+		<!--	For liquibase migration	-->
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
@@ -65,6 +73,8 @@
 			<artifactId>liquibase-maven-plugin</artifactId>
 			<version>${liquibase-version}</version>
 		</dependency>
+
+		<!--	For Open api with swagger ui	-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
