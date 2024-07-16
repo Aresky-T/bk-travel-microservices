@@ -50,3 +50,8 @@ bk-travel:
 grpc:
   server:
     port: 50083
+cloudinary:
+  cloud-name: dtm4bscge
+  api-key: 753338592148366
+  api-secret: 9DuFjid4CY301yghd9iA1tEdyjo
+  secure: true
