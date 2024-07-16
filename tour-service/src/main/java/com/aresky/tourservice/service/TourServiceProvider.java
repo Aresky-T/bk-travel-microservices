@@ -1,11 +1,7 @@
 package com.aresky.tourservice.service;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +27,13 @@ import com.aresky.tourservice.entity.Tour;
 import com.aresky.tourservice.exception.TourException;
 import com.aresky.tourservice.repository.SubTourRepository;
 import com.aresky.tourservice.repository.TourRepository;
+import com.aresky.tourservice.service.cloudinary.ICloudinaryService;
 import com.aresky.tourservice.specification.SubTourSpecification;
 import com.aresky.tourservice.specification.TourSpecification;
+import com.aresky.tourservice.utils.FieldUtils;
 
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class TourServiceProvider implements ITourService {
 
@@ -46,6 +42,9 @@ public class TourServiceProvider implements ITourService {
 
     @Autowired
     private SubTourRepository subTourRepository;
+
+    @Autowired
+    private ICloudinaryService cloudinaryService;
 
     private static final String[] BLACKLIST_TOUR_KEYS = { "id", "tourCode", "tourId" };
 
@@ -56,13 +55,28 @@ public class TourServiceProvider implements ITourService {
             throw new TourException("Tiêu đề này đã bị trùng với Tour khác!");
         }
 
-        tourRepository.save(TourCreateForm.toEntity(form));
+        try {
+            String image1 = (String) cloudinaryService.uploadImage(form.getImage1()).get("secure_url");
+            String image2 = (String) cloudinaryService.uploadImage(form.getImage2()).get("secure_url");
+            String image3 = (String) cloudinaryService.uploadImage(form.getImage3()).get("secure_url");
+            String image4 = (String) cloudinaryService.uploadImage(form.getImage4()).get("secure_url");
+
+            Tour tour = TourCreateForm.toEntity(form);
+            tour.setImage1(image1);
+            tour.setImage2(image2);
+            tour.setImage3(image3);
+            tour.setImage4(image4);
+            tourRepository.save(tour);
+
+        } catch (IOException e) {
+            throw new TourException("Upload file ảnh không thành công!");
+        }
     }
 
     @Transactional
     @Override
-    public void createSubTour(SubTourCreateForm form) {
-        Tour tour = findTourById(form.getTourId());
+    public void createSubTour(Integer tourId, SubTourCreateForm form) {
+        Tour tour = findTourById(tourId);
 
         if (tour == null) {
             throw new TourException("Tour id không hợp lệ!");
@@ -73,7 +87,7 @@ public class TourServiceProvider implements ITourService {
         }
 
         SubTour subTour = SubTourCreateForm.toEntity(form);
-
+        subTour.setTour(tour);
         subTour.setAvailableSeats(tour.getTotalSeats());
 
         if (save(subTour) != null) {
@@ -153,10 +167,25 @@ public class TourServiceProvider implements ITourService {
     @Transactional
     public void updateSubTour(Integer subTourId, Map<String, Object> fields) {
         SubTour subTour = findSubTourById(subTourId);
+
         if (subTour == null) {
             throw new TourException("Invalid subTourId");
         }
-        subTourRepository.save(updateSubTourByFields(subTour, fields));
+
+        for (Entry<String, Object> entry : fields.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (isBlacklisted(key)) {
+                continue;
+            }
+
+            Field field = FieldUtils.findField(subTour, key);
+            FieldUtils.setFieldValue(subTour, field, value);
+        }
+
+        validateSubTour(subTour);
+        subTourRepository.save(subTour);
     }
 
     @Override
@@ -283,27 +312,11 @@ public class TourServiceProvider implements ITourService {
                 continue;
             }
 
-            Field field = findTourField(tour, key);
-            setFieldValue(tour, field, value);
+            Field field = FieldUtils.findField(tour, key);
+            FieldUtils.setFieldValue(tour, field, value);
         }
 
         return tour;
-    }
-
-    private SubTour updateSubTourByFields(SubTour subTour, Map<String, Object> fields) {
-        for (Entry<String, Object> entry : fields.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (isBlacklisted(key)) {
-                continue;
-            }
-
-            Field field = findSubTourField(subTour, key);
-            setFieldValue(subTour, field, value);
-        }
-
-        return subTour;
     }
 
     private boolean isBlacklisted(String key) {
@@ -315,62 +328,16 @@ public class TourServiceProvider implements ITourService {
         return false;
     }
 
-    private Field findTourField(Tour tour, String fieldName) {
-        try {
-            return Tour.class.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException | SecurityException e) {
-            System.err.println("Field not found: " + fieldName);
-            return null;
+    private void validateSubTour(SubTour subTour) {
+        Tour tour = subTour.getTour();
+        Integer totalSeats = tour.getTotalSeats();
+
+        if (subTour.getAvailableSeats() > totalSeats) {
+            throw new TourException("Số chỗ còn trống không được vượt quá " + totalSeats);
+        }
+
+        if (subTour.getDepartureTime().before(new Date(System.currentTimeMillis()))) {
+            throw new TourException("Thời gian khởi hành không được ở trong quá khứ!");
         }
     }
-
-    private Field findSubTourField(SubTour subTour, String fieldName) {
-        try {
-            return SubTour.class.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException | SecurityException e) {
-            System.err.println("Field not found: " + fieldName);
-            return null;
-        }
-    }
-
-    private void setFieldValue(Object object, Field field, Object value) {
-        if (field != null) {
-            field.setAccessible(true);
-
-            try {
-                value = convertValue(field, value);
-            } catch (ParseException e) {
-                log.error("Error converting value for field: {}", field.getName());
-                throw new TourException("Error converting value for field " + field.getName());
-            }
-
-            try {
-                field.set(object, value);
-            } catch (IllegalAccessException e) {
-                log.error("Error setting value for field: {}", field.getName());
-                throw new TourException("Error setting value for field " + field.getName());
-            }
-        }
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static Object convertValue(Field field, Object value) throws ParseException {
-        Class<?> fieldType = field.getType();
-
-        if (fieldType.equals(Date.class) && value instanceof String) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return dateFormat.parse((String) value);
-        }
-
-        if (fieldType.equals(ZonedDateTime.class)) {
-            return Instant.parse((String) value).atZone(ZoneId.systemDefault());
-        }
-
-        if (fieldType.isEnum()) {
-            return Enum.valueOf((Class<? extends Enum>) fieldType, String.valueOf(value));
-        }
-
-        return field.getType().cast(value); // No conversion needed for other types
-    }
-
 }
