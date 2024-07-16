@@ -15,9 +15,6 @@ import lombok.NoArgsConstructor;
 public class SubTourCreateForm {
 
     @NotNull
-    private Integer tourId;
-
-    @NotNull
     private String title;
 
     @NotNull

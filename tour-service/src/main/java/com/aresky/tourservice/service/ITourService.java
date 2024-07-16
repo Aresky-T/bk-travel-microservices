@@ -18,7 +18,7 @@ import com.aresky.tourservice.dto.response.TourResponse;
 public interface ITourService {
     void createTour(TourCreateForm form);
 
-    void createSubTour(SubTourCreateForm form);
+    void createSubTour(Integer tourId, SubTourCreateForm form);
 
     void updateTour(Integer tourId, Map<String, Object> fields);
 

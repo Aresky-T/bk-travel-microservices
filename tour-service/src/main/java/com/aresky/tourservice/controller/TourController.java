@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,15 +36,17 @@ public class TourController {
 
     // POST - createTour - TourCreateForm
     @PostMapping
-    public ResponseEntity<?> createTour(@RequestBody TourCreateForm form) {
+    public ResponseEntity<?> createTour(@ModelAttribute TourCreateForm form) {
         tourService.createTour(form);
         return ResponseEntity.ok("success");
     }
 
     // POST - createSubTour - SubTourCreateForm
     @PostMapping("/sub-tour")
-    public ResponseEntity<?> createSubTour(@RequestBody SubTourCreateForm form) {
-        tourService.createSubTour(form);
+    public ResponseEntity<?> createSubTour(
+            @RequestParam Integer tourId,
+            @RequestBody SubTourCreateForm form) {
+        tourService.createSubTour(tourId, form);
         return ResponseEntity.ok("success");
     }
 
@@ -125,7 +128,6 @@ public class TourController {
     public ResponseEntity<?> updateSubTour(
             @RequestParam(name = "subTourId") Integer subTourId,
             @RequestBody Map<String, Object> fields) {
-
         tourService.updateSubTour(subTourId, fields);
         return ResponseEntity.ok("success");
     }
