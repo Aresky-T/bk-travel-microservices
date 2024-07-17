@@ -13,9 +13,8 @@ import com.aresky.paymentservice.service.booking.IBookingService;
 import com.aresky.paymentservice.utils.DateUtils;
 import com.aresky.paymentservice.utils.VnPayUtils;
 import grpc.booking.BookingResponse;
-import grpc.booking.constants.BookingStatus;
-import grpc.booking.constants.PaymentMethod;
 import grpc.booking.v2.model.Booking;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,24 +47,16 @@ public class VNPaymentServiceImp implements IVNPayService {
             throw new PaymentException("Required bookingId!");
         }
 
-        Booking booking = getBookingByBookingId(bookingId);
-
         if (existsTransactionInfoBy(bookingId)) {
             throw new PaymentException(PaymentMessage.TRANSACTION_ALREADY_EXISTS);
         }
 
-        String status = booking.getStatus();
-
-        if(status.equals(BookingStatus.PAY_UP.name())){
-            throw new PaymentException(PaymentMessage.CAN_NOT_PAYMENT_THE_PAY_UP_BOOKING);
-        }
-
-        if(status.equals(BookingStatus.REJECTED.name())){
-            throw new PaymentException(PaymentMessage.CAN_NOT_PAYMENT_THE_REJECTED_BOOKING);
-        }
+        Booking booking = getBookingByBookingId(bookingId);
+        checkValidBooking(booking);
 
         // open new payment session
-        openSession(booking);
+        // openSession(booking);
+        sessionManager.openSession(bookingId);
 
         // get amount from booking info
         int amount = booking.getAmount();
@@ -79,27 +70,23 @@ public class VNPaymentServiceImp implements IVNPayService {
 
     @Override
     public EPaymentStatus orderReturn(VnPayPaymentResult result) {
-        String vnp_ResponseCode = result.getResponseCode();
         Integer bookingId = result.getBookingId();
-        PaymentMethod paymentMethod = PaymentMethod.VNPAY;
+        closeSession(bookingId);
 
         if (bookingId == null) {
             throw new PaymentException(PaymentMessage.REQUIRED_BOOKING_ID);
         }
 
-        if (!bookingGrpcService.checkExistBookingBy(bookingId)) {
-            throw new PaymentException(PaymentMessage.INVALID_BOOKING_ID);
-        }
+        Booking booking = getBookingByBookingId(bookingId);
 
         if (existsTransactionInfoBy(bookingId)) {
             throw new PaymentException(PaymentMessage.TRANSACTION_ALREADY_EXISTS);
         }
 
-        closeSession(bookingId);
-        Booking booking = getBookingByBookingId(bookingId);
+        checkValidBooking(booking);
+
         ZonedDateTime current = DateUtils.now();
         String payAt = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT).format(current);
-
         KafkaMessageType.NotificationRequest notificationRequest = KafkaMessageType.NotificationRequest.builder()
                 .userId(booking.getAccountId())
                 .entityId(bookingId)
@@ -108,22 +95,24 @@ public class VNPaymentServiceImp implements IVNPayService {
                 .keyword("payAt", payAt);
 
 
+        String vnp_ResponseCode = result.getResponseCode();
+
         if ("00".equals(vnp_ResponseCode)) {
-//            VnPayTransactionInfo info = createVnPayTransactionInfo(result);
-//            bookingGrpcService.updateBookingAfterPaymentSucceeded(bookingId, paymentMethod);
             kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS, notificationRequest);
             vnPayRepository.save(createVnPayTransactionInfo(result));
             return EPaymentStatus.SUCCESS;
         }
 
         if ("24".equals(vnp_ResponseCode)) {
-//            bookingGrpcService.updateBookingAfterPaymentCanceled(bookingId);
-            kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED, notificationRequest);
+            if(booking.getStatus().equals("IS_PAYING")){
+                kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED, notificationRequest);
+            }
             return EPaymentStatus.CANCELED;
         }
 
-//        bookingGrpcService.updateBookingAfterPaymentFailed(bookingId, paymentMethod);
-        kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_FAILED, notificationRequest);
+        if(booking.getStatus().equals("IS_PAYING")){
+            kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_FAILED, notificationRequest);
+        }
         return EPaymentStatus.FAILED;
     }
 
@@ -148,9 +137,29 @@ public class VNPaymentServiceImp implements IVNPayService {
         sessionManager.closeSession(bookingId);
     }
 
+    @Transactional
+    @Override
+    public void deleteTransactionInfo(Integer bookingId) {
+        if(!vnPayRepository.existsByBookingId(bookingId)){
+            throw new PaymentException(PaymentMessage.TRANSACTION_NOT_FOUND);
+        }
+
+        vnPayRepository.deleteByBookingId(bookingId);
+    }
+
     @Override
     public boolean existsTransactionInfoBy(Integer bookingId) {
         return vnPayRepository.existsByBookingId(bookingId);
+    }
+
+    private void checkValidBooking(Booking booking){
+        if(booking.getStatus().equals("PAY_UP")){
+            throw new PaymentException(PaymentMessage.PAID_BOOKING);
+        }
+
+        if(booking.getStatus().equals("REJECTED")){
+            throw new PaymentException(PaymentMessage.REJECTED_BOOKING);
+        }
     }
 
     private Booking getBookingByBookingId(int bookingId) {

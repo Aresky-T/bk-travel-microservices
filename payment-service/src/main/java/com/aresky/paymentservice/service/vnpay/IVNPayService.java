@@ -18,4 +18,6 @@ public interface IVNPayService {
     Session openSession(Integer bookingId);
 
     void closeSession(Integer bookingId);
+
+    void deleteTransactionInfo(Integer bookingId);
 }
