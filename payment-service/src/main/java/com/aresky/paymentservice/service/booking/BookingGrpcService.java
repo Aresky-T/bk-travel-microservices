@@ -47,9 +47,11 @@ public class BookingGrpcService implements IBookingService {
         try {
             var stub = initCheckingStub();
             CheckBookingByIdRequest request = CheckBookingByIdRequest.newBuilder().setBookingId(bookingId).build();
-            return Boolean.TRUE.equals(stub.checkBookingById(request)
-                    .map(CheckBookingByIdResponse::getIsExists)
-                    .block());
+            CheckBookingByIdResponse response = stub.checkBookingById(request).block();
+            if(response == null){
+                throw new PaymentException("No response from booking service");
+            }
+            return response.getIsExists();
         } catch (Exception ex){
             throw new PaymentException(ex.getMessage());
         }
@@ -114,7 +116,7 @@ public class BookingGrpcService implements IBookingService {
             ReactorBookingGettingServiceStub stub = initGettingStub();
             GetBookingByIdRequest request = GetBookingByIdRequest.newBuilder().setBookingId(bookingId).build();
             GetBookingByIdResponse response = stub.getBookingById(request).block();
-            if(response == null || response.hasBooking()){
+            if(response == null || !response.hasBooking()){
                 return null;
             }
 
