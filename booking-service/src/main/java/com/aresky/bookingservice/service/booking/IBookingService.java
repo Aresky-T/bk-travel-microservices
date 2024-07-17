@@ -21,7 +21,7 @@ public interface IBookingService {
     Mono<Booking> findBookingBy(Integer bookingId);
     Mono<Booking> findBookingBy(Integer accountId, Integer subTourId);
     Mono<List<Tourist>> findAllTourists(Integer bookingId);
-    Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form);
+    Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form, EPaymentType paymentType);
     Mono<Booking> saveBooking(Booking booking);
     Mono<Booking> update(UpdateBookingForm form);
     Mono<Booking> update(Integer bookingId, Map<String, Object> fields);
