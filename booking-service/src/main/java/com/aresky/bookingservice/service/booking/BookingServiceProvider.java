@@ -6,10 +6,7 @@ import com.aresky.bookingservice.dto.request.TouristRequest;
 import com.aresky.bookingservice.dto.request.UpdateBookingForm;
 import com.aresky.bookingservice.dto.response.SubTourResponse;
 import com.aresky.bookingservice.exception.BookingException;
-import com.aresky.bookingservice.model.Booking;
-import com.aresky.bookingservice.model.EBookingStatus;
-import com.aresky.bookingservice.model.ETouristType;
-import com.aresky.bookingservice.model.Tourist;
+import com.aresky.bookingservice.model.*;
 import com.aresky.bookingservice.repository.BookingRepository;
 import com.aresky.bookingservice.repository.TouristRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +75,7 @@ public class BookingServiceProvider implements IBookingService{
     }
 
     @Override
-    public Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form) {
+    public Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form, EPaymentType paymentType) {
         return Mono.zip(validateAmount(subTour, form), validateTouristList(form))
                 .map(tuple -> {
                     if (!tuple.getT1()) {
@@ -95,7 +92,12 @@ public class BookingServiceProvider implements IBookingService{
                     Booking booking = CreateBookingForm.buildBooking(form);
                     booking.setTourId(subTour.getTourId());
                     booking.setTourCode(subTour.getTourCode());
-                    booking.setStatus(EBookingStatus.NOT_PAY);
+
+                    if(paymentType.equals(EPaymentType.PAY_LATER)){
+                        booking.setStatus(EBookingStatus.NOT_PAY);
+                    } else {
+                        booking.setStatus(EBookingStatus.IS_PAYING);
+                    }
 
                     return Mono.just(CreateBookingForm.buildTouristList(form))
                             .switchIfEmpty(Mono.empty())
