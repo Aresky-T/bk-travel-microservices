@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package service;
+
+option java_multiple_files=true;
+option java_package="grpc.booking.v2.service";
+
+import "booking/v2/dto/request/get-booking-by-id-request.proto";
+import "booking/v2/dto/response/get-booking-by-id-response.proto";
+
+service BookingGettingService {
+  rpc GetBookingById(request.GetBookingByIdRequest) returns (response.GetBookingByIdResponse){};
+}

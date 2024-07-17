@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package model;
+
+option java_multiple_files=true;
+option java_package="grpc.booking.v2.model";
+
+message Booking {
+  int32 id = 1;
+  string booking_code = 2;
+  int32 account_id = 3;
+  int32 tour_id = 4;
+  int32 sub_tour_id = 5;
+  string tour_code = 6;
+  int32 adult_number = 7;
+  int32 child_number = 8;
+  int32 baby_number = 9;
+  int32 amount = 10;
+  string booked_time = 11;
+  string status = 12;
+  string form_of_payment = 13;
+  bool is_cancellation_requested = 14;
+}
