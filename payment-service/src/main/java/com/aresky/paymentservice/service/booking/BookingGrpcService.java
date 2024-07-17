@@ -3,6 +3,15 @@ package com.aresky.paymentservice.service.booking;
 import com.aresky.paymentservice.exception.PaymentException;
 import grpc.booking.*;
 import grpc.booking.constants.PaymentMethod;
+import grpc.booking.v2.dto.request.CheckBookingByIdRequest;
+import grpc.booking.v2.dto.request.GetBookingByIdRequest;
+import grpc.booking.v2.dto.response.CheckBookingByIdResponse;
+import grpc.booking.v2.dto.response.GetBookingByIdResponse;
+import grpc.booking.v2.model.Booking;
+import grpc.booking.v2.service.ReactorBookingCheckingServiceGrpc;
+import grpc.booking.v2.service.ReactorBookingCheckingServiceGrpc.ReactorBookingCheckingServiceStub;
+import grpc.booking.v2.service.ReactorBookingGettingServiceGrpc;
+import grpc.booking.v2.service.ReactorBookingGettingServiceGrpc.ReactorBookingGettingServiceStub;
 import org.springframework.stereotype.Service;
 
 import grpc.booking.ReactorBookingServiceGrpc.ReactorBookingServiceStub;
@@ -11,14 +20,13 @@ import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class BookingGrpcService implements IBookingService {
     private static final String HOST = "booking-service";
     private static final Integer POST = 50084;
-    private static final long TIMEOUT = 5000;
+    private static final long TIMEOUT = 3000;
 
     private ManagedChannel channel;
 
@@ -36,9 +44,15 @@ public class BookingGrpcService implements IBookingService {
 
     @Override
     public boolean checkExistBookingBy(Integer bookingId) {
-        ReactorBookingServiceStub stub = initStub();
-        BookingIdRequest request = BookingIdRequest.newBuilder().setId(bookingId).build();
-        return Objects.requireNonNull(stub.checkExistBookingById(request).block()).getIsExists();
+        try {
+            var stub = initCheckingStub();
+            CheckBookingByIdRequest request = CheckBookingByIdRequest.newBuilder().setBookingId(bookingId).build();
+            return Boolean.TRUE.equals(stub.checkBookingById(request)
+                    .map(CheckBookingByIdResponse::getIsExists)
+                    .block());
+        } catch (Exception ex){
+            throw new PaymentException(ex.getMessage());
+        }
     }
 
     @Override
@@ -95,22 +109,30 @@ public class BookingGrpcService implements IBookingService {
     }
 
     @Override
-    public BookingResponse getBookingById(Integer bookingId){
-        ReactorBookingServiceStub stub = initStub();
-        BookingIdRequest request = BookingIdRequest.newBuilder().setId(bookingId).build();
+    public Booking getBookingById(Integer bookingId){
         try {
+            ReactorBookingGettingServiceStub stub = initGettingStub();
+            GetBookingByIdRequest request = GetBookingByIdRequest.newBuilder().setBookingId(bookingId).build();
             GetBookingByIdResponse response = stub.getBookingById(request).block();
-            if(response != null && response.hasBooking()){
-                return response.getBooking();
+            if(response == null || response.hasBooking()){
+                return null;
             }
+
+            return response.getBooking();
         } catch (Exception ex) {
             throw new PaymentException(ex.getMessage());
         }
-
-        return null;
     }
 
     private ReactorBookingServiceStub initStub() {
         return ReactorBookingServiceGrpc.newReactorStub(this.channel).withDeadlineAfter(TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+
+    private ReactorBookingCheckingServiceStub initCheckingStub(){
+        return ReactorBookingCheckingServiceGrpc.newReactorStub(this.channel).withDeadlineAfter(TIMEOUT, TimeUnit.MILLISECONDS);
+    }
+
+    private ReactorBookingGettingServiceStub initGettingStub(){
+        return ReactorBookingGettingServiceGrpc.newReactorStub(this.channel).withDeadlineAfter(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 }
