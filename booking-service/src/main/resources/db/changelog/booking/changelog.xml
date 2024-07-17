@@ -59,7 +59,7 @@
             <column name="booked_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false" />
             </column>
-            <column name="status" type="ENUM('NOT_PAY','PAY_UP','PAY_FAILED','REJECTED')"
+            <column name="status" type="ENUM('NOT_PAY','IS_PAYING','PAY_UP','PAY_FAILED','REJECTED')"
                 defaultValue="NOT_PAY">
                 <constraints nullable="false" />
             </column>
