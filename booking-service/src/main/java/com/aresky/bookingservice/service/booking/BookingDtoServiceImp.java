@@ -13,13 +13,13 @@ import com.aresky.bookingservice.kafka.KafkaSenderEvent;
 import com.aresky.bookingservice.kafka.KafkaTopic;
 import com.aresky.bookingservice.model.*;
 import com.aresky.bookingservice.repository.CancellationRequestedRepository;
-import com.aresky.bookingservice.repository.TouristRepository;
-import com.aresky.bookingservice.service.account.AccountGrpcService;
 import com.aresky.bookingservice.service.account.IAccountGrpcService;
 import com.aresky.bookingservice.service.payment.IVnPayService;
 import com.aresky.bookingservice.util.DateUtils;
 import com.google.gson.Gson;
 import grpc.payment.vnpay.BookingInfoRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.aresky.bookingservice.exception.BookingException;
-import com.aresky.bookingservice.repository.BookingRepository;
 import com.aresky.bookingservice.service.payment.PaymentService;
 import com.aresky.bookingservice.service.tour.TourGrpcService;
 
@@ -35,18 +34,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 public class BookingDtoServiceImp implements IBookingDtoService {
 
     @Autowired
     private IBookingService bookingService;
-
-    @Autowired
-    private BookingRepository bookingRepository;
-
-    @Autowired
-    private TouristRepository touristRepository;
 
     @Autowired
     private IAccountGrpcService accountGrpcService;
@@ -66,11 +60,11 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     @Autowired
     private CancellationRequestedRepository cancellationRequestedRepository;
 
+    private final Logger log = LoggerFactory.getLogger(BookingDtoServiceImp.class);
     private final Gson GSON = new Gson();
 
     private final DateTimeFormatter VIETNAM_FORMATTER = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
 
-    @Transactional
     @Override
     public Mono<String> handleBooking(CreateBookingForm form, EPaymentType type) {
         int accountId = form.getAccountId();
@@ -84,11 +78,12 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                         return Mono.error(new BookingException(BookingException.BOOKING_ALREADY_EXISTS));
                     }
 
-                    Mono<Booking> createBookingMono = bookingService.createBooking(tuple.getT3(), form)
+                    SubTourResponse subTour = tuple.getT3();
+                    Mono<Booking> bookingMono = bookingService.createBooking(subTour, form)
                             .switchIfEmpty(Mono.error(new BookingException(BookingException.BOOKING_FAILED)));
 
                     if(type.equals(EPaymentType.PAY_LATER)){
-                        return createBookingMono
+                        return bookingMono
                                 .flatMap(booking -> {
                                     KafkaMessageType.NotificationRequest notificationRequest = KafkaMessageType.NotificationRequest
                                             .builder()
@@ -99,14 +94,21 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                                             .keyword("bookedTime", VIETNAM_FORMATTER.format(booking.getBookedTime()));
 
                                     String message = GSON.toJson(notificationRequest);
-                                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, message);
-                                })
-                                .thenReturn("Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!");
+
+                                    kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, message)
+                                            .subscribeOn(Schedulers.boundedElastic())
+                                            .subscribe(value -> {
+                                                log.info("Message sent to Kafka successfully");
+                                            }, error -> {
+                                                log.error("Error sending message to Notification service by Kafka!", error);
+                                            });
+
+                                    return Mono.just("Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!");
+                                });
                     }
 
                     if (type.equals(EPaymentType.VNPAY_ON_WEBSITE)){
-                        SubTourResponse subTour = tuple.getT3();
-                        return createBookingMono
+                        return bookingMono
                                 .flatMap(booking -> {
                                     BookingInfoRequest request = BookingInfoRequest.newBuilder()
                                             .setBookingId(booking.getId())
@@ -121,44 +123,41 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                     }
 
                     return Mono.error(new BookingException(BookingException.UNSUPPORTED_PAYMENT_TYPE));
-                })
-                .doOnError(Mono::error);
+                });
     }
 
     @Override
     public Mono<String> handleBookingAfterPaymentWithVnPay(VnPayReturn vnPayReturn) {
         String responseCode = vnPayReturn.getResponseCode();
 
-        return bookingRepository.findById(vnPayReturn.getBookingId())
+        return bookingService.findBookingBy(vnPayReturn.getBookingId())
                 .flatMap(booking -> {
                     if (responseCode.equals("00") || Integer.parseInt(responseCode) == 0) {
                         booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
                         booking.setStatus(EBookingStatus.PAY_UP);
                         return paymentService.requestCloseVnPayPaymentSession(vnPayReturn)
-                                .flatMap(message -> {
-                                    return bookingRepository.save(booking)
-                                            .thenReturn("SUCCESS");
-                                });
+                                .flatMap(message -> bookingService.saveBooking(booking)
+                                            .thenReturn("SUCCESS"));
                     }
 
                     if (responseCode.equals("24") || Integer.parseInt(responseCode) == 24) {
                         booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
                         paymentService.requestCloseSession(vnPayReturn.getBookingId());
-                        return bookingRepository.delete(booking)
+                        return bookingService.delete(booking)
                                 .thenReturn("CANCELED");
                     }
 
                     booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
                     booking.setStatus(EBookingStatus.PAY_FAILED);
                     paymentService.requestCloseSession(vnPayReturn.getBookingId());
-                    return bookingRepository.save(booking)
+                    return bookingService.saveBooking(booking)
                             .thenReturn("FAILED");
                 });
     }
 
     @Override
     public Mono<String> handlePaymentWithVnPayAfterBooking(Integer bookingId) {
-        return bookingRepository.findById(bookingId)
+        return bookingService.findBookingBy(bookingId)
                 .switchIfEmpty(Mono.error(
                         new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(booking -> findSubTour(booking.getSubTourId())
@@ -169,7 +168,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
 
     @Override
     public Mono<String> handlePaymentAfterBooking(Integer bookingId, EFormOfPayment formOfPayment) {
-        return bookingRepository.findById(bookingId)
+        return bookingService.findBookingBy(bookingId)
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(booking -> findSubTour(booking.getSubTourId())
                         .switchIfEmpty(Mono
@@ -261,11 +260,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     @Transactional
     @Override
     public Mono<Void> delete(Integer bookingId) {
-        return bookingService.existsBookingBy(bookingId)
-                .filter(Boolean.TRUE::equals)
-                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
-                .flatMap(isExists -> bookingRepository.deleteById(bookingId)
-                        .then());
+        return bookingService.delete(bookingId);
     }
 
     @Override
@@ -283,7 +278,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                     booking.setIsCancellationRequested(Boolean.TRUE);
 
                     return cancellationRequestedRepository.save(cancellationRequested)
-                                    .then(bookingRepository.save(booking));
+                                    .then(bookingService.saveBooking(booking));
                 })
                 .flatMap(booking -> {
                     KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
@@ -310,11 +305,11 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                 .flatMap(request -> {
                     request.setStatus(ERequestStatus.APPROVED);
                     return cancellationRequestedRepository.save(request)
-                            .then(bookingRepository.findById(request.getBookingId()));
+                            .then(bookingService.findBookingBy(request.getBookingId()));
                 })
                 .flatMap(booking -> {
                     booking.setStatus(EBookingStatus.REJECTED);
-                    return bookingRepository.save(booking);
+                    return bookingService.saveBooking(booking);
                 })
                 .flatMap(booking -> {
                     KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
@@ -334,7 +329,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                 .flatMap(request -> {
                     request.setStatus(ERequestStatus.APPROVED);
                     return cancellationRequestedRepository.save(request)
-                            .then(bookingRepository.findById(request.getBookingId()));
+                            .then(bookingService.findBookingBy(request.getBookingId()));
                 })
                 .flatMap(booking -> {
                     KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
@@ -367,33 +362,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_SUB_TOUR_ID)));
     }
 
-    @Transactional
-    private Mono<Booking> create(SubTourResponse subTour, Integer accountId, CreateBookingForm form) {
-        validateTouristList(form);
-        validateAmount(subTour, form);
-
-        Booking booking = CreateBookingForm.buildBooking(form);
-        booking.setTourId(subTour.getTourId());
-        booking.setTourCode(subTour.getTourCode());
-        booking.setStatus(EBookingStatus.NOT_PAY);
-
-        List<Tourist> tourists = form.getTouristList().stream()
-                .map(dto -> {
-                    Tourist tourist = TouristRequest.buildTourist(dto);
-                    tourist.setBookingId(booking.getId());
-                    return tourist;
-                })
-                .toList();
-
-        return bookingRepository.save(booking)
-                .flatMap(savedBooking -> {
-                    tourists.forEach(tourist -> tourist.setBookingId(savedBooking.getId()));
-                    return touristRepository.saveAll(tourists)
-                            .collectList()
-                            .thenReturn(savedBooking);
-                });
-    }
-
+    @SuppressWarnings("unused")
     private Mono<Void> sendNotification(Integer accountId, Booking booking){
         DateTimeFormatter formatter = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
 
@@ -408,59 +377,5 @@ public class BookingDtoServiceImp implements IBookingDtoService {
 
         return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, "booking-service-key", GSON.toJson(request))
                 .then();
-    }
-
-    private void validateAmount(SubTourResponse subTour, CreateBookingForm form) {
-        Integer adultPrice = subTour.getAdultPrice();
-        Integer childrenPrice = subTour.getAdultPrice();
-        Integer babyPrice = subTour.getBabyPrice();
-
-        Integer adultNumber = form.getAdultNumber();
-        Integer childrenNumber = form.getChildrenNumber();
-        Integer babyNumber = form.getBabyNumber();
-
-        Integer amount = (adultNumber * adultPrice) + (childrenNumber * childrenPrice)
-                + (babyNumber * babyPrice);
-        System.out.println("amount: " + amount);
-
-        if (!amount.equals(form.getAmount())) {
-            throw new BookingException(BookingException.INVALID_AMOUNT);
-        }
-    }
-
-    private void validateTouristList(CreateBookingForm form) {
-        List<TouristRequest> touristRequests = form.getTouristList();
-
-        int adultNumber = 0;
-        int childrenNumber = 0;
-        int babyNumber = 0;
-
-        for (TouristRequest tourist : touristRequests) {
-            switch (tourist.getType()) {
-                case ADULT:
-                    adultNumber += 1;
-                    break;
-                case CHILDREN:
-                    childrenNumber += 1;
-                    break;
-                case BABY:
-                    babyNumber += 1;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        if (adultNumber != form.getAdultNumber()) {
-            throw new BookingException(BookingException.INVALID_ADULT_NUMBER);
-        }
-
-        if (childrenNumber != form.getChildrenNumber()) {
-            throw new BookingException(BookingException.INVALID_CHILD_NUMBER);
-        }
-
-        if (babyNumber != form.getBabyNumber()) {
-            throw new BookingException(BookingException.INVALID_BABY_NUMBER);
-        }
     }
 }
