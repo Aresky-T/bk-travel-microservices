@@ -1,5 +1,5 @@
 package com.aresky.bookingservice.model;
 
 public enum EBookingStatus {
-    NOT_PAY, PAY_UP, PAY_FAILED, REJECTED
+    NOT_PAY, IS_PAYING, PAY_UP, PAY_FAILED, REJECTED
 }
