@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-@GrpcService(interceptors = {BookingGrpcInterceptor.class})
+@GrpcService
 public class ReactorBookingGrpcProvider extends ReactorBookingServiceGrpc.BookingServiceImplBase {
     @Autowired
     private IBookingService bookingService;
