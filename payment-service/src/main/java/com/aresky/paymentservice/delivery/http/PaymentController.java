@@ -55,4 +55,10 @@ public class PaymentController {
         return ResponseEntity.ok("success");
     }
 
+    @DeleteMapping("/vnpay/transaction")
+    public ResponseEntity<?> deleteVnPayTransaction(@RequestParam Integer bookingId) {
+        vnPayService.deleteTransactionInfo(bookingId);
+        return ResponseEntity.ok("success");
+    }
+
 }
