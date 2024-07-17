@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface VnPayRepository extends JpaRepository<VnPayTransactionInfo, Integer> {
     Optional<VnPayTransactionInfo> findByBookingId(Integer bookingId);
     boolean existsByBookingId(Integer bookingId);
+    void deleteByBookingId(Integer bookingId);
 }
