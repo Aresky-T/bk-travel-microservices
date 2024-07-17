@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 public class BookingResponse {
     private Integer id;
+    private String bookingCode;
     private Integer accountId;
     private Integer tourId;
     private Integer subTourId;
@@ -37,6 +38,7 @@ public class BookingResponse {
     public static BookingResponse toDTO(Booking booking) {
         return BookingResponse.builder()
                 .id(booking.getId())
+                .bookingCode(booking.getBookingCode())
                 .accountId(booking.getAccountId())
                 .tourId(booking.getTourId())
                 .subTourId(booking.getSubTourId())
