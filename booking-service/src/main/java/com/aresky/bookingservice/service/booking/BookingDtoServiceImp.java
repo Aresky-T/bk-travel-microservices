@@ -79,7 +79,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                     }
 
                     SubTourResponse subTour = tuple.getT3();
-                    Mono<Booking> bookingMono = bookingService.createBooking(subTour, form)
+                    Mono<Booking> bookingMono = bookingService.createBooking(subTour, form, type)
                             .switchIfEmpty(Mono.error(new BookingException(BookingException.BOOKING_FAILED)));
 
                     if(type.equals(EPaymentType.PAY_LATER)){
