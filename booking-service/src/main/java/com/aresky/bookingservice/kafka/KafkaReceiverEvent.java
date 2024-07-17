@@ -6,8 +6,11 @@ import com.aresky.bookingservice.service.booking.IBookingService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.Disposable;
@@ -22,6 +25,8 @@ import java.util.Set;
 @Service
 public class KafkaReceiverEvent {
 
+    private static final Logger log = LoggerFactory.getLogger(KafkaReceiverEvent.class);
+
     @Autowired
     private ReceiverOptions<String, String> receiverOptions;
 
@@ -31,7 +36,9 @@ public class KafkaReceiverEvent {
     private Disposable disposable;
 
     private final Set<String> TOPICS = Set.of(
-            KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS
+            KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS,
+            KafkaTopic.BOOKING_WITH_VNPAY_FAILED,
+            KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED
     );
 
     @PostConstruct
@@ -45,25 +52,29 @@ public class KafkaReceiverEvent {
     private Mono<Void> handleReceivedMessage(ReceiverRecord<String, String> record){
         return Mono.just(record.topic())
                 .flatMap(topic -> {
-                    if (topic.equals(KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS)) {
-                        String message = record.value();
-                        Set<String> requiredKeys = new HashSet<>();
-                        requiredKeys.add("userId");
-                        requiredKeys.add("entityId");
-                        requiredKeys.add("keywords");
+                    System.out.println("Received message from topic " + topic);
+                    String message = record.value();
+                    KafkaMessageType.NotificationRequest notification = convertToNotificationRequest(message);
 
-                        KafkaMessageType.NotificationRequest notification = convertToNotificationRequest(message, requiredKeys);
+                    if(notification == null){
+                        return Mono.empty();
+                    }
 
-                        Integer bookingId = notification.getEntityId();
-                        bookingService.findBookingBy(bookingId)
+                    System.out.println(notification);
+                    Integer bookingId = notification.getEntityId();
+
+                    return switch (topic) {
+                        case KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS -> bookingService.findBookingBy(bookingId)
+                                .filter(booking -> !booking.getStatus().equals(EBookingStatus.PAY_UP))
+                                .switchIfEmpty(Mono.empty())
                                 .flatMap(booking -> {
                                     booking.setStatus(EBookingStatus.PAY_UP);
                                     booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
                                     return bookingService.saveBooking(booking).then();
                                 });
-                    }
-
-                    return Mono.empty();
+                        case KafkaTopic.BOOKING_WITH_VNPAY_FAILED, KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED -> bookingService.delete(bookingId).then();
+                        default -> Mono.empty();
+                    };
                 });
     }
 
@@ -74,21 +85,35 @@ public class KafkaReceiverEvent {
         }
     }
 
-    private KafkaMessageType.NotificationRequest convertToNotificationRequest(String jsonString, Set<String> keys){
-        return convertFromJsonMessageUsingGson(jsonString, KafkaMessageType.NotificationRequest.class, keys);
+    private KafkaMessageType.NotificationRequest convertToNotificationRequest(String jsonString){
+        Set<String> requiredKeys = new HashSet<>();
+        requiredKeys.add("userId");
+        requiredKeys.add("entityId");
+        requiredKeys.add("keywords");
+        return convertFromJsonMessageUsingGson(jsonString, KafkaMessageType.NotificationRequest.class, requiredKeys);
+    }
+
+    private KafkaMessageType.NotificationRequest convertToNotificationRequest(String jsonString, Set<String> requiredKeys){
+        return convertFromJsonMessageUsingGson(jsonString, KafkaMessageType.NotificationRequest.class, requiredKeys);
     }
 
     @SuppressWarnings("unused")
-    private <T> T convertFromJsonMessageUsingGson(String jsonString, Class<T> destinationType, Set<String> keys){
-        Gson gson = new Gson();
-        JsonObject rootObject = JsonParser.parseString(jsonString).getAsJsonObject();
-        JsonObject filteredObject = new JsonObject();
+    private <T> T convertFromJsonMessageUsingGson(String jsonString, Class<T> destinationType, Set<String> requiredKeys){
+        try {
 
-        if (keys != null) keys.forEach(key -> {
-            filteredObject.add(key, rootObject.get(key));
-        });
+            Gson gson = new Gson();
+            JsonObject rootObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject filteredObject = new JsonObject();
 
-        String filteredObjectStr = gson.toJson(filteredObject);
-        return gson.fromJson(filteredObjectStr, destinationType);
+            if (requiredKeys != null) requiredKeys.forEach(key -> {
+                filteredObject.add(key, rootObject.get(key));
+            });
+
+            String filteredObjectStr = gson.toJson(filteredObject);
+            return gson.fromJson(filteredObjectStr, destinationType);
+        } catch (JsonSyntaxException | IllegalStateException | NullPointerException ex){
+            log.error("Error: {}", ex.getMessage());
+            return null;
+        }
     }
 }
