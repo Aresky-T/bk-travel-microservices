@@ -3,14 +3,11 @@ package com.aresky.bookingservice.kafka;
 import com.aresky.bookingservice.model.EBookingStatus;
 import com.aresky.bookingservice.model.EFormOfPayment;
 import com.aresky.bookingservice.service.booking.IBookingService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.Disposable;
@@ -22,7 +19,6 @@ import reactor.kafka.receiver.ReceiverRecord;
 import java.util.HashSet;
 import java.util.Set;
 
-@Slf4j
 @Service
 public class KafkaReceiverEvent {
 

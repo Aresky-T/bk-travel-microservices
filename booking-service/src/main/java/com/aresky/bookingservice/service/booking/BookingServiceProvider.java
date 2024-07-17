@@ -77,7 +77,6 @@ public class BookingServiceProvider implements IBookingService{
         return touristRepository.findAllByBookingId(bookingId).collectList();
     }
 
-    @Transactional
     @Override
     public Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form) {
         return Mono.zip(validateAmount(subTour, form), validateTouristList(form))
