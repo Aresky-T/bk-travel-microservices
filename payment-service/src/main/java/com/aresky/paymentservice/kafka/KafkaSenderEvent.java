@@ -18,15 +18,19 @@ public class KafkaSenderEvent {
     private final Gson gson = new Gson();
 
     public void sendMessage(String topic, Object value){
-        String message = gson.toJson(value);
-        CompletableFuture<SendResult<String, Object>> future = template.send(topic, KEY, message);
-        future.whenComplete((result, ex) -> {
-            if (ex != null) {
-                System.err.println("Error sending message: " + ex.getMessage());
-            } else {
-                System.out.println("Sent message to topic " + topic);
-                System.out.println("Message sent successfully");
-            }
-        });
+        try {
+            String message = gson.toJson(value);
+            CompletableFuture<SendResult<String, Object>> future = template.send(topic, KEY, message);
+            future.whenComplete((result, ex) -> {
+                if (ex != null) {
+                    System.err.println("Error sending message: " + ex.getMessage());
+                } else {
+                    System.out.println("Sent message to topic " + topic);
+                    System.out.println("Message sent successfully");
+                }
+            });
+        } catch (Exception ex){
+            System.err.println("Error sending message with exception: " + ex.getClass().getName());
+        }
     }
 }
