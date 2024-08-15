@@ -69,9 +69,14 @@ public class StaffController {
     // PUT - updateStaff(StaffUpdateForm form)
     @PutMapping
     public Mono<ResponseEntity<?>> updateStaff(
-            @RequestParam(name = "id") Integer staffId,
+            @RequestParam Integer staffId,
             @RequestBody StaffUpdateForm form) {
         return staffService.updateStaff(staffId, form).map(ResponseEntity::ok);
+    }
+
+    @PatchMapping("/bind-account")
+    public Mono<ResponseEntity<?>> bindAccountToStaff(@RequestParam String email){
+        return staffService.bindAccountToStaff(email).thenReturn(ResponseEntity.ok("success"));
     }
 
     // PATCH - updateStaff(Integer staffId, Map<String, Object> fields)
@@ -100,5 +105,10 @@ public class StaffController {
     @DeleteMapping
     public Mono<ResponseEntity<?>> deleteStaff(@RequestParam(name = "id") Integer staffId) {
         return staffService.deleteStaff(staffId).thenReturn(ResponseEntity.ok("success"));
+    }
+
+    @DeleteMapping("/bind-account")
+    public Mono<ResponseEntity<?>> unbindAccountToStaff(@RequestParam String email){
+        return staffService.unbindAccountToStaff(email).thenReturn(ResponseEntity.ok("success"));
     }
 }
