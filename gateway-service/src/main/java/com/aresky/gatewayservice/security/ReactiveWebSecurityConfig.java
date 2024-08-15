@@ -35,7 +35,7 @@ public class ReactiveWebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration
-                .setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:3001"));
+                .setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:3001", "http://192.168.1.102:3000"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
