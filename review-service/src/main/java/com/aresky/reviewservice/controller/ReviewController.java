@@ -21,6 +21,13 @@ public class ReviewController {
     @Autowired
     private IReviewService reviewService;
 
+    @GetMapping("/check")
+    public Mono<ResponseEntity<Boolean>> checkReview(
+            @RequestParam Integer accountId,
+            @RequestParam Integer subTourId) {
+        return reviewService.existsReviewByAccountIdAndSubTourId(accountId, subTourId).map(ResponseEntity::ok);
+    }
+
     @GetMapping("/one-for-customer")
     public Mono<ResponseEntity<CustomerReview>> getReviewsForTour(
             @RequestParam Integer accountId,
