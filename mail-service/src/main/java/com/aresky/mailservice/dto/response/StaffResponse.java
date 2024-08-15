@@ -14,4 +14,5 @@ public class StaffResponse {
     private String fullName;
     private String email;
     private String avatarUrl;
+    private Boolean permission;
 }

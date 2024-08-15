@@ -15,4 +15,5 @@ public class MailBoxResponse {
     private Integer totalMail;
     private Integer unrepliedMailCount;
     private String createdAt;
+    private String updatedAt;
 }
