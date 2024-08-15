@@ -34,4 +34,9 @@ public class Message {
 
     @Column("sent_at")
     private ZonedDateTime sentAt;
+
+    public Message status(EMessageStatus status){
+        this.status = status;
+        return this;
+    }
 }

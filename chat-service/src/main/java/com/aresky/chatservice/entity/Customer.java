@@ -26,4 +26,9 @@ public class Customer {
 
     @Column("status")
     private EActivationStatus status;
+
+    public Customer status(EActivationStatus status){
+        this.status = status;
+        return this;
+    }
 }
