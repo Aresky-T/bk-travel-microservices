@@ -3,6 +3,7 @@ package com.aresky.mailservice.controller;
 import com.aresky.mailservice.dto.request.MailReplyRequest;
 import com.aresky.mailservice.dto.request.MailRequest;
 import com.aresky.mailservice.dto.response.*;
+import com.aresky.mailservice.mappers.http.StaffMapper;
 import com.aresky.mailservice.service.mail.IMailService;
 import com.aresky.mailservice.service.mailbox.IMailBoxService;
 import com.aresky.mailservice.service.staff.IStaffService;
@@ -55,12 +56,12 @@ public class MailController {
 
     // GET /all
     @GetMapping("/all-for-customer")
-    public Mono<ResponseEntity<List<MailResponse>>> getAllMailsForCustomer(
+    public Mono<ResponseEntity<PaginationWrapper<MailResponse>>> getAllMailsForCustomer(
             @RequestParam String customerEmail,
-            @RequestParam Integer limit,
-            @RequestParam Integer offset
+            @RequestParam Integer page,
+            @RequestParam Integer size
     ){
-        return mailService.getAllMailsForCustomer(customerEmail, limit, offset).map(ResponseEntity::ok);
+        return mailService.getAllMailsForCustomer(customerEmail, page, size).map(ResponseEntity::ok);
     }
 
     @GetMapping("/details-for-customer")
@@ -81,9 +82,9 @@ public class MailController {
     }
 
     // GET /staff/check
-    @GetMapping("/staff/check")
-    public Mono<ResponseEntity<Boolean>> checkStaff(@RequestParam String email){
-        return staffService.existsByEmail(email).map(ResponseEntity::ok);
+    @GetMapping("/staff/permission")
+    public Mono<ResponseEntity<Boolean>> checkStaffPermission(@RequestParam String email){
+        return staffService.checkPermission(email).map(ResponseEntity::ok);
     }
 
     // GET /staff/details
@@ -114,6 +115,18 @@ public class MailController {
             @RequestParam Integer mailId
     ){
         return mailService.markMailAsRead(staffEmail, mailId).map(ResponseEntity::ok);
+    }
+
+    // PATCH /staff/permission/enable
+    @PatchMapping("/staff/permission/enable")
+    public Mono<ResponseEntity<StaffResponse>> enableStaffPermission(@RequestParam String email){
+        return staffService.enablePermission(email).map(StaffMapper::toStaffResponse).map(ResponseEntity::ok);
+    }
+
+    // PATCH /staff/permission/enable
+    @PatchMapping("/staff/permission/disable")
+    public Mono<ResponseEntity<StaffResponse>> disableStaffPermission(@RequestParam String email){
+        return staffService.disablePermission(email).map(StaffMapper::toStaffResponse).map(ResponseEntity::ok);
     }
 
     // DELETE
