@@ -17,6 +17,9 @@
             <column name="booking_id" type="INT">
                 <constraints nullable="false" unique="true" />
             </column>
+            <column name="booking_code" type="VARCHAR(20)">
+                <constraints nullable="true" unique="true"/>
+            </column>
             <column name="bank" type="VARCHAR(100)">
                 <constraints nullable="false" />
             </column>
