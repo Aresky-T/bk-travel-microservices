@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ChatException extends RuntimeException {
+    public static final ChatException STAFF_NOT_FOUND_EX = new ChatException(ExceptionMessage.STAFF_NOT_FOUND);
+
     private String message;
 
     public ChatException(String message) {
