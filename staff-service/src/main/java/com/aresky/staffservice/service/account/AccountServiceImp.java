@@ -8,10 +8,14 @@ import grpc.account.dto.response.CheckAccountByEmailResponse;
 import grpc.account.fields.AccountEmailField;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AccountServiceImp implements IAccountService {
@@ -43,15 +47,24 @@ public class AccountServiceImp implements IAccountService {
                 .setAccountEmail(accountEmailField)
                 .build();
 
-        return initStub().flatMap(stub -> stub.checkAccountByEmail(request))
+        return initStub()
+                .checkAccountByEmail(request)
                 .filter(CheckAccountByEmailResponse::getIsExists)
                 .switchIfEmpty(Mono.empty())
                 .map(CheckAccountByEmailResponse::getAccount)
-                .onErrorResume(err -> Mono.error(new StaffException(err.getMessage())));
+                .onErrorResume(err -> {
+                    if(err instanceof UnknownHostException || err instanceof StatusRuntimeException){
+                        return Mono.error(new StaffException("Unable to connect to account-service!"));
+                    }
+
+                    return Mono.error(new StaffException(err.getMessage()));
+                });
     }
 
-    private Mono<ReactorAccountServiceCheckGrpc.ReactorAccountServiceCheckStub> initStub(){
-        return Mono.just(ReactorAccountServiceCheckGrpc.newReactorStub(this.channel));
+    private ReactorAccountServiceCheckGrpc.ReactorAccountServiceCheckStub initStub(){
+        return ReactorAccountServiceCheckGrpc
+                .newReactorStub(this.channel)
+                .withDeadlineAfter(3000, TimeUnit.MILLISECONDS);
     }
 
     private void shutdownChannel(){

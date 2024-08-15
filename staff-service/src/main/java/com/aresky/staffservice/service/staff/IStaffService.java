@@ -48,4 +48,8 @@ public interface IStaffService {
     Mono<Staff> getStaffByEmail(String email);
 
     Mono<Void> layoffStaff(Integer staffId);
+
+    Mono<Void> bindAccountToStaff(String email);
+
+    Mono<Void> unbindAccountToStaff(String email);
 }

@@ -17,6 +17,7 @@ import com.aresky.staffservice.service.account.IAccountService;
 import com.aresky.staffservice.utils.FieldUtils;
 import com.google.common.base.Objects;
 
+import grpc.account.dto.response.AccountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -232,6 +233,38 @@ public class StaffServiceImp implements IStaffService {
                             staff.setStatus(EStaffStatus.TERMINATED);
                             return staffRepository.save(staff).then();
                         }));
+    }
+
+    @Override
+    public Mono<Void> bindAccountToStaff(String email) {
+        return staffRepository.findByEmail(email)
+                .switchIfEmpty(Mono.error(StaffException.STAFF_DOES_NOT_EXIST_EX))
+                .flatMap(staff -> accountService.checkAccountByEmail(staff.getEmail())
+                        .switchIfEmpty(Mono.error(StaffException.ACCOUNT_NOT_FOUND_EX))
+                        .filter(account -> account.getRole().equals("STAFF"))
+                        .switchIfEmpty(Mono.error(StaffException.ACCOUNT_ROLE_MUST_BE_STAFF_EX))
+                        .flatMap(account -> Mono.zip(Mono.just(staff), Mono.just(account))))
+                .flatMap(tuple -> {
+                   Staff staff = tuple.getT1();
+                   AccountResponse account = tuple.getT2();
+
+                   staff.setAccountId(account.getId());
+                   return staffRepository.save(staff);
+                })
+                .then();
+    }
+
+    @Override
+    public Mono<Void> unbindAccountToStaff(String email) {
+        return staffRepository.findByEmail(email)
+                .switchIfEmpty(Mono.error(StaffException.STAFF_DOES_NOT_EXIST_EX))
+                .filter(staff -> staff.getAccountId() != null)
+                .switchIfEmpty(Mono.error(StaffException.STAFF_HAS_NOT_BOUND_TO_ACCOUNT_EX))
+                .flatMap(staff -> {
+                    staff.setAccountId(null);
+                    return staffRepository.save(staff);
+                })
+                .then();
     }
 
     private Mono<StaffDetails> createStaffDetails(Mono<Staff> staffMono) {
