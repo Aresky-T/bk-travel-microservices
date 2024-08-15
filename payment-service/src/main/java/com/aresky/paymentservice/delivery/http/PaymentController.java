@@ -32,6 +32,11 @@ public class PaymentController {
         return ResponseEntity.ok(vnPayService.getVnPayTransactionInfo(bookingId));
     }
 
+    @GetMapping("/vnpay/transaction/check")
+    public ResponseEntity<Boolean> checkVnPayTransactionInfo(@RequestParam Integer bookingId) {
+        return ResponseEntity.ok(vnPayService.checkVnPayTransactionInfo(bookingId));
+    }
+
     @PostMapping("/vnpay")
     public ResponseEntity<String> paymentWithVNPay(
             @RequestParam Integer bookingId) {
