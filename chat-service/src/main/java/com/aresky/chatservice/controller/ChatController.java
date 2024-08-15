@@ -2,7 +2,11 @@ package com.aresky.chatservice.controller;
 
 import com.aresky.chatservice.dto.request.ConversationRequest;
 import com.aresky.chatservice.dto.request.CustomerRequest;
+import com.aresky.chatservice.dto.response.ConversationResponse;
+import com.aresky.chatservice.dto.response.CustomerConversation;
+import com.aresky.chatservice.dto.response.CustomerResponse;
 import com.aresky.chatservice.entity.EActivationStatus;
+import com.aresky.chatservice.mappers.http.CustomerMapper;
 import com.aresky.chatservice.service.conversation.IConversationService;
 import com.aresky.chatservice.service.customer.ICustomerService;
 import com.aresky.chatservice.service.message.IMessageService;
@@ -11,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/chat")
@@ -29,7 +35,7 @@ public class ChatController {
     private IMessageService messageService;
 
     @PostMapping("/customer/connect-to-staff")
-    public Mono<ResponseEntity<?>> connectToConversationByCustomer(@RequestBody ConversationRequest request) {
+    public Mono<ResponseEntity<CustomerConversation>> connectToStaff(@RequestBody ConversationRequest request) {
         return conversationService.connectByCustomer(request).map(ResponseEntity::ok);
     }
 
@@ -39,12 +45,12 @@ public class ChatController {
     }
 
     @PostMapping("/register-customer")
-    public Mono<ResponseEntity<?>> createCustomer(@RequestBody CustomerRequest request) {
+    public Mono<ResponseEntity<CustomerResponse>> createCustomer(@RequestBody CustomerRequest request) {
         return customerService.register(request).map(ResponseEntity::ok);
     }
 
     @GetMapping("/conversations")
-    public Mono<ResponseEntity<?>> getAllConversations(
+    public Mono<ResponseEntity<List<ConversationResponse>>> getAllConversations(
             @RequestParam Integer staffId,
             @RequestParam Integer limit,
             @RequestParam Integer offset) {
@@ -52,8 +58,10 @@ public class ChatController {
     }
 
     @GetMapping("/customer")
-    public Mono<ResponseEntity<?>> getCustomerByEmail(@RequestParam String email) {
-        return customerService.getByEmail(email).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<CustomerResponse>> getCustomerByEmail(@RequestParam String email) {
+        return customerService.getByEmail(email)
+                .map(CustomerMapper::mapToCustomerResponse)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/customer/check")
@@ -63,7 +71,7 @@ public class ChatController {
 
     @GetMapping("/staff")
     public Mono<ResponseEntity<?>> getStaffByEmail(@RequestParam String email) {
-        return staffService.getStaffByEmail(email).map(ResponseEntity::ok);
+        return staffService.getByEmail(email).map(ResponseEntity::ok);
     }
 
     @GetMapping("/staff/check")
