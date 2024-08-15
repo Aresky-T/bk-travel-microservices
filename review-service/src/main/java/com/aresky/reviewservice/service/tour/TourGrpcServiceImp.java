@@ -9,12 +9,14 @@ import grpc.tour.dto.response.CheckTourByIdResponse;
 import grpc.tour.dto.response.SubTourResponse;
 import grpc.tour.fields.SubTourIdField;
 import grpc.tour.fields.TourIdField;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class TourGrpcServiceImp implements ITourService {
@@ -36,35 +38,32 @@ public class TourGrpcServiceImp implements ITourService {
     @Override
     public Mono<Boolean> checkExistsTourById(Integer tourId) {
         CheckTourByIdRequest request = buildCheckTourByIdRequest(tourId);
-        return initStub()
-                .flatMap(stub -> Mono.fromCallable(() -> stub.checkTourById(request)))
+        return Mono.fromCallable(() -> initStub().checkTourById(request))
                 .map(CheckTourByIdResponse::getIsExists)
-                .onErrorResume(ex -> Mono.error(new ReviewException(ex.getMessage())));
+                .onErrorResume(this::handleException);
     }
 
     @Override
     public Mono<Boolean> checkExistsSubTourById(Integer subTourId) {
         CheckSubTourByIdRequest request = buildCheckSubTourByIdRequest(subTourId);
-        return initStub()
-                .flatMap(stub -> Mono.fromCallable(() -> stub.checkSubTourById(request)))
+        return Mono.fromCallable(() -> initStub().checkSubTourById(request))
                 .map(CheckSubTourByIdResponse::getIsExists)
-                .onErrorResume(ex -> Mono.error(new ReviewException(ex.getMessage())));
+                .onErrorResume(this::handleException);
     }
 
     @Override
     public Mono<SubTourResponse> getSubTourById(Integer subTourId) {
         CheckSubTourByIdRequest request = buildCheckSubTourByIdRequest(subTourId);
-        return initStub()
-                .flatMap(stub -> Mono.fromCallable(() -> stub.checkSubTourById(request)))
+        return Mono.fromCallable(() -> initStub().checkSubTourById(request))
                 .filter(CheckSubTourByIdResponse::getIsExists)
                 .switchIfEmpty(Mono.empty())
                 .map(CheckSubTourByIdResponse::getSubTour)
-                .onErrorResume(ex -> Mono.error(new ReviewException(ex.getMessage())));
+                .onErrorResume(this::handleException);
     }
 
-    private Mono<TourCheckServiceGrpc.TourCheckServiceBlockingStub> initStub(){
-        return Mono.justOrEmpty(TourCheckServiceGrpc.newBlockingStub(channel))
-                .switchIfEmpty(Mono.error(new ReviewException("Connect to tour-service failed!")));
+    private TourCheckServiceGrpc.TourCheckServiceBlockingStub initStub(){
+        return TourCheckServiceGrpc.newBlockingStub(channel)
+                .withDeadline(Deadline.after(2000, TimeUnit.MILLISECONDS));
     }
 
     private CheckTourByIdRequest buildCheckTourByIdRequest(Integer tourId){
@@ -82,4 +81,15 @@ public class TourGrpcServiceImp implements ITourService {
             channel.shutdown();
         }
     }
+
+    private <T> Mono<T> handleException (Throwable err) {
+        if(err instanceof UnknownHostException){
+            return Mono.error(new ReviewException("Unable to resolve host tour-service!"));
+        }
+
+        if(err instanceof StatusRuntimeException && ((StatusRuntimeException) err).getStatus().getCode().equals(Status.Code.DEADLINE_EXCEEDED)){
+            return Mono.error(new ReviewException("Connect to tour-service failed!"));
+        }
+        return Mono.error(new ReviewException(err.getMessage()));
+    };
 }

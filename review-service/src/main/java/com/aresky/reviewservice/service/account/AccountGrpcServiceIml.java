@@ -1,5 +1,6 @@
 package com.aresky.reviewservice.service.account;
 
+import io.grpc.*;
 import org.springframework.stereotype.Service;
 
 import com.aresky.reviewservice.exception.ReviewException;
@@ -9,11 +10,12 @@ import grpc.account.dto.request.CheckProfileByAccountIdRequest;
 import grpc.account.dto.response.CheckProfileByAccountIdResponse;
 import grpc.account.dto.response.ProfileResponse;
 import grpc.account.fields.AccountIdField;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import reactor.core.publisher.Mono;
+
+import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AccountGrpcServiceIml implements IAccountService {
@@ -35,26 +37,24 @@ public class AccountGrpcServiceIml implements IAccountService {
     @Override
     public Mono<Boolean> checkExistsAccountById(Integer accountId) {
         CheckProfileByAccountIdRequest request = buildCheckProfileByAccountIdRequest(accountId);
-        return initStub()
-                .flatMap(stub -> stub.checkProfileByAccountId(request))
+        return initStub().checkProfileByAccountId(request)
                 .map(CheckProfileByAccountIdResponse::getIsExistsAccountId)
-                .onErrorResume(ex -> Mono.error(new ReviewException(ex.getMessage())));
+                .onErrorResume(this::handleException);
     }
 
     @Override
     public Mono<ProfileResponse> getProfileById(Integer accountId) {
         CheckProfileByAccountIdRequest request = buildCheckProfileByAccountIdRequest(accountId);
-        return initStub()
-                .flatMap(stub -> stub.checkProfileByAccountId(request))
+        return initStub().checkProfileByAccountId(request)
                 .filter(CheckProfileByAccountIdResponse::getIsExistsAccountId)
                 .switchIfEmpty(Mono.empty())
                 .map(CheckProfileByAccountIdResponse::getProfile)
-                .onErrorResume(ex -> Mono.error(new ReviewException(ex.getMessage())));
+                .onErrorResume(this::handleException);
     }
 
-    private Mono<ReactorAccountProfileCheckServiceGrpc.ReactorAccountProfileCheckServiceStub> initStub() {
-        return Mono.justOrEmpty(ReactorAccountProfileCheckServiceGrpc.newReactorStub(channel))
-                .switchIfEmpty(Mono.error(new ReviewException("Connect to account-service failed!")));
+    private ReactorAccountProfileCheckServiceGrpc.ReactorAccountProfileCheckServiceStub initStub() {
+        return ReactorAccountProfileCheckServiceGrpc.newReactorStub(channel)
+                .withDeadline(Deadline.after(2000, TimeUnit.MILLISECONDS));
     }
 
     private CheckProfileByAccountIdRequest buildCheckProfileByAccountIdRequest(Integer accountId) {
@@ -68,4 +68,16 @@ public class AccountGrpcServiceIml implements IAccountService {
             channel.shutdown();
         }
     }
+
+    private <T> Mono<T> handleException (Throwable err) {
+        if(err instanceof UnknownHostException){
+            return Mono.error(new ReviewException("Unable to resolve host account-service!"));
+        }
+
+        if(err instanceof StatusRuntimeException && ((StatusRuntimeException) err).getStatus().getCode().equals(Status.Code.DEADLINE_EXCEEDED)){
+            return Mono.error(new ReviewException("Connect to account-service failed!"));
+        }
+
+        return Mono.error(new ReviewException(err.getMessage()));
+    };
 }

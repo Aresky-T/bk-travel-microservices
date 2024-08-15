@@ -55,11 +55,13 @@ public class ReviewServiceImp implements IReviewService {
         Integer stars = form.getStars();
         String comment = form.getComment();
 
-        return existsReviewerByAccountId(accountId)
+        Mono<Reviewer> reviewerMono = existsReviewerByAccountId(accountId)
                 .flatMap(existsReviewer -> existsReviewer
                         ? getReviewerByAccountId(accountId)
                         : createReviewerIfNotExists(accountId)
-                )
+                );
+
+        return reviewerMono
                 .map(Reviewer::getId)
                 .flatMap(reviewerId -> existsReviewByReviewerIdIdAndSubTourId(reviewerId, subTourId)
                         .flatMap(existsReview -> {
@@ -106,6 +108,14 @@ public class ReviewServiceImp implements IReviewService {
         return statisticRepository.findByTourId(tourId)
                 .switchIfEmpty(Mono.error(new ReviewException(MessageResponse.STATISTIC_DOES_NOT_EXIST)))
                 .map(StatisticResponse::toDto);
+    }
+
+    @Override
+    public Mono<Boolean> existsReviewByAccountIdAndSubTourId(Integer accountId, Integer subTourId) {
+        return reviewerRepository.findByAccountId(accountId)
+                .switchIfEmpty(Mono.error(new ReviewException(MessageResponse.INVALID_ACCOUNT_ID)))
+                .map(Reviewer::getId)
+                .flatMap(reviewerId -> reviewRepository.existsByReviewerIdAndSubTourId(reviewerId, subTourId));
     }
 
     private Mono<Review> createAndSaveReview(Integer reviewerId, Integer subTourId, Integer stars, String comment) {

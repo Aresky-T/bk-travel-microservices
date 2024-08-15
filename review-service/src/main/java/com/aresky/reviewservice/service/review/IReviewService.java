@@ -15,4 +15,6 @@ public interface IReviewService {
     Mono<CustomerReview> getReviewForCustomer(Integer accountId, Integer subTourId);
 
     Mono<StatisticResponse> getStatisticForTour(Integer tourId);
+
+    Mono<Boolean> existsReviewByAccountIdAndSubTourId(Integer accountId, Integer subTourId);
 }
