@@ -25,7 +25,7 @@ spring:
 #     "[org.hibernate.SQL]": DEBUG
 #     "[org.hibernate.type.descriptor.sql.BasicBinder]": TRACE
 # ---------------
-# Euraka config
+# Eureka config
 # ---------------
 eureka:
   instance:
@@ -34,16 +34,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka
-# ---------------
-# Euraka config
-# ---------------
-bk-travel:
-  config:
-    database:
-      server:
-        url: r2dbc:mysql://mysql-server:3306/bk_travel_tour
-        username: root
-        password: root
 # ---------------
 # gRPC config
 # ---------------
@@ -55,3 +45,12 @@ cloudinary:
   api-key: 753338592148366
   api-secret: 9DuFjid4CY301yghd9iA1tEdyjo
   secure: true
+# ---------------
+# Kafka config
+# ---------------
+kafka:
+  bootstrap-servers:
+    url: kafka-broker-01:19092
+  consumer:
+    group-id: bk-travel-group
+    auto-offset-reset: latest
