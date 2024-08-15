@@ -2,7 +2,7 @@ package com.aresky.bookingservice.service.payment;
 
 import com.aresky.bookingservice.dto.request.BookingInfoReq;
 import com.aresky.bookingservice.dto.request.VnPayPaymentResult;
-import com.aresky.bookingservice.dto.response.VnPayTransactionInfo;
+import com.aresky.bookingservice.model.VnPayTransactionInfo;
 import grpc.payment.vnpay.BookingInfoRequest;
 import reactor.core.publisher.Mono;
 

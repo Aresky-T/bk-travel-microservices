@@ -1,10 +1,11 @@
 package com.aresky.bookingservice.service.booking;
 
+import java.lang.reflect.Field;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.aresky.bookingservice.dto.request.*;
 import com.aresky.bookingservice.dto.response.*;
@@ -15,7 +16,9 @@ import com.aresky.bookingservice.model.*;
 import com.aresky.bookingservice.repository.CancellationRequestedRepository;
 import com.aresky.bookingservice.service.account.IAccountGrpcService;
 import com.aresky.bookingservice.service.payment.IVnPayService;
+import com.aresky.bookingservice.service.tour.ITourService;
 import com.aresky.bookingservice.util.DateUtils;
+import com.aresky.bookingservice.util.FieldUtils;
 import com.google.gson.Gson;
 import grpc.payment.vnpay.BookingInfoRequest;
 import org.slf4j.Logger;
@@ -27,8 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.aresky.bookingservice.exception.BookingException;
-import com.aresky.bookingservice.service.payment.PaymentService;
-import com.aresky.bookingservice.service.tour.TourGrpcService;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,10 +47,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     private IAccountGrpcService accountGrpcService;
 
     @Autowired
-    private TourGrpcService tourGrpcService;
-
-    @Autowired
-    private PaymentService paymentService;
+    private ITourService tourService;
 
     @Autowired
     private IVnPayService vnPayService;
@@ -61,123 +59,61 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     private CancellationRequestedRepository cancellationRequestedRepository;
 
     private final Logger log = LoggerFactory.getLogger(BookingDtoServiceImp.class);
+
     private final Gson GSON = new Gson();
-
-    private final DateTimeFormatter VIETNAM_FORMATTER = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
-
+    
     @Override
     public Mono<String> handleBooking(CreateBookingForm form, EPaymentType type) {
         int accountId = form.getAccountId();
         int subTourId = form.getSubTourId();
+        boolean isPayLaterType = type.equals(EPaymentType.PAY_LATER);
+        boolean isPayWithVNPAYType = type.equals(EPaymentType.VNPAY_ON_WEBSITE);
 
         return Mono.zip(existsBy(accountId, subTourId), validateAccount(accountId), findSubTour(subTourId))
                 .flatMap(tuple -> {
-                    boolean existBooking = tuple.getT1();
+                    Boolean existsBooking = tuple.getT1();
+                    SubTour subTour = tuple.getT3();
 
-                    if(existBooking){
-                        return Mono.error(new BookingException(BookingException.BOOKING_ALREADY_EXISTS));
+                    if(subTour.getAvailableSeats() == 0){
+                        throw new BookingException("Chúng tôi rất tiếc phải thông báo rằng tour mà Quý khách đã chọn hiện tại đã hết chỗ!");
                     }
 
-                    SubTourResponse subTour = tuple.getT3();
-                    Mono<Booking> bookingMono = bookingService.createBooking(subTour, form, type)
-                            .switchIfEmpty(Mono.error(new BookingException(BookingException.BOOKING_FAILED)));
-
-                    if(type.equals(EPaymentType.PAY_LATER)){
-                        return bookingMono
+                    if(existsBooking) {
+                        return bookingService.findBookingBy(accountId, subTourId)
                                 .flatMap(booking -> {
-                                    KafkaMessageType.NotificationRequest notificationRequest = KafkaMessageType.NotificationRequest
-                                            .builder()
-                                            .userId(accountId)
-                                            .entityId(booking.getId())
-                                            .keyword("tourCode", booking.getTourCode())
-                                            .keyword("bookingCode", booking.getBookingCode())
-                                            .keyword("bookedTime", VIETNAM_FORMATTER.format(booking.getBookedTime()));
+                                    EBookingStatus status = booking.getStatus();
 
-                                    String message = GSON.toJson(notificationRequest);
+                                    if(!status.equals(EBookingStatus.IS_PAYING)){
+                                        throw BookingException.BOOKING_EXISTS;
+                                    };
 
-                                    kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, message)
-                                            .subscribeOn(Schedulers.boundedElastic())
-                                            .subscribe(value -> {
-                                                log.info("Message sent to Kafka successfully");
-                                            }, error -> {
-                                                log.error("Error sending message to Notification service by Kafka!", error);
-                                            });
+                                    if (isPayWithVNPAYType){
+                                        return getVNPayUrl(booking, subTour);
+                                    }
 
+                                    return Mono.empty();
+                                });
+                    }
+
+                    return bookingService.createBooking(subTour, form, type)
+                            .flatMap(booking -> {
+                                EBookingStatus status = booking.getStatus();
+                                boolean isPaying = status.equals(EBookingStatus.IS_PAYING);
+                                boolean isNotPay = status.equals(EBookingStatus.NOT_PAY);
+
+                                if(isNotPay && isPayLaterType){
+                                    sendNotification(KafkaTopic.BOOKING_SUCCESS, booking);
                                     return Mono.just("Đặt tour thành công, vui lòng kiểm tra thông tin chi tiết trong hồ sơ của bạn!");
-                                });
-                    }
+                                }
 
-                    if (type.equals(EPaymentType.VNPAY_ON_WEBSITE)){
-                        return bookingMono
-                                .flatMap(booking -> {
-                                    BookingInfoRequest request = BookingInfoRequest.newBuilder()
-                                            .setBookingId(booking.getId())
-                                            .setTourCode(subTour.getTourCode())
-                                            .setAmount(booking.getAmount())
-                                            .build();
+                                if(isPaying && isPayWithVNPAYType){
+                                    return getVNPayUrl(booking, subTour);
+                                }
 
-                                    return vnPayService.getPaymentURL(request)
-                                            .onErrorResume(ex -> bookingService.delete(booking)
-                                                    .then(Mono.error(new BookingException(BookingException.CREATE_PAYMENT_SESSION_FAILED))));
-                                });
-                    }
-
-                    return Mono.error(new BookingException(BookingException.UNSUPPORTED_PAYMENT_TYPE));
-                });
-    }
-
-    @Override
-    public Mono<String> handleBookingAfterPaymentWithVnPay(VnPayReturn vnPayReturn) {
-        String responseCode = vnPayReturn.getResponseCode();
-
-        return bookingService.findBookingBy(vnPayReturn.getBookingId())
-                .flatMap(booking -> {
-                    if (responseCode.equals("00") || Integer.parseInt(responseCode) == 0) {
-                        booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
-                        booking.setStatus(EBookingStatus.PAY_UP);
-                        return paymentService.requestCloseVnPayPaymentSession(vnPayReturn)
-                                .flatMap(message -> bookingService.saveBooking(booking)
-                                            .thenReturn("SUCCESS"));
-                    }
-
-                    if (responseCode.equals("24") || Integer.parseInt(responseCode) == 24) {
-                        booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
-                        paymentService.requestCloseSession(vnPayReturn.getBookingId());
-                        return bookingService.delete(booking)
-                                .thenReturn("CANCELED");
-                    }
-
-                    booking.setFormOfPayment(EFormOfPayment.VNPAY_ON_WEBSITE);
-                    booking.setStatus(EBookingStatus.PAY_FAILED);
-                    paymentService.requestCloseSession(vnPayReturn.getBookingId());
-                    return bookingService.saveBooking(booking)
-                            .thenReturn("FAILED");
-                });
-    }
-
-    @Override
-    public Mono<String> handlePaymentWithVnPayAfterBooking(Integer bookingId) {
-        return bookingService.findBookingBy(bookingId)
-                .switchIfEmpty(Mono.error(
-                        new BookingException(BookingException.INVALID_BOOKING_ID)))
-                .flatMap(booking -> findSubTour(booking.getSubTourId())
-                        .flatMap(subTour -> paymentService
-                                .getVnPayPaymentURL(PaymentRequest.createDTO(booking,
-                                        subTour))));
-    }
-
-    @Override
-    public Mono<String> handlePaymentAfterBooking(Integer bookingId, EFormOfPayment formOfPayment) {
-        return bookingService.findBookingBy(bookingId)
-                .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
-                .flatMap(booking -> findSubTour(booking.getSubTourId())
-                        .switchIfEmpty(Mono
-                                .error(new BookingException(BookingException.SUB_TOUR_NOT_FOUND)))
-                        .flatMap(
-                                subTour -> paymentService.getVnPayPaymentURL(
-                                                PaymentRequest.createDTO(booking,
-                                                        subTour))
-                                        .onErrorResume(Mono::error)));
+                                return Mono.empty();
+                            });
+                })
+                .switchIfEmpty(Mono.error(BookingException.UNSUPPORTED_PAYMENT_TYPE));
     }
 
     @Override
@@ -204,7 +140,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     }
 
     @Override
-    public Mono<VnPayTransactionInfo> findVnPayTransactionInfo(Integer bookingId) {
+    public Mono<VnPayTransactionInfoResponse> findVnPayTransactionInfo(Integer bookingId) {
         return bookingService.findBookingBy(bookingId)
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
                 .flatMap(booking -> {
@@ -213,20 +149,23 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                     }
 
                     return vnPayService.getTransactionInfo(bookingId);
-                });
+                })
+                .switchIfEmpty(Mono.error(BookingException.VNPAY_TRANSACTION_INFO_NOT_FOUND))
+                .map(VnPayTransactionInfoResponse::new);
     }
 
     @Override
     public Mono<BookingDetails> findOne(Integer bookingId) {
         return bookingService.findBookingBy(bookingId)
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_BOOKING_ID)))
-                .flatMap(booking -> Mono.zip(
-                        findSubTour(booking.getSubTourId()),
-                        findAllTourist(bookingId)).flatMap(tuple -> {
-                    SubTourResponse subTour = tuple.getT1();
-                    List<Tourist> touristList = tuple.getT2();
-                    return Mono.just(BookingDetails.toDTO(booking, subTour, touristList));
-                }))
+                .flatMap(booking -> findAllTourist(bookingId).map(booking::touristList))
+                .flatMap(booking -> vnPayService.getTransactionInfo(bookingId)
+                        .map(booking::transactionInfo)
+                        .thenReturn(booking))
+                .flatMap(booking -> tourService.getSubTourById(booking.getSubTourId())
+                        .map(booking::subTour)
+                        .thenReturn(booking))
+                .map(BookingDetails::toDTO)
                 .onErrorResume(Mono::error);
     }
 
@@ -236,8 +175,14 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                 .onErrorResume(Mono::error)
                 .flatMap(tuple -> findByAccountIdAndSubTourId(accountId, subTourId)
                         .flatMap(booking -> findAllTourist(booking.getId())
-                                .map(tourist -> BookingDetails.toDTO(booking,
-                                        tuple.getT2(), tourist))));
+                                .map(booking::touristList))
+                        .flatMap(booking -> vnPayService.getTransactionInfo(booking.getId())
+                                .map(booking::transactionInfo)
+                                .thenReturn(booking))
+                        .map(booking -> booking.subTour(tuple.getT2()))
+                )
+                .map(BookingDetails::toDTO)
+                .onErrorResume(Mono::error);
     }
 
     @Override
@@ -254,7 +199,18 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     @Transactional
     @Override
     public Mono<BookingResponse> update(Integer bookingId, Map<String, Object> fields) {
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        return bookingService.findBookingBy(bookingId)
+                .switchIfEmpty(Mono.error(BookingException.INVALID_BOOKING_ID_EX))
+                .map(booking -> {
+                    fields.forEach((key, value) -> {
+                        Field field = FieldUtils.findField(booking, key);
+                        FieldUtils.setFieldValue(booking, field, value);
+                    });
+
+                    return booking;
+                })
+                .flatMap(bookingService::saveBooking)
+                .map(BookingResponse::toDTO);
     }
 
     @Transactional
@@ -264,31 +220,40 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     }
 
     @Override
-    public Mono<Void> sendCancellationBookingRequest(Integer accountId, CreateCancelBookedTourForm form) {
-        return Mono.zip(validateAccount(accountId), bookingService.findBookingBy(form.getBookingId()))
-                .flatMap(tuple -> {
-                    CancellationRequested cancellationRequested = form.toCancellationRequested();
+    public Mono<CancellationRequestedResponse> sendCancellationBookingRequest(Integer accountId, CreateCancelBookedTourForm form) {
+        Integer bookingId = form.getBookingId();
 
-                    Booking booking = tuple.getT2();
+        return Mono.zip(
+                        validateAccount(accountId),
+                        bookingService.findBookingBy(bookingId),
+                        cancellationRequestedRepository.existsByBookingId(bookingId)
+                )
+                .flatMap(tuple1 -> {
+                    Booking booking = tuple1.getT2();
 
                     if(!accountId.equals(booking.getAccountId())){
                         return Mono.error(BookingException.PERMISSION_DENIED);
                     }
 
+                    Boolean existsCancellationRequest = tuple1.getT3();
+
+                    if(existsCancellationRequest){
+                        return Mono.error(BookingException.CANCELLATION_REQUEST_ALREADY_EXIST);
+                    }
+
+                    CancellationRequested cancellationRequested = form.toCancellationRequested();
                     booking.setIsCancellationRequested(Boolean.TRUE);
 
-                    return cancellationRequestedRepository.save(cancellationRequested)
-                                    .then(bookingService.saveBooking(booking));
+                    return Mono.zip(
+                            cancellationRequestedRepository.save(cancellationRequested),
+                            bookingService.saveBooking(booking)
+                    );
                 })
-                .flatMap(booking -> {
-                    KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
-                            .userId(accountId)
-                            .entityId(booking.getId())
-                            .keyword("tourCode", booking.getTourCode())
-                            .keyword("bookingCode", booking.getBookingCode());
-
-                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_CANCEL_PENDING, GSON.toJson(notificationReq)).then();
-                });
+                .map(tuple2 -> {
+                    sendNotification(KafkaTopic.BOOKING_CANCEL_PENDING, tuple2.getT2());
+                    return tuple2.getT1();
+                })
+                .map(CancellationRequestedResponse::fromCancellationRequested);
     }
 
     @Override
@@ -299,47 +264,82 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     }
 
     @Override
-    public Mono<Void> approveCancellationBookingRequest(Integer requestId) {
-        return cancellationRequestedRepository.findById(requestId)
-                .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
-                .flatMap(request -> {
-                    request.setStatus(ERequestStatus.APPROVED);
-                    return cancellationRequestedRepository.save(request)
-                            .then(bookingService.findBookingBy(request.getBookingId()));
-                })
-                .flatMap(booking -> {
-                    booking.setStatus(EBookingStatus.REJECTED);
-                    return bookingService.saveBooking(booking);
-                })
-                .flatMap(booking -> {
-                    KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
-                            .userId(booking.getAccountId())
-                            .entityId(booking.getId())
-                            .keyword("tourCode", booking.getTourCode())
-                            .keyword("bookingCode", booking.getBookingCode());
+    public Mono<Void> approveCancellationBookingRequestByBookingId(Integer bookingId) {
+        return bookingService.findBookingBy(bookingId)
+                .switchIfEmpty(Mono.error(BookingException.INVALID_BOOKING_ID_EX))
+                .filter(booking -> booking.getStatus().equals(EBookingStatus.REJECTED))
+                .switchIfEmpty(Mono.error(BookingException.BOOKING_STATUS_MUST_BE_REJECTED))
+                .flatMap(booking -> cancellationRequestedRepository.findByBookingId(bookingId)
+                        .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
+                        .filter(request -> request.getStatus().equals(ERequestStatus.PENDING))
+                        .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUESTED_CANNOT_APPROVE))
+                        .flatMap(request -> {
+                            booking.setStatus(EBookingStatus.REJECTED);
+                            request.setStatus(ERequestStatus.APPROVED);
 
-                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_CANCEL_APPROVED, GSON.toJson(notificationReq)).then();
-                });
+                            return Mono.zip(bookingService.saveBooking(booking), cancellationRequestedRepository.save(request))
+                                    .then(Mono.fromRunnable(() -> sendNotification(KafkaTopic.BOOKING_CANCEL_APPROVED, booking)))
+                                    .then();
+                        }));
     }
 
     @Override
-    public Mono<Void> rejectCancellationBookingRequest(Integer requestId) {
-        return cancellationRequestedRepository.findById(requestId)
-                .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
-                .flatMap(request -> {
-                    request.setStatus(ERequestStatus.APPROVED);
-                    return cancellationRequestedRepository.save(request)
-                            .then(bookingService.findBookingBy(request.getBookingId()));
-                })
-                .flatMap(booking -> {
-                    KafkaMessageType.NotificationRequest notificationReq = KafkaMessageType.NotificationRequest.builder()
-                            .userId(booking.getAccountId())
-                            .entityId(booking.getId())
-                            .keyword("tourCode", booking.getTourCode())
-                            .keyword("bookingCode", booking.getBookingCode());
+    public Mono<Void> rejectCancellationBookingRequestByBookingId(Integer bookingId) {
+        return bookingService.findBookingBy(bookingId)
+                .switchIfEmpty(Mono.error(BookingException.INVALID_BOOKING_ID_EX))
+                .flatMap(booking -> cancellationRequestedRepository.findByBookingId(bookingId)
+                        .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
+                        .filter(request -> request.getStatus().equals(ERequestStatus.PENDING))
+                        .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUESTED_CANNOT_REJECT))
+                        .flatMap(request -> {
+                            request.setStatus(ERequestStatus.REJECTED);
 
-                    return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_CANCEL_REJECTED, GSON.toJson(notificationReq)).then();
-                });
+                            return cancellationRequestedRepository.save(request)
+                                    .then(Mono.fromRunnable(() -> sendNotification(KafkaTopic.BOOKING_CANCEL_REJECTED, booking)));
+                        }));
+    }
+
+    @Transactional
+    @Override
+    public Mono<Void> deleteCancellationBookingRequestByBookingId(Integer bookingId) {
+        return bookingService.findBookingBy(bookingId)
+                .switchIfEmpty(Mono.error(BookingException.BOOKING_NOT_FOUND_EX))
+                .flatMap(booking -> bookingService.findCancellationRequestByBookingId(bookingId)
+                        .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
+                        .filter(request -> request.getStatus().equals(ERequestStatus.PENDING))
+                        .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUESTED_CANNOT_DELETE))
+                        .flatMap(request -> {
+                                booking.setIsCancellationRequested(false);
+
+                                return Mono.zip(
+                                        bookingService.saveBooking(booking),
+                                        cancellationRequestedRepository.delete(request)
+                                ).then();
+                            }));
+    }
+
+    @Override
+    public Mono<BookingResponse> updateStatus(Integer bookingId, BookingStatusUpdateRequest request) {
+        return bookingService.findBookingBy(bookingId)
+                .switchIfEmpty(Mono.error(BookingException.INVALID_BOOKING_ID_EX))
+                .map(booking -> {
+                    booking.setStatus(EBookingStatus.valueOf(request.getStatus()));
+                    booking.setFormOfPayment(Optional.ofNullable(request.getFormOfPayment()).map(EFormOfPayment::valueOf).orElse(null));
+                    return booking;
+                })
+                .onErrorMap(IllegalArgumentException.class, err -> new BookingException(err.getMessage()))
+                .flatMap(bookingService::saveBooking)
+                .map(BookingResponse::toDTO);
+    }
+
+    @Override
+    public Mono<CancellationRequestedResponse> findCancellationRequested(Integer bookingId) {
+        return bookingService.existsBookingBy(bookingId)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(BookingException.BOOKING_NOT_FOUND_EX))
+                .then(bookingService.findCancellationRequestByBookingId(bookingId))
+                .switchIfEmpty(Mono.error(BookingException.CANCELLATION_REQUEST_DOES_NOT_EXIST))
+                .map(CancellationRequestedResponse::fromCancellationRequested);
     }
 
     private Mono<List<Tourist>> findAllTourist(Integer bookingId) {
@@ -357,25 +357,58 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_ACCOUNT_ID)));
     }
 
-    private Mono<SubTourResponse> findSubTour(Integer subTourId) {
-        return tourGrpcService.getSubTourById(subTourId)
+    private Mono<SubTour> findSubTour(Integer subTourId) {
+        return tourService.getSubTourById(subTourId)
                 .switchIfEmpty(Mono.error(new BookingException(BookingException.INVALID_SUB_TOUR_ID)));
     }
 
     @SuppressWarnings("unused")
-    private Mono<Void> sendNotification(Integer accountId, Booking booking){
+    private void sendNotification(String topic, Booking booking){
+        sendNotification(topic, booking.getAccountId(), booking);
+    }
+
+    private void sendNotification(String topic, Integer accountId, Booking booking){
         DateTimeFormatter formatter = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
+        KafkaMessageType.NotificationRequest request = KafkaMessageType.NotificationRequest.builder()
+                .userId(accountId)
+                .entityId(booking.getId())
+                .keyword("tourId", booking.getTourId())
+                .keyword("subTourId", booking.getSubTourId())
+                .keyword("status", booking.getStatus().name())
+                .keyword("tourCode", booking.getTourCode())
+                .keyword("bookingCode", booking.getBookingCode())
+                .keyword("bookedTime", formatter.format(booking.getBookedTime()));
 
-        Map<String, Object> keywords = new HashMap<>();
-        keywords.put("tourCode", booking.getTourCode());
-        keywords.put("bookingCode", booking.getBookingCode());
-        keywords.put("bookedTime", formatter.format(booking.getBookedTime()));
+        kafkaSenderEvent.sendMessage(topic, "booking-service-key", GSON.toJson(request))
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe(value -> {
+                    log.info("Message sent to Kafka successfully with topic {}", topic);
+                }, error -> {
+                    log.error("Error sending message to Notification service by Kafka: {}", error.getMessage());
+                });
+    }
 
-        KafkaMessageType.NotificationRequest request = new KafkaMessageType.NotificationRequest(accountId);
-        request.setEntityId(booking.getId());
-        request.setKeywords(keywords);
+    @SuppressWarnings("unused")
+    private Mono<String> getVNPayUrl(Booking booking, SubTourResponse subTour){
+        BookingInfoRequest request = BookingInfoRequest.newBuilder()
+                .setBookingId(booking.getId())
+                .setTourCode(subTour.getTourCode())
+                .setAmount(booking.getAmount())
+                .build();
 
-        return kafkaSenderEvent.sendMessage(KafkaTopic.BOOKING_SUCCESS, "booking-service-key", GSON.toJson(request))
-                .then();
+        return vnPayService.getPaymentURL(request)
+                .onErrorResume(ex -> Mono.error(new BookingException(ex.getMessage())));
+    }
+
+    @SuppressWarnings("unused")
+    private Mono<String> getVNPayUrl(Booking booking, SubTour subTour){
+        BookingInfoRequest request = BookingInfoRequest.newBuilder()
+                .setBookingId(booking.getId())
+                .setTourCode(subTour.getTourCode())
+                .setAmount(booking.getAmount())
+                .build();
+
+        return vnPayService.getPaymentURL(request)
+                .onErrorResume(ex -> Mono.error(new BookingException(ex.getMessage())));
     }
 }

@@ -1,8 +1,8 @@
 package com.aresky.bookingservice.service.tour;
 
+import com.aresky.bookingservice.model.SubTour;
+import io.grpc.Deadline;
 import org.springframework.stereotype.Service;
-
-import com.aresky.bookingservice.dto.response.SubTourResponse;
 
 import grpc.tour.SubTourDetailsResponse;
 import grpc.tour.SubTourIdRequest;
@@ -14,10 +14,10 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.Callable;;
+import java.util.concurrent.TimeUnit;;
 
 @Service
-public class TourGrpcService {
+public class TourGrpcService implements ITourService {
     private ManagedChannel channel;
     private TourServiceBlockingStub stub;
 
@@ -31,14 +31,15 @@ public class TourGrpcService {
         stopChannel();
     }
 
-    public Mono<SubTourResponse> getSubTourById(int subTourId) {
+    @Override
+    public Mono<SubTour> getSubTourById(Integer subTourId) {
         System.out.println("tour grpc client: getSubTourById");
-        stub = TourServiceGrpc.newBlockingStub(channel);
+        stub = TourServiceGrpc.newBlockingStub(channel).withDeadline(Deadline.after(2000, TimeUnit.MILLISECONDS));
         SubTourIdRequest request = SubTourIdRequest.newBuilder().setId(subTourId).build();
-        Callable<SubTourDetailsResponse> callable = () -> stub.getSubTourById(request);
-        return Mono.fromCallable(callable)
+
+        return Mono.fromCallable(() -> stub.getSubTourById(request))
                 .onErrorResume(err -> Mono.empty())
-                .map(this::convertToSubTourResponse);
+                .map(this::convertToSubTour);
     }
 
     private void stopChannel(){
@@ -47,8 +48,8 @@ public class TourGrpcService {
         }
     }
 
-    private SubTourResponse convertToSubTourResponse(SubTourDetailsResponse grpcDTO) {
-        return SubTourResponse
+    private SubTour convertToSubTour(SubTourDetailsResponse grpcDTO) {
+        return SubTour
                 .builder()
                 .id(grpcDTO.getId())
                 .tourId(grpcDTO.getTourId())
@@ -74,4 +75,5 @@ public class TourGrpcService {
                 .createdTime(grpcDTO.getCreatedTime())
                 .build();
     }
+
 }

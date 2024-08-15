@@ -4,10 +4,10 @@ import com.aresky.bookingservice.dto.request.BookingFilter;
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
 import com.aresky.bookingservice.dto.request.TouristRequest;
 import com.aresky.bookingservice.dto.request.UpdateBookingForm;
-import com.aresky.bookingservice.dto.response.SubTourResponse;
 import com.aresky.bookingservice.exception.BookingException;
 import com.aresky.bookingservice.model.*;
 import com.aresky.bookingservice.repository.BookingRepository;
+import com.aresky.bookingservice.repository.CancellationRequestedRepository;
 import com.aresky.bookingservice.repository.TouristRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +30,9 @@ public class BookingServiceProvider implements IBookingService{
 
     @Autowired
     private TouristRepository touristRepository;
+
+    @Autowired
+    private CancellationRequestedRepository cancellationRequestedRepository;
 
     @Override
     public Mono<List<Booking>> findAllBookings() {
@@ -75,7 +78,7 @@ public class BookingServiceProvider implements IBookingService{
     }
 
     @Override
-    public Mono<Booking> createBooking(SubTourResponse subTour, CreateBookingForm form, EPaymentType paymentType) {
+    public Mono<Booking> createBooking(SubTour subTour, CreateBookingForm form, EPaymentType paymentType) {
         return Mono.zip(validateAmount(subTour, form), validateTouristList(form))
                 .map(tuple -> {
                     if (!tuple.getT1()) {
@@ -104,7 +107,8 @@ public class BookingServiceProvider implements IBookingService{
                             .flatMap(tourists1 -> bookingRepository.save(booking)
                                     .flatMap(savedBooking -> setBookingForTouristList(tourists1, savedBooking.getId())
                                     .flatMap(tourists2 -> touristRepository.saveAll(tourists2).then().thenReturn(savedBooking))));
-                });
+                })
+                .switchIfEmpty(Mono.error(new BookingException(BookingException.BOOKING_FAILED)));
     }
 
     @Override
@@ -165,9 +169,9 @@ public class BookingServiceProvider implements IBookingService{
     }
 
     @Override
-    public Mono<Boolean> validateAmount(SubTourResponse subTour, CreateBookingForm form) {
+    public Mono<Boolean> validateAmount(SubTour subTour, CreateBookingForm form) {
         Integer adultPrice = subTour.getAdultPrice();
-        Integer childrenPrice = subTour.getAdultPrice();
+        Integer childrenPrice = subTour.getChildrenPrice();
         Integer babyPrice = subTour.getBabyPrice();
 
         Integer adultNumber = form.getAdultNumber();
@@ -208,5 +212,10 @@ public class BookingServiceProvider implements IBookingService{
                 .map(tourist -> tourist.getType().equals(type))
                 .collectList()
                 .map(List::size);
+    }
+
+    @Override
+    public Mono<CancellationRequested> findCancellationRequestByBookingId(Integer bookingId) {
+        return cancellationRequestedRepository.findByBookingId(bookingId);
     }
 }

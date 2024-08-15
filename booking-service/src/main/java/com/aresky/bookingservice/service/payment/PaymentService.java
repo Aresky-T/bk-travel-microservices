@@ -1,8 +1,8 @@
 package com.aresky.bookingservice.service.payment;
 
 import com.aresky.bookingservice.dto.request.VnPayReturn;
-import com.aresky.bookingservice.dto.response.VnPayTransactionInfo;
 import com.aresky.bookingservice.exception.MessageResponse;
+import com.aresky.bookingservice.model.VnPayTransactionInfo;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
