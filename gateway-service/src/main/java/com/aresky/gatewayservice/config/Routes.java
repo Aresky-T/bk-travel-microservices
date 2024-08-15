@@ -45,7 +45,8 @@ public class Routes {
                 };
 
                 String[] chatPaths = {
-                                "/api/v1/chat/**"
+                                "/api/v1/chat/**",
+                                "/ws/**"
                 };
 
                 String[] mailPaths = {
@@ -58,6 +59,10 @@ public class Routes {
 
                 String[] notificationPaths = {
                                 "/api/v1/notifications/**"
+                };
+
+                String[] reviewPaths = {
+                        "/api/v1/review/**"
                 };
 
                 this.registerRoute(
@@ -100,6 +105,9 @@ public class Routes {
                 this.registerRoute("notification-service",
                                 "lb://notification-service",
                                 notificationPaths);
+                this.registerRoute("review-service",
+                                  "lb://review-service",
+                                reviewPaths);
         }
 
         public Route getRoute(String id) {

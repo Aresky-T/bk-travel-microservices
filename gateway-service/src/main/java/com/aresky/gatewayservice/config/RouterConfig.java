@@ -28,6 +28,7 @@ public class RouterConfig {
                 Route markingService = routes.getRoute("marking-service");
                 Route notificationService = routes.getRoute("notification-service");
                 Route paymentService = routes.getRoute("payment-service");
+                Route reviewService = routes.getRoute("review-service");
 
                 return builder.routes()
                                 .route(authRoute.getId(), r -> r
@@ -63,6 +64,9 @@ public class RouterConfig {
                                 .route(paymentService.getId(), r -> r
                                                 .path(paymentService.getPaths())
                                                 .uri(paymentService.getUri()))
+                                .route(reviewService.getId(), r -> r
+                                                .path(reviewService.getPaths())
+                                                .uri(reviewService.getUri()))
                                 .build();
         }
 }
