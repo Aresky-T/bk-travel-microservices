@@ -13,6 +13,7 @@ public class MailBoxMapper {
                 .totalMail(mailBox.getTotalMail())
                 .unrepliedMailCount(mailBox.getUnrepliedMailCount())
                 .createdAt(DateUtils.formatDateTime(mailBox.getCreatedAt()))
+                .updatedAt(DateUtils.formatDateTime(mailBox.getUpdatedAt()))
                 .build();
     }
 
@@ -24,6 +25,7 @@ public class MailBoxMapper {
                 .unrepliedMailCount(mailBox.getUnrepliedMailCount())
                 .mailList(mailBox.getMailList().stream().map(MailMapper::toMailResponse).toList())
                 .createdAt(DateUtils.formatDateTime(mailBox.getCreatedAt()))
+                .updatedAt(DateUtils.formatDateTime(mailBox.getUpdatedAt()))
                 .build();
     }
 

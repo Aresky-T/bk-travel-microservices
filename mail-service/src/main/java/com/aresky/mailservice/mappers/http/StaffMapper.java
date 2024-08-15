@@ -12,6 +12,7 @@ public class StaffMapper {
                 .email(staff.getEmail())
                 .fullName(staff.getFullName())
                 .avatarUrl(staff.getAvatarUrl())
+                .permission(staff.getPermission())
                 .build();
     }
 }

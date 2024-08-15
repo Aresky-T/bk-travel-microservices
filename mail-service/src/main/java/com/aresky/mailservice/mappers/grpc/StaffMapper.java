@@ -10,6 +10,7 @@ public class StaffMapper {
                 .email(response.getEmail().getEmail())
                 .fullName(response.getLastname().getLastName() + " " + response.getFirstname().getFistName())
                 .avatarUrl(response.getAvatarUrl().getAvatarUrl())
+                .permission(Boolean.TRUE)
                 .build();
     }
 }
