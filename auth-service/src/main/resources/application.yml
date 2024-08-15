@@ -51,9 +51,9 @@ auth:
     prefix: Bearer
     secret: aresky_sercret_ast5ld3mdkisbaoyqmtnx7casdkycgajgf334twi5y35_124qwirweaser234
     expiration: 86400000
-#kafka:
-#  bootstrap-servers:
-#    url: http://localhost:9092
-#  consumer:
-#    auto-offset-reset: latest
-#    group-id: bk-travel-group
+kafka:
+  bootstrap-servers:
+    url: kafka-broker-01:19092
+  consumer:
+    auto-offset-reset: latest
+    group-id: bk-travel-group
