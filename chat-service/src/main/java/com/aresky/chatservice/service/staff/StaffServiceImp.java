@@ -46,13 +46,13 @@ public class StaffServiceImp implements IStaffService {
     }
 
     @Override
-    public Mono<Staff> getStaffById(Integer staffId) {
+    public Mono<Staff> getById(Integer staffId) {
         return staffRepository.findById(staffId)
                 .switchIfEmpty(Mono.error(new ChatException(ExceptionMessage.INVALID_STAFF_ID)));
     }
 
     @Override
-    public Mono<Staff> getStaffByEmail(String email) {
+    public Mono<Staff> getByEmail(String email) {
         return staffRepository.findByEmail(email)
                 .switchIfEmpty(Mono.error(new ChatException(ExceptionMessage.INVALID_STAFF_EMAIL)));
     }
@@ -90,13 +90,19 @@ public class StaffServiceImp implements IStaffService {
     }
 
     @Override
-    public Mono<Void> updateStatus(Integer staffId, EActivationStatus status) {
+    public Mono<Staff> updateStatus(Integer staffId, EActivationStatus status) {
         return staffRepository.findById(staffId)
-                .switchIfEmpty(Mono.error(new ChatException(ExceptionMessage.INVALID_STAFF_ID)))
+                .switchIfEmpty(Mono.error(ChatException.STAFF_NOT_FOUND_EX))
                 .flatMap(staff -> {
                     staff.setStatus(status);
-                    return staffRepository.save(staff).then();
+                    return staffRepository.save(staff);
                 });
+    }
+
+    @Override
+    public Mono<Staff> updateStatus(Staff staff, EActivationStatus status) {
+        staff.setStatus(status);
+        return staffRepository.save(staff);
     }
 
     @Override

@@ -12,9 +12,9 @@ public interface IStaffService {
 
     Mono<Void> create(String email);
 
-    Mono<Staff> getStaffById(Integer staffId);
+    Mono<Staff> getById(Integer staffId);
 
-    Mono<Staff> getStaffByEmail(String email);
+    Mono<Staff> getByEmail(String email);
 
     Mono<List<Staff>> getAllStaffsBy(EActivationStatus status);
 
@@ -24,7 +24,9 @@ public interface IStaffService {
 
     Mono<Boolean> existsByEmail(String email);
 
-    Mono<Void> updateStatus(Integer staffId, EActivationStatus status);
+    Mono<Staff> updateStatus(Integer staffId, EActivationStatus status);
+
+    Mono<Staff> updateStatus(Staff staff, EActivationStatus status);
 
     Mono<Void> deleteStaff(Integer staffId);
 }

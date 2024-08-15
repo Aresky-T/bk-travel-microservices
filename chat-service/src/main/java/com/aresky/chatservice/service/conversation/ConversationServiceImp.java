@@ -1,6 +1,7 @@
 package com.aresky.chatservice.service.conversation;
 
 import com.aresky.chatservice.dto.request.ConversationRequest;
+import com.aresky.chatservice.dto.response.ConversationResponse;
 import com.aresky.chatservice.dto.response.CustomerConversation;
 import com.aresky.chatservice.dto.response.StaffConversation;
 import com.aresky.chatservice.entity.*;
@@ -14,6 +15,7 @@ import com.aresky.chatservice.service.customer.ICustomerService;
 import com.aresky.chatservice.service.message.IMessageService;
 import com.aresky.chatservice.service.staff.IStaffService;
 
+import com.aresky.chatservice.utils.DateUtils;
 import io.r2dbc.spi.Row;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,37 +46,38 @@ public class ConversationServiceImp implements IConversationService {
     private DatabaseClient databaseClient;
 
     @Override
-    public Mono<List<StaffConversation>> getAll(Integer staffId, Integer limit, Integer offset) {
-        String query = "SELECT * FROM conversation WHERE staff_id = :staffId LIMIT :limit OFFSET :offset";
-        return databaseClient.sql(query)
-                .bind("staffId", staffId)
-                .bind("limit", limit)
-                .bind("offset", offset)
-                .map((row, metadata) -> mapToConversation(row))
-                .all()
-                .flatMap(conversation -> {
-                    StaffConversation empConversation = ConversationMapper.mapToStaffConversation(conversation);
-                    Mono<Customer> customerMono = customerService.getById(conversation.getCustomerId());
+    public Mono<List<ConversationResponse>> getAll(Integer staffId, Integer limit, Integer offset) {
 
-                    if (conversation.getLatestCustomerMessageId() == null) {
-                        return customerMono.map(customer -> {
-                            empConversation.setCustomer(CustomerMapper.mapCustomerToCustomerResponse(customer));
-                            return empConversation;
-                        });
-                    }
+        return staffService.existsById(staffId)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(ChatException.STAFF_NOT_FOUND_EX))
+                .flatMap(existsStaff -> {
+                    String query = "SELECT * FROM conversation WHERE staff_id = :staffId ORDER BY updated_at DESC LIMIT :limit OFFSET :offset";
+                    return databaseClient.sql(query)
+                            .bind("staffId", staffId)
+                            .bind("limit", limit)
+                            .bind("offset", offset)
+                            .map((row, metadata) -> mapToConversation(row))
+                            .all()
+                            .flatMap(conversation -> {
+                                Mono<Customer> customerMono = customerService.getById(conversation.getCustomerId());
 
-                    Mono<Message> latestCustomerMessageMono = messageService
-                            .getById(conversation.getLatestCustomerMessageId());
+                                if(conversation.getLatestMessageId() == null){
+                                    return customerMono.map(conversation::customer);
+                                }
 
-                    return Mono.zip(latestCustomerMessageMono, customerMono)
-                            .flatMap(tuple -> {
-                                empConversation
-                                        .setCustomer(CustomerMapper.mapCustomerToCustomerResponse(tuple.getT2()));
-                                empConversation.setLatestMessage(MessageMapper.mapToMessageResponse(tuple.getT1()));
-                                return Mono.just(empConversation);
-                            });
-                })
-                .collectList();
+                                Mono<Message> latestMessageMono = messageService.getById(conversation.getLatestMessageId());
+                                return Mono.zip(latestMessageMono, customerMono)
+                                        .map(tuple -> conversation.customer(tuple.getT2()).latestMessage(tuple.getT1()));
+                            })
+                            .map(ConversationMapper::mapToConversationResponse)
+                            .collectList();
+                });
+    }
+
+    @Override
+    public Mono<Conversation> save(Conversation conversation) {
+        return conversationRepository.save(conversation);
     }
 
     @Override
@@ -86,7 +89,26 @@ public class ConversationServiceImp implements IConversationService {
     }
 
     @Override
-    public Mono<List<Conversation>> getAllByStaffId(Integer staffId) {
+    public Mono<Conversation> update(Conversation conversation, Message newMessage) {
+        return Mono.fromCallable(() -> {
+            EMessageSender sender = newMessage.getSender();
+
+            if(sender.equals(EMessageSender.CUSTOMER)){
+                conversation.setNewCustomerMessageCount(conversation.getNewCustomerMessageCount() + 1);
+                conversation.setLatestCustomerMessageId(newMessage.getId());
+            } else {
+                conversation.setNewStaffMessageCount(conversation.getNewStaffMessageCount() + 1);
+                conversation.setLatestStaffMessageId(newMessage.getId());
+            }
+
+            conversation.setLatestMessageId(newMessage.getId());
+            conversation.setUpdatedAt(DateUtils.now());
+            return conversation;
+        }).flatMap(conversationRepository::save);
+    }
+
+    @Override
+    public Mono<List<Conversation>> getAllWithMore(Integer staffId) {
         return conversationRepository.findByStaffId(staffId)
                 .collectList();
     }
@@ -106,7 +128,7 @@ public class ConversationServiceImp implements IConversationService {
 
                     if (conversation.getLatestCustomerMessageId() == null) {
                         return customerMono.map(customer -> {
-                            empConversation.setCustomer(CustomerMapper.mapCustomerToCustomerResponse(customer));
+                            empConversation.setCustomer(CustomerMapper.mapToCustomerResponse(customer));
                             return empConversation;
                         });
                     }
@@ -116,7 +138,7 @@ public class ConversationServiceImp implements IConversationService {
                     return Mono.zip(latestCustomerMessageMono, customerMono)
                             .flatMap(tuple -> {
                                 empConversation
-                                        .setCustomer(CustomerMapper.mapCustomerToCustomerResponse(tuple.getT2()));
+                                        .setCustomer(CustomerMapper.mapToCustomerResponse(tuple.getT2()));
                                 empConversation.setLatestMessage(MessageMapper.mapToMessageResponse(tuple.getT1()));
                                 return Mono.just(empConversation);
                             });
@@ -139,30 +161,15 @@ public class ConversationServiceImp implements IConversationService {
                         return Mono.error(new ChatException(ExceptionMessage.INVALID_STAFF_ID));
                     }
 
-                    return staffService.getStaffById(staffId)
-                            .flatMap(staff -> {
-
-                                if (staff.getStatus().equals(EActivationStatus.OFFLINE)) {
-                                    return Mono.error(new ChatException(ExceptionMessage.STAFF_NOT_ONLINE));
-                                }
-
-                                return conversationRepository.existsByCustomerIdAndStaffId(customerId, staffId)
-                                        .flatMap(isExists -> {
-
-                                            if (isExists) {
-                                                return conversationRepository.findByCustomerIdAndStaffId(customerId,
-                                                        staffId);
-                                            }
-
-                                            return conversationRepository.save(
-                                                    Conversation.builder()
-                                                            .customerId(customerId)
-                                                            .staffId(staffId)
-                                                            .build())
-                                                    .then(connect(customerId, staffId));
-                                        });
-                            });
-                });
+                    return staffService.getById(staffId);
+                })
+                .filter(staff -> staff.getStatus().equals(EActivationStatus.ONLINE))
+                .switchIfEmpty(Mono.error(new ChatException(ExceptionMessage.STAFF_NOT_ONLINE)))
+                .then(customerService.updateActivationStatus(customerId, EActivationStatus.ONLINE))
+                .then(conversationRepository.existsByCustomerIdAndStaffId(customerId, staffId))
+                .flatMap(existsConversation -> existsConversation
+                        ? findByCustomerIdAndStaffId(customerId, staffId)
+                        : create(customerId, staffId));
     }
 
     @Override
@@ -191,16 +198,31 @@ public class ConversationServiceImp implements IConversationService {
                 .then();
     }
 
+    private Mono<Conversation> findByCustomerIdAndStaffId(Integer customerId, Integer staffId){
+        return conversationRepository.findByCustomerIdAndStaffId(customerId, staffId);
+    }
+
+    private Mono<Conversation> create(Integer customerId, Integer staffId){
+        Conversation conversation = Conversation.builder()
+                .customerId(customerId)
+                .staffId(staffId)
+                .createdAt(DateUtils.now())
+                .build();
+        return  conversationRepository.save(conversation);
+    }
+
     private Conversation mapToConversation(Row row) {
         return Conversation.builder()
                 .id(row.get("id", Integer.class))
                 .customerId(row.get("customer_id", Integer.class))
                 .staffId(row.get("staff_id", Integer.class))
+                .latestMessageId(row.get("latest_msg_id", Integer.class))
                 .latestCustomerMessageId(row.get("latest_customer_msg_id", Integer.class))
                 .latestStaffMessageId(row.get("latest_staff_msg_id", Integer.class))
                 .newCustomerMessageCount(row.get("new_customer_msg_count", Integer.class))
                 .newStaffMessageCount(row.get("new_staff_msg_count", Integer.class))
                 .createdAt(row.get("created_at", ZonedDateTime.class))
+                .updatedAt(row.get("updated_at", ZonedDateTime.class))
                 .build();
     }
 }

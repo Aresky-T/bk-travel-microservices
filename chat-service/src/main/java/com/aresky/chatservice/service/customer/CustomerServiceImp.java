@@ -1,7 +1,9 @@
 package com.aresky.chatservice.service.customer;
 
 import com.aresky.chatservice.dto.request.CustomerRequest;
+import com.aresky.chatservice.dto.response.CustomerResponse;
 import com.aresky.chatservice.entity.Customer;
+import com.aresky.chatservice.entity.EActivationStatus;
 import com.aresky.chatservice.exception.ChatException;
 import com.aresky.chatservice.exception.ExceptionMessage;
 import com.aresky.chatservice.mappers.http.CustomerMapper;
@@ -17,19 +19,16 @@ public class CustomerServiceImp implements ICustomerService {
     private ICustomerRepository customerRepository;
 
     @Override
-    public Mono<Customer> register(CustomerRequest request) {
+    public Mono<CustomerResponse> register(CustomerRequest request) {
         return customerRepository.existsByEmail(request.getEmail())
-                .flatMap(existsEmail -> {
-                    if (existsEmail) {
-                        return customerRepository.findByEmail(request.getEmail())
+                .flatMap(existsEmail -> existsEmail
+                        ? customerRepository.findByEmail(request.getEmail())
                                 .flatMap(customer -> {
                                     customer.setFullName(request.getFullName());
                                     return customerRepository.save(customer);
-                                });
-                    }
-
-                    return customerRepository.save(CustomerMapper.mapCustomerRequestToCustomer(request));
-                });
+                                })
+                        : customerRepository.save(CustomerMapper.mapToCustomer(request)))
+                .map(CustomerMapper::mapToCustomerResponse);
     }
 
     @Override
@@ -65,5 +64,13 @@ public class CustomerServiceImp implements ICustomerService {
                 .switchIfEmpty(Mono.error(new ChatException(ExceptionMessage.INVALID_CUSTOMER_ID)))
                 .then(customerRepository.deleteById(customerId))
                 .then();
+    }
+
+    @Override
+    public Mono<Customer> updateActivationStatus(Integer customerId, EActivationStatus status) {
+        return customerRepository.findById(customerId)
+                .filter(customer -> !customer.getStatus().equals(status))
+                .flatMap(customer -> Mono.just(status).map(customer::status))
+                .flatMap(customerRepository::save);
     }
 }

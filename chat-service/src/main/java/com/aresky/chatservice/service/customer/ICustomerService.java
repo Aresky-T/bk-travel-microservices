@@ -1,11 +1,13 @@
 package com.aresky.chatservice.service.customer;
 
 import com.aresky.chatservice.dto.request.CustomerRequest;
+import com.aresky.chatservice.dto.response.CustomerResponse;
 import com.aresky.chatservice.entity.Customer;
+import com.aresky.chatservice.entity.EActivationStatus;
 import reactor.core.publisher.Mono;
 
 public interface ICustomerService {
-    Mono<Customer> register(CustomerRequest request);
+    Mono<CustomerResponse> register(CustomerRequest request);
 
     Mono<Customer> save(Customer customer);
 
@@ -18,4 +20,6 @@ public interface ICustomerService {
     Mono<Customer> getByEmail(String email);
 
     Mono<Void> deleteById(Integer customerId);
+
+    Mono<Customer> updateActivationStatus(Integer customerId, EActivationStatus status);
 }

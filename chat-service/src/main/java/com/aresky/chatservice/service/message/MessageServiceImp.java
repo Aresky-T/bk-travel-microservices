@@ -76,7 +76,11 @@ public class MessageServiceImp implements IMessageService {
 
     @Override
     public Mono<List<Message>> seenMessages(Integer conversationId, EMessageSender sender) {
-        return messageRepository.findAllByConversationIdAndSender(conversationId, sender).collectList();
+        return messageRepository.findAllByConversationIdAndSender(conversationId, sender)
+                .flatMap(message -> message.getStatus().equals(EMessageStatus.NEW)
+                        ? messageRepository.save(message.status(EMessageStatus.SEEN))
+                        : Mono.just(message))
+                .collectList();
     }
 
     @Override
@@ -91,6 +95,15 @@ public class MessageServiceImp implements IMessageService {
     public Mono<Message> getById(Mono<Integer> id) {
         return id.switchIfEmpty(Mono.empty())
                 .flatMap(idValue -> messageRepository.findById(idValue));
+    }
+
+    @Override
+    public Mono<Message> getLatestByConversationId(Integer conversationId) {
+        String query = "SELECT * FROM message WHERE conversation_id = :conversationId ORDER BY sent_at DESC LIMIT 1;";
+        return databaseClient.sql(query)
+                .bind("conversationId", conversationId)
+                .map((row, metadata) -> mapRowToMessage(row))
+                .one();
     }
 
     @Override

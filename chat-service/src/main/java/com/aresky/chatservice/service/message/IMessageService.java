@@ -26,6 +26,8 @@ public interface IMessageService {
 
     Mono<Message> getById(Mono<Integer> id);
 
+    Mono<Message> getLatestByConversationId(Integer conversationId);
+
     Mono<List<Message>> seenMessages(Integer conversationId, EMessageSender sender);
 
     Mono<Void> delete(Integer chatId);
