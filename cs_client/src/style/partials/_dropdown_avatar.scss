@@ -1,0 +1,21 @@
+.dropdown-avatar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: scaleY(0);
+
+    button {
+        width: 100%;
+        border-radius: 0;
+        border: none;
+        justify-content: flex-start;
+        gap: 25px;
+        font-size: 0.9rem;
+    }
+}
+
+.dropdown-avatar.active {
+    opacity: 1;
+    transform: scaleY(100%);
+}

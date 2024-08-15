@@ -1,0 +1,170 @@
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--navbar-height);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  padding-inline: 15px;
+  background-color: #fff;
+  --navbar-item-height: 40px;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 10000;
+
+  .navbar_item {
+    height: var(--navbar-item-height);
+  }
+
+  .left {
+    .logo {
+      height: 100%;
+      width: var(--navbar-item-height);
+      // overflow: hidden;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      line-height: 100%;
+      color: #fff;
+      position: relative;
+      user-select: none;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .logo::after {
+      content: "Chăm sóc khách hàng";
+      color: var(--primary-color);
+      font-weight: 600;
+      position: absolute;
+      left: 120%;
+      text-wrap: nowrap;
+      user-select: none;
+      pointer-events: none;
+    }
+  }
+
+  .main {
+    height: 100%;
+
+    .menu {
+      height: 100%;
+      list-style-type: none;
+      list-style-position: outside;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      column-gap: 15px;
+
+      .menu_item {
+        height: inherit;
+        width: 5vw;
+        background-color: #fff;
+        color: #606266;
+        padding: 5px 0;
+        position: relative;
+        transition: 50ms linear;
+
+        a {
+          display: block;
+          height: 100%;
+          width: inherit;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 10px;
+          font-size: 25px;
+          color: inherit;
+          transition: inherit;
+        }
+
+        &:hover {
+          a {
+            background-color: #f2f2f2;
+          }
+        }
+      }
+
+      .menu_item.selected {
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          height: 3px;
+          border-radius: 2px 2px 0 0;
+          background-color: var(--primary-color);
+        }
+
+        a {
+          background-color: transparent;
+
+          svg {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    display: flex;
+    justify-content: flex-end;
+    column-gap: 15px;
+    position: relative;
+
+    .name_n_email {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      user-select: none;
+      position: absolute;
+      right: 150%;
+      min-width: 200px;
+      width: fit-content;
+
+      .name {
+        font-size: 1rem;
+        color: #4f4f4f;
+      }
+
+      .email {
+        font-size: 0.7rem;
+        color: #4f4f4f;
+      }
+    }
+
+    .status {
+      position: absolute;
+      bottom: -3px;
+      left: -3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: red;
+      border: 3px solid #fff;
+
+      &.onl {
+        background-color: #4bd500;
+      }
+    }
+
+    .avatar {
+      height: 100%;
+      width: var(--navbar-item-height);
+      overflow: hidden;
+      border-radius: 50%;
+      cursor: pointer;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+}

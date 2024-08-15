@@ -1,0 +1,18 @@
+.permission-page {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #ffffffd0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  .content {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--gray-color);
+  }
+}

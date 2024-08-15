@@ -1,0 +1,26 @@
+.reply-form-container {
+  height: 100%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  textarea {
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 10px;
+    resize: unset;
+    outline: none;
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    font-family: inherit;
+  }
+
+  .reply-form--error-msg {
+    font-size: 0.7rem;
+    font-style: italic;
+    color: var(--red-color);
+    padding-left: 10px;
+  }
+}
