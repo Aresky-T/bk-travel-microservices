@@ -1,0 +1,130 @@
+.tours-container {
+  padding-inline: 0 !important;
+  margin-top: 0 !important;
+
+  .tours-header {
+    .tours-filter {
+      .filter-bar {
+        .filter-item {
+          // width: 100% !important;
+          // border-left: unset !important;
+
+          &.filter-submit {
+            // height: 40px;
+            .submit-icon {
+              span {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .tours-main {
+    padding-inline: 10vw;
+    margin: 50px 0;
+    min-height: 500px;
+
+    .tours-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      // grid-template-rows: repeat(auto-fill, minmax(570px, 600px));
+      grid-template-rows: auto;
+      gap: 40px 20px;
+    }
+
+    .tours-list--empty {
+      text-align: center;
+      padding: 50px 0;
+      color: var(--font-color);
+      font-style: italic;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .tours-main__loading {
+      min-height: inherit;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+@media screen and (max-width: 1190px) {
+  .tours-container {
+    .tours-header {
+      .tours-filter {
+        .filter-bar {
+          display: grid;
+          grid-template-columns: repeat(2, 250px);
+          row-gap: 20px;
+
+          .filter-item {
+            width: 100%;
+            border-right: unset !important;
+          }
+
+          .filter-item.filter-submit {
+            grid-column: 1/3;
+            .submit-icon {
+              width: 100%;
+
+              svg {
+                display: none;
+              }
+
+              span {
+                display: block;
+                font-size: 15px;
+                font-weight: 600;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 655px) {
+  .tours-container {
+    .tours-header {
+      .tours-filter {
+        width: 100%;
+        padding-inline: 20px;
+        .filter-bar {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+          .filter-item {
+            width: 100% !important;
+          }
+
+          .filter-item.filter-submit {
+            .submit-icon {
+              width: 100%;
+
+              svg {
+                display: none;
+              }
+
+              span {
+                display: block;
+                font-size: 15px;
+                font-weight: 600;
+              }
+            }
+          }
+        }
+      }
+    }
+    .tours-main {
+      padding-inline: 0;
+    }
+  }
+}

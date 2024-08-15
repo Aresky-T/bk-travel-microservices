@@ -1,0 +1,33 @@
+.custom-text-area {
+    position: relative;
+
+    .custom-label {
+        position: absolute;
+        top: 30px;
+        left: 20px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        transition: all 0.3s;
+        color: #666;
+        font-size: 15px;
+    }
+
+    .custom-input {
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.3s;
+        font-size: 15px;
+    }
+}
+
+.custom-text-area.focused .custom-label,
+.custom-text-area input:not(:placeholder-shown) + .custom-label {
+    top: 0px;
+    left: 10px;
+    font-size: 11px;
+    color: #007bff;
+    background-color: #fff;
+    padding: 0 4px;
+}

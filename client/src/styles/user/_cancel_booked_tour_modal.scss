@@ -1,0 +1,17 @@
+.cancel-booked-tour {
+  .modal {
+    .modal__footer {
+      .buttons-area {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        align-self: flex-end;
+
+        .profile-btn.submit {
+          background-color: var(--font-color2);
+        }
+      }
+    }
+  }
+}

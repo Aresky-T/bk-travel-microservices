@@ -1,0 +1,117 @@
+.admin-form-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  transition: all 150ms linear;
+  z-index: 1000;
+
+  .admin-form {
+    width: 40%;
+    min-width: 400px;
+    height: 100%;
+    background-color: transparent;
+    box-shadow: -5px 0 25px 0px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    transition: transform 200ms linear;
+    overflow-y: auto;
+    position: relative;
+
+    &--title {
+      font-size: 1.2rem;
+      padding: 0;
+      font-weight: 600;
+      font-family: "Poppins", sans-serif;
+      padding: 20px 0;
+
+      span {
+        font-size: 0.8rem;
+        font-style: italic;
+        color: var(--font-color);
+      }
+    }
+
+    &--close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+
+      button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        outline: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        cursor: pointer;
+        background-color: #fff;
+        transition: all 200ms ease-in-out;
+
+        &:hover {
+          background-color: #f2f2f2;
+        }
+      }
+    }
+  }
+
+  &.left {
+    transform: translateX(-100%);
+    justify-content: flex-start;
+    .admin-form {
+      transform: translate(-100%, 0);
+    }
+  }
+
+  &.center {
+    transform: translateY(-100%);
+    justify-content: center;
+    align-items: center;
+
+    .admin-form {
+      border-radius: 10px;
+      height: fit-content;
+      max-height: 85vh;
+      transform: translate(0, -100%);
+    }
+
+    .admin-form--title {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      row-gap: 15px;
+    }
+  }
+
+  &.right {
+    transform: translateX(100%);
+    justify-content: flex-end;
+    .admin-form {
+      transform: translate(100%, 0);
+    }
+  }
+
+  &.active {
+    background-color: #ffffff94;
+    transform: translateY(0);
+
+    .admin-form {
+      background-color: #fff;
+      transform: translate(0, 0);
+    }
+  }
+}

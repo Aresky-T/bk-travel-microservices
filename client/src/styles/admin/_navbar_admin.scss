@@ -1,0 +1,94 @@
+.navbar-admin {
+  height: 100%;
+  width: 100%;
+  min-width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: "Source San 3", sans-serif;
+  grid-area: b;
+  position: relative;
+  background-color: #fff;
+
+  svg {
+    font-size: 20px;
+  }
+
+  span,
+  a,
+  p {
+    user-select: none;
+  }
+
+  .notification {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    background-color: #e6e6e6;
+
+    &:hover {
+      background-color: var(--gray-color);
+    }
+
+    &-number {
+      width: 18px;
+      height: 18px;
+      background-color: var(--red-color);
+      color: white;
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 4px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      user-select: none;
+    }
+  }
+
+  .admin-wrapper {
+    width: 170px;
+    height: 40px;
+    margin: 0 35px;
+
+    .admin {
+      height: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-radius: 40px;
+      padding: 0 10px;
+      background-color: #e6e6e6;
+
+      &:hover {
+        background-color: #e6e6e6;
+      }
+    }
+  }
+
+  .title {
+    position: absolute;
+    left: 30px;
+    display: flex;
+    align-items: center;
+
+    span {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    a {
+      color: var(--third-color);
+    }
+  }
+}

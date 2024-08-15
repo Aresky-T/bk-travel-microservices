@@ -1,0 +1,43 @@
+.booking-manager-container {
+  h1,
+  h2,
+  h3 {
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    padding: 20px 0;
+  }
+
+  .booking-manager {
+    table.bookings-table {
+      thead {
+        tr {
+          th {
+            font-weight: 550;
+            color: #000;
+
+            &:nth-child(1) {
+              width: 5%;
+            }
+
+            &:nth-child(2) {
+              width: 15%;
+            }
+
+            &:nth-child(3) {
+              width: 15%;
+            }
+
+            &:nth-child(5) {
+              width: 5%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .booking-detail-admin-wrapper {
+    height: 100%;
+    overflow: auto;
+  }
+}

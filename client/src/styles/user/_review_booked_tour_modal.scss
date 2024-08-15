@@ -1,0 +1,29 @@
+.review-booked-tour {
+  .rating {
+    &__main {
+      .stars {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
+  .comment {
+    .comment__main {
+      margin-top: 20px;
+    }
+  }
+
+  .buttons-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    align-self: flex-end;
+
+    .profile-btn.submit {
+      background-color: var(--font-color2);
+    }
+  }
+}

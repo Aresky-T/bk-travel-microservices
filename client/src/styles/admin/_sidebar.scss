@@ -1,0 +1,126 @@
+.sidebar-container {
+  width: 240px;
+  height: 100%;
+  padding: 36px 0;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  font-family: "Source San 3", sans-serif;
+  grid-area: a;
+
+  a {
+    text-decoration: none;
+  }
+
+  // .dividing-line {
+  //   width: 186px;
+  //   height: 2px;
+  //   margin-top: 50px;
+  //   background-color: #444444;
+  // }
+
+  .logo {
+    cursor: pointer;
+
+    a {
+      font-size: 1rem;
+      font-weight: 600;
+      //   color: #ffffff;
+      font-family: "Montserrat", sans-serif;
+      user-select: none;
+    }
+  }
+
+  .sidebar-links {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-right: 20px;
+
+    &-item {
+      width: 100%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 22px;
+      border-left: 4px solid transparent;
+
+      span {
+        vertical-align: middle;
+      }
+
+      .link-content {
+        color: #000;
+        background-color: transparent;
+        font-family: "Source San 3", sans-serif;
+        font-size: 0.8rem;
+        width: 90%;
+        height: 100%;
+        border-radius: 7px;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        transition: all 50ms ease-in-out;
+        font-weight: 600;
+
+        &:hover {
+          background-color: var(--fifth-color);
+          color: var(--primary-color);
+        }
+
+        .link-icon {
+          font-size: 1rem;
+          margin-left: 20px;
+        }
+
+        .link-name {
+          margin-left: 10px;
+          user-select: none;
+        }
+      }
+    }
+
+    .active {
+      border-left-color: var(--primary-color);
+      .link-content {
+        background-color: var(--fifth-color);
+        color: var(--primary-color);
+      }
+    }
+  }
+
+  .logout {
+    // margin-top: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    background-color: var(--gray-color);
+    width: fit-content;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 100ms ease-in-out;
+
+    &:hover {
+      background-color: #000;
+      color: #fff;
+    }
+
+    svg {
+      font-size: 20px;
+    }
+
+    span {
+      margin-right: 10px;
+      font-size: 0.9rem;
+    }
+  }
+}

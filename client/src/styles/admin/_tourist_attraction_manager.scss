@@ -1,0 +1,78 @@
+.tourist-attraction-manager-container {
+  padding: 15px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-size: 0.8rem;
+
+  .tourist-attraction-manager {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    padding: 15px;
+
+    &_header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 36px;
+    }
+
+    &_main {
+      border-top: 1px solid var(--third-color);
+      background-color: #fff;
+      height: calc(100% - 36px);
+    }
+
+    &__title {
+      font-weight: 600;
+      color: var(--third-color);
+      user-select: none;
+    }
+
+    &__menu {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+
+      &-item {
+        height: 38px;
+        width: fit-content;
+        cursor: pointer;
+        padding-inline: 15px;
+        background-color: #fff;
+        border: 1px solid var(--gray-color);
+        border-bottom-color: var(--third-color);
+        border-radius: 8px 8px 0 0;
+        font-weight: 600;
+        color: var(--font-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        user-select: none;
+
+        &.active {
+          color: var(--third-color);
+          border-color: var(--third-color);
+          border-bottom-color: #fff;
+        }
+      }
+    }
+  }
+
+  .tourist-attraction-create-form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+  }
+}
+
+.admin-tourist-attraction-list {
+  & > table {
+    th {
+      &.__action {
+        width: 10% !important;
+      }
+    }
+  }
+}

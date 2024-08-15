@@ -1,0 +1,103 @@
+.tourist-attraction-card {
+  height: fit-content;
+  width: 100%;
+  min-width: 230px;
+  // box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  // border-radius: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 50px;
+
+  &_item {
+    &.image {
+      width: 50%;
+      height: 400px;
+      min-width: 50%;
+      height: fi;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &.info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 30px;
+
+      .tourist-attraction-card-item_info {
+        &.name {
+          font-size: 1.5rem;
+          font-weight: 600;
+        }
+
+        &.intro {
+          font-size: 0.9rem;
+          line-height: 1.8rem;
+          color: var(--font-color);
+          font-style: italic;
+        }
+
+        &.action {
+          button {
+            outline: none;
+            border: none;
+            font-size: 1.3rem;
+            background-color: var(--secondary-color);
+            border: 1px solid transparent;
+            color: #fff;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 150ms ease-in-out;
+
+            &:hover {
+              background-color: var(--primary-color);
+            }
+
+            &:active {
+              background-color: #fff;
+              color: var(--primary-color);
+              border-color: var(--primary-color);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .tourist-attraction-card {
+    &::after {
+      content: "";
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(0, 0, 0, 0.8) 100%
+      );
+      border-radius: inherit;
+      opacity: 1;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .tourist-attraction__name {
+      width: 100%;
+      text-align: center;
+      bottom: 20px;
+      color: #fff;
+      z-index: 100;
+    }
+  }
+}

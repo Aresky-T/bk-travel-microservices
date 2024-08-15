@@ -1,0 +1,184 @@
+@import url("./global/_reset_css.scss");
+//@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Dancing+Script:wght@500;600;700&family=Grenze:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Poppins:wght@100&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+//@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Dancing+Script:wght@500;600;700&family=Grenze:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@100&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Island+Moments&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
+//
+:root {
+  --animation-speed: 1;
+  --button-color: #25272b;
+  --font-color: #4b5563;
+  --font-color2: #2d4271;
+  --heading-color: #25272b;
+  --navbar-admin-height: 100px;
+  --shadow-color: #0000007a;
+  --sidebar-width: 240px;
+  --primary-color: #ff7e01;
+  --secondary-color: #faa935;
+  --third-color: #1976d2;
+  --third-color-hover: #3c39eb;
+  --fourth-color: #1ae90b;
+  --fifth-color: #fee7c7;
+  --red-color: #e41e3f;
+  --gray-color: #d8dadf;
+  --blue-color: #005fc6;
+  --green-color: #1ae90b;
+  --sixth-color: #f5f4fa;
+}
+
+@function getAnimationDuration($duration: number) {
+  @return calc($duration * var(--animation-speed));
+}
+
+.layout {
+  width: 100%;
+  min-width: 330px;
+  max-height: 100vh;
+  overflow-y: auto;
+
+  &.scrolled {
+    .header {
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.5);
+      background-color: #fff;
+    }
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #eeeeee;
+  }
+}
+
+.main,
+.main-session {
+  padding-inline: 10vw;
+  font-family: "Montserrat", sans-serif;
+}
+
+.main-session {
+  min-height: 600px;
+  margin-block: 80px;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scroll-container {
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #d9d9d9;
+    border-radius: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #fff;
+  }
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+// style for sweet alert 2
+.swal2-container {
+  z-index: 9999;
+}
+
+// animation
+@import url("./animation/_animation.scss");
+
+// custom modal
+@import url("./modal/_modal.scss");
+
+// admin style
+@import url("./admin/index.scss");
+@import url("./admin/_home_admin.scss");
+@import url("./admin/_sidebar.scss");
+@import url("./admin/_navbar_admin.scss");
+@import url("./admin/_admin_main.scss");
+@import url("./admin/_admin_login.scss");
+@import url("./admin/_tourist_attraction_detail_admin.scss");
+@import url("./admin/_tour_create_container.scss");
+@import url("./admin/_tour_detail_admin.scss");
+@import url("./admin/_staff_manager.scss");
+@import url("./admin/_tour_manager.scss");
+@import url("./admin/_tourist_attraction_manager.scss");
+@import url("./admin/_booking_manager.scss");
+@import url("./admin/_tourist_attraction_card.scss");
+@import url("./admin/_blog_manager.scss");
+@import url("./admin/_blog_form.scss");
+@import url("./admin/_admin_form.scss");
+
+// global style
+@import url("./global/_loading.scss");
+@import url("./global/_not_found_page.scss");
+@import url("./global/_main_header.scss");
+@import url("./global/_main_footer.scss");
+@import url("./global/_sidebar.scss");
+@import url("./global/_auth.scss");
+@import url("./global/_home.scss");
+@import url("./global/_tours.scss");
+@import url("./global/_tour_card.scss");
+@import url("./global/_tourist_attraction_card.scss");
+@import url("./global/_tourist_attraction_details.scss");
+@import url("./global/_tour_details.scss");
+@import url("./global/_tourist_attraction_page.scss");
+@import url("./global/_blog.scss");
+@import url("./global/_booking.scss");
+@import url("./global/_forgot_password.scss");
+@import url("./global/_price_range_slider.scss");
+@import url("./global/_custom_alert.scss");
+@import url("./global/_react_qill.scss");
+@import url("./global/_chat.scss");
+@import url("./global/_text_field.scss");
+@import url("./global/_mail.scss");
+@import url("./global/_text_area.scss");
+@import url("./global/_main_session.scss");
+@import url("./global/_tour_reviews.scss");
+@import url("./global/_pagination.scss");
+@import url("./global/_field_check.scss");
+
+// user style
+// @import url("./user/_profile.scss");
+@import url("./user/_checkout.scss");
+@import url("./user/_profile_ver2.scss");
+@import url("./user/_review_booked_tour_modal.scss");
+@import url("./user/_cancel_booked_tour_modal.scss");
+@import url("./user/_notification.scss");
+@import url("./user/_payment.scss");
+
+// responsive
+@media screen and (max-width: 855px) {
+}
+
+@media screen and (max-width: 420px) {
+  body {
+    &::-webkit-scrollbar {
+      width: 1px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+  }
+}

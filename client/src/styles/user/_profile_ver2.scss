@@ -1,0 +1,726 @@
+.profile-container {
+  color: var(--font-color);
+  display: grid;
+  grid-template-areas: "a a" "b c";
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 50px 1fr;
+  gap: 20px;
+  padding: 50px 0;
+
+  * {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+      sans-serif;
+  }
+
+  &__title {
+    font-size: 1.8rem;
+    grid-area: a;
+    width: fit-content;
+    height: fit-content;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-family: "Island Moments", cursive;
+    line-height: 25px;
+    border-radius: 20px;
+    padding: 5px 20px;
+    letter-spacing: 1px;
+  }
+
+  &__menu {
+    border: 1px solid #f2f2f2;
+    width: 300px;
+    height: fit-content;
+    grid-area: b;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border-bottom: 1px solid #f2f2f2;
+      font-size: 0.9rem;
+      overflow: hidden;
+
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #ccc;
+      }
+
+      p {
+        width: 200px;
+        line-height: 1.4;
+        // display: -webkit-box;
+        // -webkit-box-orient: vertical;
+        // -webkit-line-clamp: 1;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    &__main {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      .menu-item {
+        height: 50px;
+        border-left: 2px solid transparent;
+
+        button {
+          width: 100%;
+          height: 100%;
+          background-color: #fff;
+          color: var(--font-color);
+          cursor: pointer;
+          border: none;
+          outline: none;
+          font-size: 1rem;
+          padding: 0 10px;
+          text-align: left;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: 100ms ease-in-out;
+
+          &:hover {
+            background-color: #f2f2f2;
+          }
+
+          span {
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+
+      .menu-item.active {
+        border-left-color: var(--primary-color);
+
+        button {
+          background-color: #f6f8fa;
+        }
+      }
+    }
+  }
+
+  &__main {
+    grid-area: c;
+    padding: 0 20px;
+    border-left: 1px dashed #f2f2f2;
+
+    &_item {
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+    }
+
+    .profile-btn,
+    .profile-form__field,
+    .profile-form__btn {
+      padding: 7px 12px;
+      border-radius: 5px;
+      border: 1px solid #d0d7de;
+      outline: 1px solid #fff;
+      box-sizing: border-box;
+      background-color: #f6f8fa;
+      color: #5e5e5e;
+      font-size: 12px;
+      transition: all 100ms linear;
+      width: fit-content;
+      height: fit-content;
+      min-width: unset;
+    }
+
+    .profile-form__field {
+      width: 500px;
+      min-width: 400px;
+      box-shadow: 0 0 2px 1px rgba($color: #d0d7de, $alpha: 0.5) inset;
+
+      &:focus {
+        outline-color: var(--third-color);
+        border-color: var(--third-color);
+        background-color: #fff;
+      }
+    }
+
+    .profile-form__field.invalid {
+      outline-color: red;
+      border-color: red;
+      background-color: #fff;
+    }
+
+    .profile-btn,
+    .profile-form__btn {
+      box-shadow: unset;
+      border: none;
+      outline: 2px solid transparent;
+      color: #fff;
+      cursor: pointer;
+
+      &.normal {
+        background-color: #fff;
+        color: var(--font-color);
+        border: 1px solid var(--font-color);
+        font-weight: 600;
+
+        &:focus,
+        &:hover {
+          outline-color: rgba($color: #000, $alpha: 0.5);
+        }
+      }
+
+      &.submit {
+        background-color: var(--third-color);
+
+        &:focus,
+        &:hover {
+          outline-color: rgba($color: #1976d2, $alpha: 0.5);
+        }
+      }
+
+      &.reset,
+      &.cancel {
+        background-color: #c40000;
+
+        &:focus,
+        &:hover {
+          outline-color: rgba($color: #c40000, $alpha: 0.5);
+        }
+      }
+    }
+
+    &__title-1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      line-height: 1.5rem;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #d8dee4;
+      color: #000;
+    }
+
+    .profile__note {
+      font-size: 0.8rem;
+      line-height: 1.3;
+      padding: 10px 0 20px 0;
+      font-style: italic;
+    }
+
+    .profile__avatar-image {
+      width: 300px;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .profile-item {
+      &--account-info {
+        .profile__personal-info {
+          &__main {
+            .profile__personal-info__form {
+              display: flex;
+              flex-direction: column;
+              gap: 15px;
+
+              &__item {
+                display: flex;
+                flex-direction: column;
+
+                .profile__personal-info__label {
+                  // font-weight: bold;
+                  font-size: 0.9rem;
+                  line-height: 1.2;
+                  padding-bottom: 10px;
+
+                  strong {
+                    color: var(--font-color2);
+                  }
+                }
+
+                &.btn-area {
+                  flex-direction: row;
+                  gap: 20px;
+                }
+              }
+            }
+          }
+        }
+
+        .profile__avatar-update {
+          display: flex;
+          flex-direction: column;
+
+          .update-btn {
+            margin-top: 25px;
+          }
+        }
+
+        .profile__password-update {
+          .profile-form__field {
+            width: 500px;
+            min-width: 400px;
+          }
+
+          &__main {
+            display: flex;
+            flex-direction: column;
+
+            .profile__password-update__form {
+              display: flex;
+              flex-direction: column;
+              row-gap: 25px;
+
+              .btn-area {
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+              }
+            }
+          }
+        }
+      }
+
+      &--marked-tour {
+        &.list {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+          grid-template-rows: auto;
+          gap: 40px 20px;
+        }
+      }
+    }
+
+    .profile__booked-tour-info {
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+
+      &__item {
+        .booked-tour-list {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+
+          .profile__note {
+            padding: 0;
+            font-size: 1rem;
+            font-weight: 600;
+          }
+
+          .booked-tour-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            height: fit-content;
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            padding: 15px;
+
+            &.active {
+              .representative,
+              .tourists,
+              .note {
+                display: block;
+              }
+            }
+
+            &__image {
+              width: 100px;
+              height: 100px;
+              min-width: 100px;
+              min-height: 100px;
+              border-radius: 10px;
+              overflow: hidden;
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+
+            &__buttons {
+              display: flex;
+              align-items: center;
+              justify-content: flex-end;
+              gap: 15px;
+              padding: 3px 0;
+              margin-top: 15px;
+              align-self: flex-end;
+              width: 100%;
+
+              .profile-btn.review {
+                background-color: #ff7e00;
+
+                &:hover {
+                  outline-color: rgba($color: #ff7e00, $alpha: 0.5) !important;
+                }
+              }
+            }
+
+            &__item {
+              font-size: 1rem;
+              line-height: 1.2;
+              transition: all 200s linear;
+
+              &__label {
+                margin-right: 5px;
+              }
+
+              &.__image_n_title {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 15px;
+              }
+
+              &__content {
+                color: var(--font-color2);
+                font-weight: 600;
+                font-style: italic;
+              }
+
+              &.tour-title {
+                font-weight: bold;
+                color: var(--third-color);
+                transition: all 100ms linear;
+                cursor: pointer;
+
+                &:hover {
+                  text-decoration: underline;
+                  color: var(--primary-color);
+                }
+              }
+
+              ul {
+                list-style-type: disc;
+                margin-left: 30px;
+                padding: 5px 0;
+
+                li {
+                  font-size: 0.9rem;
+                  line-height: 1.5;
+
+                  b {
+                    color: var(--font-color2);
+                    font-weight: 600;
+                    font-style: italic;
+                  }
+                }
+              }
+            }
+
+            &__main {
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+              width: 100%;
+
+              .representative,
+              .tourists,
+              .note {
+                display: none;
+              }
+
+              .tourists {
+                ul {
+                  list-style-type: disc;
+                  margin-left: 30px;
+                }
+
+                ol {
+                  list-style: auto;
+                  margin-left: 30px;
+                  padding: 5px 0;
+                }
+
+                li {
+                  font-size: 0.9rem;
+                  line-height: 1.5;
+                }
+
+                b {
+                  color: var(--font-color2);
+                  font-weight: 600;
+                  font-style: italic;
+                }
+              }
+            }
+
+            .review-status {
+              span {
+                display: inline-flex;
+                align-items: center;
+                font-size: 0.8rem;
+                font-weight: 600;
+                line-height: 16px;
+                vertical-align: middle;
+                gap: 5px;
+              }
+
+              .reviewed {
+                color: green;
+              }
+
+              .non-review {
+                color: var(--primary-color);
+              }
+            }
+
+            .cancellation-request-status {
+              span {
+                display: inline-flex;
+                align-items: center;
+                color: #c40000;
+                font-size: 0.8rem;
+                font-weight: 600;
+                line-height: 16px;
+                vertical-align: middle;
+                gap: 5px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .profile--sent-mail {
+      .profile-item--sent-mail.list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+
+        .profile__note {
+          padding: 0;
+          font-size: 1rem;
+          font-weight: 600;
+        }
+
+        .show-more-btn {
+          align-self: center;
+        }
+
+        .sent-mail-card {
+          display: flex;
+          align-items: flex-start;
+          gap: 15px;
+          width: 100%;
+          height: fit-content;
+          background-color: #f2f2f2;
+          border-radius: 10px;
+          padding: 15px;
+
+          &.active {
+            .representative,
+            .tourists,
+            .note {
+              display: block;
+            }
+          }
+
+          &__image {
+            width: 100px;
+            height: 100px;
+            min-width: 100px;
+            min-height: 100px;
+            border-radius: 10px;
+            overflow: hidden;
+
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+
+          &__buttons {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+            padding: 3px 0;
+            margin-top: 15px;
+            align-self: flex-end;
+            width: 100%;
+
+            .profile-btn.review {
+              background-color: #ff7e00;
+
+              &:hover {
+                outline-color: rgba($color: #ff7e00, $alpha: 0.5) !important;
+              }
+            }
+          }
+
+          &__item {
+            font-size: 1rem;
+            line-height: 1.2;
+            transition: all 200s linear;
+
+            &__label {
+              margin-right: 5px;
+            }
+
+            &.__image_n_title {
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              gap: 15px;
+            }
+
+            &__content {
+              color: var(--font-color2);
+              font-weight: 600;
+              font-style: italic;
+            }
+
+            &.tour-title {
+              font-weight: bold;
+              color: var(--third-color);
+              transition: all 100ms linear;
+              cursor: pointer;
+
+              &:hover {
+                text-decoration: underline;
+                color: var(--primary-color);
+              }
+            }
+
+            ul {
+              list-style-type: disc;
+              margin-left: 30px;
+              padding: 5px 0;
+
+              li {
+                font-size: 0.9rem;
+                line-height: 1.5;
+
+                b {
+                  color: var(--font-color2);
+                  font-weight: 600;
+                  font-style: italic;
+                }
+              }
+            }
+
+            &.replied-mail {
+              .replied-mail--body {
+                margin-top: 10px;
+                padding: 15px 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                background-color: #fff;
+              }
+            }
+          }
+
+          &__main {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+          }
+        }
+      }
+    }
+
+    .profile__error-message {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: red;
+      line-height: 1rem;
+      padding: 10px 0 0 10px;
+    }
+  }
+}
+
+@media screen and (max-width: 1080px) {
+  .profile-container {
+    grid-template-areas: "a" "b" "c";
+    grid-template-columns: 100%;
+
+    &.main-session {
+      padding-inline: 10px;
+    }
+  }
+}
+
+@media screen and (max-width: 680px) {
+  .profile-container {
+    &__main {
+      border-left: none;
+      padding: 0;
+
+      .profile__account-info {
+        &__item {
+          .profile__password-update {
+            .profile-form__field {
+              width: 100%;
+              min-width: 300px;
+            }
+          }
+        }
+      }
+
+      .profile-form__field {
+        width: 100% !important;
+        min-width: unset;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .profile-container__main {
+    .profile__account-info {
+      .profile__account-info__item {
+        .profile__personal-info__main {
+          .profile__personal-info__form {
+            .btn-area {
+              align-self: center;
+            }
+          }
+        }
+        .profile__avatar-update {
+          align-items: center;
+        }
+
+        .profile__password-update {
+          .profile__password-update__main {
+            button {
+              align-self: center;
+            }
+          }
+
+          .profile__password-update__form {
+            .btn-area {
+              justify-content: center;
+            }
+          }
+        }
+      }
+    }
+    .profile__booked-tour-info__item {
+      .booked-tour-list {
+        .booked-tour-details {
+          flex-direction: column;
+
+          &__buttons {
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}

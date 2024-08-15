@@ -1,0 +1,89 @@
+.tour-reviews-container {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-size: 1rem;
+  color: #000;
+
+  .modal {
+    width: 750px;
+    &__main {
+      &-item {
+        .avg-stars {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+
+          strong {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--font-color2);
+          }
+        }
+
+        .review-item {
+          display: flex;
+          gap: 15px;
+          padding: 25px 0;
+          border-top: 1px solid #d9d9d9;
+
+          .reviewer-avatar {
+            .image {
+              width: 50px;
+              height: 50px;
+              border-radius: 50%;
+              overflow: hidden;
+
+              img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+          }
+
+          .review-info {
+            .review-info-item {
+              display: flex;
+              align-items: center;
+              font-size: 0.8rem;
+              padding: 3px 0;
+              line-height: 1.2;
+              gap: 10px;
+            }
+
+            .fullname {
+              font-size: 1rem;
+            }
+
+            .review-time {
+              color: #919191;
+              font-weight: 600;
+              font-size: 0.7rem;
+            }
+
+            .comment {
+              font-size: 0.9rem;
+              line-height: 1.3rem;
+              padding-inline: 15px;
+              border-left: 1px dashed #ccc;
+              font-family: inherit;
+              text-wrap: pretty;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .tour-reviews-container {
+    .modal {
+      width: 90%;
+      min-width: 300px;
+    }
+  }
+}

@@ -1,0 +1,108 @@
+.sidebar {
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  top: 100%;
+  background-color: #dfdfdf80;
+  width: 100vw;
+  height: calc(100vh - 80px);
+  //   z-index: 999;
+
+  $gradient: linear-gradient(
+    180deg,
+    rgb(252, 215, 215) 19%,
+    var(--secondary-color) 100%
+  );
+
+  .sidebar-wrapper {
+    width: 300px;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 50px;
+    box-shadow: -3px 3px 3px rgba($color: #8d8d8d, $alpha: 0.3);
+    animation: slideRightToLeft 0.5s forwards;
+
+    .sidebar-title {
+      font-weight: bold;
+      font-size: 25px;
+      margin: 30px 0;
+    }
+
+    .sidebar-item {
+      position: relative;
+      width: 70%;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+      border-bottom: 1px solid #ccc;
+      transition: background 0.5s s;
+      user-select: none;
+      cursor: pointer;
+
+      &:hover {
+        background: $gradient;
+        color: #fff;
+      }
+    }
+
+    .sidebar-item {
+      &::before,
+      &::after {
+        content: "";
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        background-color: transparent;
+        position: absolute;
+        top: 0;
+      }
+
+      &::before {
+        left: 0;
+        transform: translateX(-50%);
+      }
+
+      &::after {
+        right: 0;
+        transform: translateX(50%);
+      }
+    }
+
+    .sidebar-item:hover {
+      &::before,
+      &::after {
+        background: $gradient;
+      }
+    }
+
+    .sidebar-item.active {
+      background: $gradient;
+      color: #fff;
+      border-bottom: none;
+
+      &::before,
+      &::after {
+        background: $gradient;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 855px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 420px) {
+  .sidebar {
+    .sidebar-wrapper {
+      width: 100%;
+    }
+  }
+}

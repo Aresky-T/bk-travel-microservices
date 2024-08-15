@@ -1,0 +1,351 @@
+.admin-main-wrapper {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+  height: 100%;
+  overflow: auto;
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    padding: 20px 0;
+  }
+
+  .admin-main {
+    background-color: #fff;
+    padding: 15px;
+  }
+
+  .admin-main__header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: fit-content;
+    padding-block: 40px;
+
+    .admin-main__header__btn {
+      backface-visibility: hidden;
+      background: #332cf2;
+      border: 0;
+      border-radius: 0.375rem;
+      box-sizing: border-box;
+      color: #fff;
+      cursor: pointer;
+      display: inline-block;
+      font-family: Circular, Helvetica, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      padding: 10px 15px;
+      position: relative;
+      text-align: left;
+      text-decoration: none;
+      transform: translateZ(0) scale(1);
+      transition: transform 0.2s;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+
+      &:disabled {
+        color: #787878;
+        cursor: auto;
+      }
+
+      &:not(:disabled):hover {
+        transform: scale(1.05);
+      }
+
+      &:not(:disabled):hover:active {
+        transform: scale(1.05) translateY(0.125rem);
+      }
+
+      &:focus {
+        outline: 0 solid transparent;
+      }
+
+      &:focus:before {
+        border-width: 0.125rem;
+        content: "";
+        left: calc(-1 * 0.375rem);
+        pointer-events: none;
+        position: absolute;
+        top: calc(-1 * 0.375rem);
+        transition: border-radius;
+        user-select: none;
+      }
+
+      &:focus:not(:focus-visible) {
+        outline: 0 solid transparent;
+      }
+
+      &:not(:disabled):active {
+        transform: translateY(0.125rem);
+      }
+    }
+  }
+
+  .admin-main__body {
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+
+    .admin-main__body__table {
+      width: 100%;
+      background-color: #fff;
+      border-collapse: collapse;
+      border-spacing: 0 5px;
+
+      th,
+      td {
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: middle;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.8rem;
+        line-height: 1.3;
+        color: var(--font-color);
+      }
+
+      thead {
+        tr {
+          th {
+            font-weight: 550;
+            color: #000;
+            // font-weight: bold;
+
+            // &:nth-child(1) {
+            //     width: 5%;
+            // }
+
+            // &:nth-child(2) {
+            //     width: 15%;
+            // }
+
+            // &:nth-child(3) {
+            //     width: 40%;
+            // }
+
+            // &:nth-child(4) {
+            //     width: 20%;
+            // }
+
+            // &:nth-child(5) {
+            //     width: 20%;
+            // }
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          height: 50px;
+        }
+
+        tr:nth-child(odd) {
+          background-color: #f1f1f1;
+        }
+
+        tr:hover {
+          background-color: #eaeaea;
+        }
+
+        .admin-table-row {
+          .admin-table-data__action {
+            button {
+              background-color: var(--third-color);
+              border: none;
+              color: #fff;
+              border-radius: 5px;
+              font-weight: 600;
+              padding: 7px 15px;
+              cursor: pointer;
+            }
+
+            span {
+              font-style: italic;
+              margin: 0 10px;
+              cursor: pointer;
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .admin-main__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    padding: 20px 0;
+  }
+
+  .back-to-prev-page_btn {
+    width: fit-content;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--third-color);
+    padding: 15px 0;
+
+    span {
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  button.admin-form__btn {
+    margin-top: 10px;
+    margin-right: 15px;
+
+    &:hover {
+      background-color: var(--third-color);
+      color: #fff;
+    }
+  }
+
+  button.admin-form__btn--delete {
+    color: red;
+
+    &:hover {
+      background-color: red;
+      color: #fff;
+    }
+  }
+
+  button.admin-form__btn--submit {
+    background-color: var(--third-color);
+    color: #fff;
+    align-self: center;
+
+    &:hover {
+      background-color: var(--third-color);
+    }
+  }
+
+  .admin-main-form {
+    textarea {
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: #606060;
+        border-radius: 5px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: #ccc;
+      }
+    }
+
+    .admin-form__btn--submit {
+      width: fit-content;
+      background-color: var(--third-color);
+      color: #fff;
+      align-self: center;
+
+      &:hover {
+        background-color: var(--third-color);
+      }
+    }
+
+    .input-label {
+      padding: 10px 0;
+    }
+  }
+
+  .paginate {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .paginate-item {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      color: var(--third-color);
+      background-color: #fff;
+      cursor: pointer;
+      margin-inline: 5px;
+      transition: all 0.2s linear;
+
+      &:hover {
+        background-color: var(--third-color);
+        color: #fff;
+      }
+    }
+    .active {
+      background-color: var(--third-color);
+      color: #fff;
+    }
+  }
+}
+
+.tour-guide-create-container {
+  padding-inline: 100px;
+}
+
+.account-manager-container {
+  .action--lock-acc {
+    background-color: rgb(199, 0, 0) !important;
+  }
+
+  .action--active-acc {
+    background-color: var(--fourth-color) !important;
+  }
+
+  .admin-table-data__status {
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+
+    span {
+      display: flex;
+      align-items: center;
+      margin-right: 5px;
+    }
+  }
+}
+
+// .booking-manager-container {
+//   .admin-main__body__table {
+//     .booking-manager__head--total-persons {
+//       width: 10%;
+//     }
+//   }
+// }
+
+.admin-modal-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  transform: scale(0);
+  background-color: #ffffff94;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+  .admin-modal {
+    width: 60%;
+    min-width: 600px;
+    height: 95vh;
+    background-color: #fff;
+    padding: 25px;
+    box-shadow: 0 0 25px 0px rgba(94, 94, 94, 0.2);
+    overflow-y: scroll;
+    border-radius: 7px;
+    position: relative;
+    z-index: 1;
+  }
+}

@@ -1,0 +1,143 @@
+.footer{
+    display: flex;
+    justify-content: space-between;
+    background-color: #C3DEF0;
+    height: 300px;
+    padding: 40px 0;
+    
+    .footer-item{
+        width: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+
+        h3 {
+            user-select: none;
+        }
+        
+        span, a {
+            color: var(--font-color);
+            font-size: 15px;
+            line-height: 1.3;
+            user-select: none;
+            transition: all 50ms linear;
+            font-family: 'Source San 3', sans-serif;
+        }
+
+        .text-1 {
+            font-weight: bold;
+            margin: 0 7px;
+        }
+
+        .text-2 {
+            font-style: italic;
+        }
+
+        .text-3 {
+            font-weight: bold;
+        }
+
+        a.text-2:hover {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+    }
+
+    .footer-item.footer-logo{
+        img {
+            width: 200px;
+        }
+    }
+
+    .footer-item.discover{
+        width: 150px;
+        margin: 0 20px;
+    }
+
+    .footer-item.contact{
+
+        .contact-item{
+            display: inline;
+
+            span {
+                vertical-align: middle;
+            }
+        }
+
+        .contact-item.facebook{
+            .text-2 {
+                text-decoration: underline;
+            }
+        }
+
+        .contact-icon {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--secondary-color);
+        }
+    }
+}
+
+
+@media screen and (max-width : 855px) {
+    .footer {
+        flex-direction: column;
+        align-items: center;
+        height: fit-content;
+
+        .footer-item {
+            align-items: center;
+            margin: 25px;
+            width: 80%;
+
+            h3 {
+                margin-bottom: 10px;
+            }
+            
+            span, a {
+                text-align: center;
+                margin: 10px 0;
+            }
+        }
+
+        .footer-item.contact {
+            .contact-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    }
+}
+
+@media screen and (max-width : 420px) {
+    .footer {
+        flex-direction: column;
+        align-items: center;
+        height: fit-content;
+
+        .footer-item {
+            align-items: center;
+            margin: 25px;
+            width: 80%;
+
+            h3 {
+                margin-bottom: 10px;
+            }
+            
+            span, a {
+                text-align: center;
+                margin: 10px 0;
+            }
+        }
+
+        .footer-item.contact {
+
+            .contact-item {
+                flex-direction: column;
+            }
+        }
+    }
+}

@@ -1,0 +1,25 @@
+.global-field-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 0;
+
+  &--valid {
+    color: green;
+  }
+
+  &--invalid {
+    color: red;
+  }
+
+  .icon {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .message {
+    font-size: 0.8rem;
+  }
+}
