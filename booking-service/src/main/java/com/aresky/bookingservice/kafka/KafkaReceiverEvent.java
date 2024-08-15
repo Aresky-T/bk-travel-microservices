@@ -38,7 +38,8 @@ public class KafkaReceiverEvent {
     private final Set<String> TOPICS = Set.of(
             KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS,
             KafkaTopic.BOOKING_WITH_VNPAY_FAILED,
-            KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED
+            KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED,
+            KafkaTopic.VNPAY_PAYMENT_SUCCESS
     );
 
     @PostConstruct
@@ -64,7 +65,7 @@ public class KafkaReceiverEvent {
                     Integer bookingId = notification.getEntityId();
 
                     return switch (topic) {
-                        case KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS -> bookingService.findBookingBy(bookingId)
+                        case KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS, KafkaTopic.VNPAY_PAYMENT_SUCCESS -> bookingService.findBookingBy(bookingId)
                                 .filter(booking -> !booking.getStatus().equals(EBookingStatus.PAY_UP))
                                 .switchIfEmpty(Mono.empty())
                                 .flatMap(booking -> {
@@ -79,6 +80,7 @@ public class KafkaReceiverEvent {
     }
 
     @PreDestroy
+    @SuppressWarnings("unused")
     public void stopConsumer(){
         if (disposable != null && !disposable.isDisposed()){
             disposable.dispose();
@@ -93,6 +95,7 @@ public class KafkaReceiverEvent {
         return convertFromJsonMessageUsingGson(jsonString, KafkaMessageType.NotificationRequest.class, requiredKeys);
     }
 
+    @SuppressWarnings("unused")
     private KafkaMessageType.NotificationRequest convertToNotificationRequest(String jsonString, Set<String> requiredKeys){
         return convertFromJsonMessageUsingGson(jsonString, KafkaMessageType.NotificationRequest.class, requiredKeys);
     }
