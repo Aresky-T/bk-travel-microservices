@@ -135,7 +135,9 @@ public class NotificationServiceImp implements INotificationService {
     public Mono<Void> createNotification(NotificationRequest request) {
         return typeRepository.findByName(request.getTypeName())
                 .switchIfEmpty(Mono.error(NotificationException.INVALID_TYPE_NAME))
+                .flatMap(type -> findAllKeywords(type).map(type::keywords).thenReturn(type))
                 .flatMap(type -> {
+                    // Generate new notification entity object
                     Notification notification = new Notification();
                     notification.setTypeId(type.getId());
                     notification.setUserId(request.getUserId());
@@ -157,6 +159,7 @@ public class NotificationServiceImp implements INotificationService {
                 .switchIfEmpty(Mono.empty())
                 .flatMap(reqValue -> typeRepository.findByName(reqValue.getTypeName())
                         .switchIfEmpty(Mono.empty())
+                        .flatMap(type -> findAllKeywords(type).map(type::keywords).thenReturn(type))
                         .flatMap(type -> {
                             Notification notification = new Notification();
                             notification.setTypeId(type.getId());
@@ -261,6 +264,21 @@ public class NotificationServiceImp implements INotificationService {
                 .then();
     }
 
+    @SuppressWarnings("unused")
+    private Mono<List<NotificationKeyword>> findAllKeywords(NotificationType type){
+        return keywordRepository.findByNotificationTypeId(type.getId())
+                .collectList();
+    }
+
+    @SuppressWarnings("unused")
+    private Mono<List<NotificationKeyword>> findAllKeywords(Integer typeId){
+        return typeRepository.existsById(typeId)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.empty())
+                .then(keywordRepository.findByNotificationTypeId(typeId).collectList());
+    }
+
+    @SuppressWarnings("unused")
     private Flux<Notification> findAllNotifications(Integer userId, Integer limit, Integer offset) {
         String query = "SELECT * FROM notifications \n"
                 + "WHERE user_id = :userId \n"
@@ -280,6 +298,7 @@ public class NotificationServiceImp implements INotificationService {
         return notificationRepository.countByUserId(userId);
     }
 
+    @SuppressWarnings("unused")
     private Mono<Map<String, Long>> countNotificationsWithEntityTypeByUserId(Integer userId) {
         String query = "SELECT N.user_id, COUNT(N.id) AS `count`, T.entity_type\n" +
                 "FROM notifications as N\n" +
@@ -304,16 +323,19 @@ public class NotificationServiceImp implements INotificationService {
     }
 
     private static String buildMessage(NotificationType type, Map<String, Object> keysMap) {
+        List<NotificationKeyword> keywords = type.getKeywords();
+        List<String> keywordNames = keywords.stream().map(NotificationKeyword::getKeyword).toList();
         String template = type.getTemplate();
         String message = "<p>" + template + "</p>";
 
         if (keysMap != null) {
             for (Map.Entry<String, Object> entry : keysMap.entrySet()) {
-                String keyword = "{" + entry.getKey() + "}";
+                String keyword = entry.getKey();
+                String keywordTemplate = "{" + keyword + "}";
                 Object value = entry.getValue();
 
-                if (template.contains(keyword)) {
-                    message = message.replace(keyword, "<b>" + value.toString() + "</b>");
+                if (keywordNames.contains(keyword) && template.contains(keywordTemplate)) {
+                    message = message.replace(keywordTemplate, "<b>" + value.toString() + "</b>");
                 }
             }
         }
