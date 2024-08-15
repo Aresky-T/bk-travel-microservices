@@ -38,12 +38,13 @@ public class KafkaConsumerEvent {
             KafkaTopic.BOOKING_SUCCESS,
             KafkaTopic.BOOKING_CANCEL_APPROVED,
             KafkaTopic.BOOKING_CANCEL_PENDING,
+            KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS,
+            KafkaTopic.VNPAY_PAYMENT_SUCCESS,
             KafkaTopic.TOUR_CANCELLED,
             KafkaTopic.TOUR_DAILY_REMINDER,
             KafkaTopic.CUSTOMER_MAIL_RECEIVED,
             KafkaTopic.MAIL_REPLIED,
             KafkaTopic.MAIL_SENT,
-            KafkaTopic.VNPAY_PAYMENT_SUCCESS,
             KafkaTopic.FIRST_TIME_LOGIN
     );
 
