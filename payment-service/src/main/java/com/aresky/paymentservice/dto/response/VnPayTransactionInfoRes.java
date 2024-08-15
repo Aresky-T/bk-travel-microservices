@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VnPayTransactionInfoRes {
+    private String bookingCode;
     private String bank;
     private String cardType;
     private String orderInfo;
@@ -21,6 +22,7 @@ public class VnPayTransactionInfoRes {
 
     public static VnPayTransactionInfoRes toDTO(VnPayTransactionInfo info) {
         return VnPayTransactionInfoRes.builder()
+                .bookingCode(info.getBookingCode())
                 .bank(info.getBank())
                 .cardType(info.getCardType())
                 .orderInfo(info.getOrderInfo())

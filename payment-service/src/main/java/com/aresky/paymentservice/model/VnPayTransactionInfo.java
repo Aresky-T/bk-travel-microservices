@@ -28,6 +28,9 @@ public class VnPayTransactionInfo implements Serializable {
     @Column(name = "booking_id", nullable = false, unique = true)
     private Integer bookingId;
 
+    @Column(name = "booking_code", nullable = false, unique = true)
+    private String bookingCode;
+
     @Column(name = "bank", nullable = false)
     private String bank;
 
