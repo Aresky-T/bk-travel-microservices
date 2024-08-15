@@ -118,4 +118,32 @@
             <column name="latest_staff_msg_id" type="INT" />
         </addColumn>
     </changeSet>
+    <changeSet id="Add new column latest_msg_id" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column latest_msg_id already exist!">
+            <and>
+                <tableExists tableName="conversation" />
+                <not>
+                    <columnExists tableName="conversation" columnName="latest_msg_id" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="latest_msg_id" type="INT" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="Add new column updated_at" author="Aresky" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="Column updated_at already exist!">
+            <and>
+                <tableExists tableName="conversation"/>
+                <not>
+                    <columnExists tableName="conversation" columnName="updated_at"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="conversation">
+            <column name="updated_at" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
