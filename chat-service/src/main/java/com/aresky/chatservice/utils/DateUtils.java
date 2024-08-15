@@ -1,6 +1,7 @@
 package com.aresky.chatservice.utils;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -35,5 +36,9 @@ public class DateUtils {
 
     public static String format(ZonedDateTime date, DateTimeFormatter formatter) {
         return formatter.format(date);
+    }
+
+    public static ZonedDateTime now() {
+        return ZonedDateTime.now(ZoneId.systemDefault());
     }
 }
