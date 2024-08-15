@@ -25,4 +25,16 @@
             </column>
         </createTable>
     </changeSet>
+    <changeSet id="Add new column permission for table staff" author="Aresky">
+        <preConditions onFail="CONTINUE" onFailMessage="Table staff column permission already exist!">
+            <not>
+                <columnExists tableName="staff" columnName="permission"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="staff">
+            <column name="permission" type="tinyint(1)" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
