@@ -1,9 +1,9 @@
 package com.aresky.accountservice.model;
 
 import java.io.Serializable;
-import java.time.Clock;
 import java.time.ZonedDateTime;
 
+import com.aresky.accountservice.utils.DateUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -51,6 +51,6 @@ public class Account implements Serializable {
         this.role = ERole.USER;
         this.activationStatus = EActivationStatus.ACTIVE;
         this.onlineStatus = EOnlineStatus.OFFLINE;
-        this.createdTime = ZonedDateTime.now(Clock.systemDefaultZone());
+        this.createdTime = DateUtils.now();
     }
 }
