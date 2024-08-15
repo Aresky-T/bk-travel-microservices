@@ -1,5 +1,8 @@
 package com.aresky.authservice.service.auth;
 
+import com.aresky.authservice.kafka.KafkaMessageType;
+import com.aresky.authservice.kafka.KafkaSenderEvent;
+import com.aresky.authservice.kafka.KafkaTopic;
 import io.r2dbc.spi.Row;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -53,6 +56,9 @@ public class AuthServiceImp implements IAuthService {
     @Autowired
     public DatabaseClient databaseClient;
 
+    @Autowired
+    public KafkaSenderEvent kafkaSenderEvent;
+
     @Value("${spring.mail.username}")
     private String email;
 
@@ -85,12 +91,17 @@ public class AuthServiceImp implements IAuthService {
                             .status(account.getStatus())
                             .build();
 
-                    return this.findAuthByAccountId(account.getId())
-                            .switchIfEmpty(authRepository.save(new Auth(account.getId(), token)))
-                            .flatMap(auth -> {
-                                auth.setAccessToken(token);
-                                return authRepository.save(auth).then();
-                            })
+                    Integer accountId = account.getId();
+                    return existsAuthByAccountId(accountId)
+                            .flatMap(existsAuth -> existsAuth
+                                    ? findAuthByAccountId(accountId)
+                                    .flatMap(auth -> {
+                                        auth.setAccessToken(token);
+                                        return authRepository.save(auth);
+                                    })
+                                    : createAuth(accountId, token)
+                            )
+                            .then()
                             .thenReturn(loginResponse);
                 });
     }
@@ -111,13 +122,7 @@ public class AuthServiceImp implements IAuthService {
                             .switchIfEmpty(Mono.error(new AuthException(ExceptionNotification.ACCOUNT_NOT_EXISTS)))
                             .map(AccountResponse::getId)
                             .flatMap(authRepository::findByAccountId)
-                            .map(auth -> {
-                                if (auth.getAccessToken().equals(token)) {
-                                    return true;
-                                }
-
-                                return false;
-                            });
+                            .map(auth -> auth.getAccessToken().equals(token));
                 });
     }
 
@@ -161,6 +166,28 @@ public class AuthServiceImp implements IAuthService {
         return databaseClient.sql(query).bind("accountId", accountId)
                 .map(((row, rowMetadata) -> mapRowToAuth(row)))
                 .one();
+    }
+
+    public Mono<Auth> createAuth(Integer accountId, String accessToken){
+        return authRepository.save(new Auth(accountId, accessToken))
+                .map(auth -> {
+
+                    KafkaMessageType.NotificationRequest notification
+                            = KafkaMessageType.NotificationRequest.builder()
+                            .userId(accountId);
+
+                    kafkaSenderEvent.sendMessage(
+                            KafkaTopic.FIRST_TIME_LOGIN,
+                            KafkaSenderEvent.KEY,
+                            notification
+                    );
+
+                    return auth;
+                });
+    }
+
+    private Mono<Boolean> existsAuthByAccountId(Integer accountId){
+        return authRepository.existsByAccountId(accountId);
     }
 
     private Auth mapRowToAuth(Row row) {
