@@ -89,7 +89,7 @@ bk-travel-microservices/
 │
 ├── client/
 │   ├── src/
-│   └── pom.xml
+│   └── package.json
 │
 └── cs_client/
     ├── src/
