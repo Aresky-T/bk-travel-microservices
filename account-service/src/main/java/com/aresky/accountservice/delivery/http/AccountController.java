@@ -72,6 +72,14 @@ public class AccountController {
         return accountService.handleSignup(form).thenReturn(ResponseEntity.ok("success"));
     }
 
+    @PatchMapping()
+    public Mono<ResponseEntity<?>> onUpdate(
+            @RequestParam("id") Integer accountId,
+            @RequestBody Map<String, Object> fields
+    ){
+        return accountService.update(accountId, fields).map(ResponseEntity::ok);
+    }
+
     @PatchMapping("/update-password")
     public Mono<ResponseEntity<?>> onUpdatePassword(
             @RequestParam String username,
