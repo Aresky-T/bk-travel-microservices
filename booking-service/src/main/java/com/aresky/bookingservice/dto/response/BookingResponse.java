@@ -3,12 +3,11 @@ package com.aresky.bookingservice.dto.response;
 import com.aresky.bookingservice.model.Booking;
 import com.aresky.bookingservice.model.EFormOfPayment;
 
+import com.aresky.bookingservice.util.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.format.DateTimeFormatter;
 
 @Data
 @Builder
@@ -34,6 +33,7 @@ public class BookingResponse {
     private String status;
     private EFormOfPayment formOfPayment;
     private String bookedTime;
+    private Boolean isCancellationRequested;
 
     public static BookingResponse toDTO(Booking booking) {
         return BookingResponse.builder()
@@ -55,7 +55,8 @@ public class BookingResponse {
                 .amount(booking.getAmount())
                 .status(booking.getStatus().name())
                 .formOfPayment(booking.getFormOfPayment())
-                .bookedTime(DateTimeFormatter.ISO_INSTANT.format(booking.getBookedTime()))
+                .bookedTime(DateUtils.formatDateTime(booking.getBookedTime()))
+                .isCancellationRequested(booking.getIsCancellationRequested())
                 .build();
     }
 }

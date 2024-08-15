@@ -2,14 +2,15 @@ package com.aresky.bookingservice.dto.response;
 
 import com.aresky.bookingservice.model.Booking;
 import com.aresky.bookingservice.model.EFormOfPayment;
-import com.aresky.bookingservice.model.Tourist;
+import com.aresky.bookingservice.model.SubTour;
+import com.aresky.bookingservice.util.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -17,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingDetails {
     private Integer id;
+    private String bookingCode;
     private Integer accountId;
     private Integer tourId;
     private Integer subTourId;
@@ -34,12 +36,20 @@ public class BookingDetails {
     private String status;
     private EFormOfPayment formOfPayment;
     private String bookedTime;
+    private Boolean isCancellationRequested;
     private TourInfo tourInfo;
+    private VnPayTransactionInfoResponse transactionInfo;
     private List<TouristResponse> touristList;
 
     public static BookingDetails toDTO(Booking booking) {
+        List<TouristResponse> touristList = booking.getTouristList()
+                .stream()
+                .map(TouristResponse::toDTO)
+                .toList();
+
         return BookingDetails.builder()
                 .id(booking.getId())
+                .bookingCode(booking.getBookingCode())
                 .accountId(booking.getAccountId())
                 .tourId(booking.getTourId())
                 .subTourId(booking.getSubTourId())
@@ -56,21 +66,12 @@ public class BookingDetails {
                 .amount(booking.getAmount())
                 .status(booking.getStatus().name())
                 .formOfPayment(booking.getFormOfPayment())
-                .bookedTime(DateTimeFormatter.ISO_INSTANT.format(booking.getBookedTime()))
+                .bookedTime(DateUtils.formatDateTime(booking.getBookedTime()))
+                .isCancellationRequested(booking.getIsCancellationRequested())
+                .tourInfo(Optional.ofNullable(booking.getSubTour()).map(TourInfo::new).orElse(null))
+                .transactionInfo(Optional.ofNullable(booking.getTransactionInfo()).map(VnPayTransactionInfoResponse::new).orElse(null))
+                .touristList(touristList)
                 .build();
-    }
-
-    public static BookingDetails toDTO(Booking booking, List<Tourist> touristList) {
-        BookingDetails bookingDetails = BookingDetails.toDTO(booking);
-        bookingDetails.setTouristList(touristList.stream().map(TouristResponse::toDTO).toList());
-        return bookingDetails;
-    }
-
-    public static BookingDetails toDTO(Booking booking, SubTourResponse subTour, List<Tourist> touristList) {
-        BookingDetails bookingDetails = BookingDetails.toDTO(booking);
-        bookingDetails.setTourInfo(new TourInfo(subTour));
-        bookingDetails.setTouristList(touristList.stream().map(TouristResponse::toDTO).toList());
-        return bookingDetails;
     }
 
     @Data
@@ -83,7 +84,7 @@ public class BookingDetails {
         private String code;
         private String status;
 
-        public TourInfo(SubTourResponse subTour) {
+        public TourInfo(SubTour subTour) {
             this.tourId = subTour.getTourId();
             this.subTourId = subTour.getId();
             this.code = subTour.getTourCode();
