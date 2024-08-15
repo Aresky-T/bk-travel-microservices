@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConversationResponse {
     private Integer id;
-    private Integer customerId;
-    private Integer staffId;
     private Integer newCustomerMessageCount;
     private Integer newStaffMessageCount;
-    private MessageResponse latestMessage;
     private String createdAt;
+    private String updatedAt;
+    private ConversationMessage latestMessage;
+    private CustomerResponse customer;
 }

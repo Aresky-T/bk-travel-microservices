@@ -1,13 +1,12 @@
 package com.aresky.chatservice.mappers.http;
 
-import com.aresky.chatservice.dto.response.ConversationResponse;
-import com.aresky.chatservice.dto.response.CustomerConversation;
-import com.aresky.chatservice.dto.response.StaffConversation;
+import com.aresky.chatservice.dto.response.*;
 import com.aresky.chatservice.entity.Conversation;
 import com.aresky.chatservice.entity.Message;
 import com.aresky.chatservice.utils.DateUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ConversationMapper {
     public static StaffConversation mapToStaffConversation(Conversation conversation) {
@@ -35,13 +34,22 @@ public class ConversationMapper {
     }
 
     public static ConversationResponse mapToConversationResponse(Conversation conversation) {
+        ConversationMessage latestMessage = Optional.ofNullable(conversation.getLastestMessage())
+                .map(ConversationMessage::new)
+                .orElse(null);
+
+        CustomerResponse customer = Optional.ofNullable(conversation.getCustomer())
+                .map(CustomerMapper::mapToCustomerResponse)
+                .orElse(null);
+
         return ConversationResponse.builder()
                 .id(conversation.getId())
-                .customerId(conversation.getCustomerId())
-                .staffId(conversation.getStaffId())
                 .newCustomerMessageCount(conversation.getNewCustomerMessageCount())
                 .newStaffMessageCount(conversation.getNewStaffMessageCount())
                 .createdAt(DateUtils.formatDateTime(conversation.getCreatedAt()))
+                .updatedAt(DateUtils.formatDateTime(conversation.getUpdatedAt()))
+                .latestMessage(latestMessage)
+                .customer(customer)
                 .build();
     }
 }

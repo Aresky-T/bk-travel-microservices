@@ -6,7 +6,7 @@ import com.aresky.chatservice.entity.Customer;
 import com.aresky.chatservice.entity.EActivationStatus;
 
 public class CustomerMapper {
-    public static Customer mapCustomerRequestToCustomer(CustomerRequest request){
+    public static Customer mapToCustomer(CustomerRequest request){
         return Customer.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
@@ -14,7 +14,7 @@ public class CustomerMapper {
                 .build();
     }
 
-    public static CustomerResponse mapCustomerToCustomerResponse(Customer customer){
+    public static CustomerResponse mapToCustomerResponse(Customer customer){
         return CustomerResponse.builder()
                .id(customer.getId())
                .fullName(customer.getFullName())
