@@ -61,7 +61,7 @@ public class BookingDtoServiceImp implements IBookingDtoService {
     private final Logger log = LoggerFactory.getLogger(BookingDtoServiceImp.class);
 
     private final Gson GSON = new Gson();
-    
+
     @Override
     public Mono<String> handleBooking(CreateBookingForm form, EPaymentType type) {
         int accountId = form.getAccountId();
