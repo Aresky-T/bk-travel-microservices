@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import com.aresky.authservice.constants.ExceptionNotification;
-import com.aresky.authservice.exception.AuthException;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
@@ -79,7 +76,7 @@ public class JwtUtils {
             log.error("Invalid token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
             log.error("Expired JWT token: {}", e.getMessage());
-            throw new AuthException(ExceptionNotification.SESSION_HAS_EXPIRED);
+//            throw new AuthException(ExceptionNotification.SESSION_HAS_EXPIRED);
         } catch (IllegalArgumentException e) {
             log.error("JWT Claims is empty: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
