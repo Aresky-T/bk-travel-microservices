@@ -1,12 +1,16 @@
 package com.aresky.bookingservice.delivery.http;
 
 import com.aresky.bookingservice.dto.request.BookingFilter;
+import com.aresky.bookingservice.dto.request.BookingStatusUpdateRequest;
 import com.aresky.bookingservice.dto.request.CreateCancelBookedTourForm;
+import com.aresky.bookingservice.dto.response.BookingResponse;
+import com.aresky.bookingservice.dto.response.CancellationRequestedResponse;
 import com.aresky.bookingservice.service.booking.IBookingDtoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.aresky.bookingservice.dto.request.CreateBookingForm;
@@ -28,23 +32,6 @@ public class BookingController {
             @Valid @RequestBody CreateBookingForm form) {
         return bookingService.handleBooking(form, type).map(ResponseEntity::ok);
     }
-
-    // POST - createBookingWithPayment(CreateBookingForm form)
-    // @PostMapping("/payment/vnpay")
-    // public Mono<ResponseEntity<?>> createBookingWithPayment(
-    // @RequestParam Integer bookingId) {
-    // return bookingService.handlePaymentWithVnPayAfterBooking(bookingId)
-    // .map(ResponseEntity::ok);
-    // }
-
-    // @PostMapping("/payment/vnpay-result")
-    // public Mono<ResponseEntity<?>> getBookingResult(@RequestBody VnPayReturn
-    // vnPayReturn) {
-    // return
-    // bookingService.handleBookingAfterPaymentWithVnPay(vnPayReturn).map(ResponseEntity::ok);
-    // }
-
-    // POST - createRequestCancelBookedTour(CreateCancelBookedTourForm)
 
     // GET - getVnPayTransactionInfo(Integer bookingId)
     @GetMapping("/payment/vnpay-transaction-info")
@@ -91,6 +78,19 @@ public class BookingController {
         return bookingService.existsBy(accountId, subTourId).map(ResponseEntity::ok);
     }
 
+    @PatchMapping("/status")
+    public Mono<ResponseEntity<BookingResponse>> updateBookingStatus(
+            @RequestParam Integer bookingId,
+            @Validated @RequestBody BookingStatusUpdateRequest request
+    ){
+        return bookingService.updateStatus(bookingId, request).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/cancellation-requested")
+    public Mono<ResponseEntity<CancellationRequestedResponse>> getCancellationRequested(@RequestParam Integer bookingId){
+        return bookingService.findCancellationRequested(bookingId).map(ResponseEntity::ok);
+    }
+
     @GetMapping("/cancellation-requested/all")
     public Mono<ResponseEntity<?>> getAllCancellationRequested(
             @RequestParam Integer page,
@@ -109,22 +109,27 @@ public class BookingController {
             @RequestParam("accountId") Integer accountId,
             @RequestBody CreateCancelBookedTourForm form
     ){
-        return bookingService.sendCancellationBookingRequest(accountId, form).thenReturn(ResponseEntity.ok("success"));
+        return bookingService.sendCancellationBookingRequest(accountId, form).map(ResponseEntity::ok);
     }
 
     @PatchMapping("/cancellation-requested/approve")
-    public Mono<ResponseEntity<?>> acceptRequestCancelBookedTour(@RequestParam Integer requestId){
-        return bookingService.approveCancellationBookingRequest(requestId).thenReturn(ResponseEntity.ok("success"));
+    public Mono<ResponseEntity<?>> acceptRequestCancelBookedTour(@RequestParam Integer bookingId){
+        return bookingService.approveCancellationBookingRequestByBookingId(bookingId).thenReturn(ResponseEntity.ok("success"));
     }
 
     @PatchMapping("/cancellation-requested/reject")
-    public Mono<ResponseEntity<?>> rejectRequestCancelBookedTour(@RequestParam Integer requestId){
-        return bookingService.rejectCancellationBookingRequest(requestId).thenReturn( ResponseEntity.ok("success"));
+    public Mono<ResponseEntity<?>> rejectRequestCancelBookedTour(@RequestParam Integer bookingId){
+        return bookingService.rejectCancellationBookingRequestByBookingId(bookingId).thenReturn( ResponseEntity.ok("success"));
     }
 
     // DELETE - deleteBooking(int bookingId)
     @DeleteMapping
     public Mono<ResponseEntity<?>> deleteBooking(@RequestParam("id") Integer bookingId) {
         return bookingService.delete(bookingId).thenReturn(ResponseEntity.ok("success"));
+    }
+
+    @DeleteMapping("/cancellation-requested")
+    public Mono<ResponseEntity<?>> deleteCancellationRequested(@RequestParam Integer bookingId){
+        return bookingService.deleteCancellationBookingRequestByBookingId(bookingId).thenReturn( ResponseEntity.ok("success"));
     }
 }
