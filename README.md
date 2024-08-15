@@ -47,7 +47,7 @@ bk-travel-microservices/
 │   ├── src/
 │   └── pom.xml
 │
-├── discovery-service/
+├── discovery-server/
 │   ├── src/
 │   └── pom.xml
 │
@@ -137,13 +137,13 @@ bk-travel-microservices/
    ###### 2. _*`Building Kafka zookeeper server container named "zookeeper-01"`*_
 
    ```bash
-   docker-compose -f kafka-deployment.yaml up zookeeper-01
+   docker-compose -f kafka-deployment.yaml up --no-start zookeeper-01
    ```
 
    ###### 3. _*`Building Kafka broker server container named "kafka-broker-01"`*_
 
    ```bash
-   docker-compose -f kafka-deployment.yaml up kafka-broker-01
+   docker-compose -f kafka-deployment.yaml up --no-start kafka-broker-01
    ```
 
 3. Buiding Mysql server container
@@ -157,13 +157,13 @@ bk-travel-microservices/
    ###### 1. _*`Discovery server`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate discovery-server
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start discovery-server
    ```
 
    ###### 2. _*`Gateway service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate gateway-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start gateway-service
    ```
 
 5. Buiding main service containers
@@ -171,82 +171,76 @@ bk-travel-microservices/
    ###### 1. _*`account-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate account-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start account-service
    ```
 
    ###### 2. _*`auth-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate auth-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start auth-service
    ```
 
    ###### 3. _*`tour-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate tour-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start tour-service
    ```
 
    ###### 4. _*`tourist-attraction-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate tourist-attraction-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start tourist-attraction-service
    ```
 
    ###### 5. _*`booking-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate booking-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start booking-service
    ```
 
    ###### 6. _*`payment-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate payment-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start payment-service
    ```
 
    ###### 7. _*`review-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate review-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start review-service
    ```
 
    ###### 8. _*`marking-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate marking-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start marking-service
    ```
 
    ###### 9. _*`staff-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate staff-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start staff-service
    ```
 
    ###### 10. _*`chat-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate chat-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start chat-service
    ```
 
    ###### 11. _*`mail-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate mail-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start mail-service
    ```
 
    ###### 12. _*`notification-service`*_
 
    ```bash
-   docker-compose -f docker-compose.yml up --build --no-recreate notification-service
+   docker-compose -f docker-compose.yml up --build --no-recreate --no-start notification-service
    ```
 
-6. Buiding Mysql server container
-
-   ```bash
-   docker-compose -f docker-compose.yml up mysql-server
-   ```
-
-7. Install client dependencies and building:
+6. Install client dependencies and building:
 
    ```bash
    cd client
@@ -254,7 +248,7 @@ bk-travel-microservices/
    npm run build
    ```
 
-8. Install cs_client dependencies:
+7. Install cs_client dependencies:
 
    ```bash
    cd cs_client
