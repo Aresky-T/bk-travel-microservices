@@ -4,6 +4,7 @@ import com.aresky.mailservice.dto.request.MailReplyRequest;
 import com.aresky.mailservice.dto.request.MailRequest;
 import com.aresky.mailservice.dto.response.CustomerMailDetails;
 import com.aresky.mailservice.dto.response.MailResponse;
+import com.aresky.mailservice.dto.response.PaginationWrapper;
 import com.aresky.mailservice.dto.response.StaffMailDetails;
 import com.aresky.mailservice.entity.*;
 import com.aresky.mailservice.exception.ExceptionMessage;
@@ -177,10 +178,10 @@ public class MailServiceImp implements IMailService {
     }
 
     @Override
-    public Mono<List<MailResponse>> getAllMailsForCustomer(String customerEmail, Integer limit, Integer offset) {
+    public Mono<PaginationWrapper<MailResponse>> getAllMailsForCustomer(String customerEmail, Integer page, Integer size) {
         return customerService.getByEmail(customerEmail)
                 .flatMap(customer -> {
-                    String query = "SELECT M.id, M.subject, M.body, M.sent_at, M.status, B.id as box_id, B.customer_id, B.staff_id\n" +
+                    String query1 = "SELECT M.id, M.subject, M.body, M.sent_at, M.status, B.id as box_id, B.customer_id, B.staff_id\n" +
                             "FROM mail M\n" +
                             "INNER JOIN mail_box B\n" +
                             "ON M.mail_box_id = B.id\n" +
@@ -189,10 +190,17 @@ public class MailServiceImp implements IMailService {
                             "LIMIT :limit\n" +
                             "OFFSET :offset;";
 
-                    return databaseClient.sql(query)
+                    String query2 = "SELECT COUNT(*) AS total_elements\n" +
+                            "FROM mail M\n" +
+                            "INNER JOIN mail_box B\n" +
+                            "ON M.mail_box_id = B.id\n" +
+                            "WHERE B.customer_id = :customerId\n" +
+                            "GROUP BY B.customer_id;";
+
+                    Mono<List<MailResponse>> firstQueryMono = databaseClient.sql(query1)
                             .bind("customerId", customer.getId())
-                            .bind("limit", limit)
-                            .bind("offset", offset)
+                            .bind("limit", size)
+                            .bind("offset", page * size)
                             .fetch()
                             .all()
                             .map(row -> Mail.builder()
@@ -205,8 +213,17 @@ public class MailServiceImp implements IMailService {
                                     .build())
                             .map(MailMapper::toMailResponse)
                             .collectList();
+
+                    Mono<Long> secondQueryMono = databaseClient.sql(query2)
+                            .bind("customerId", customer.getId())
+                            .fetch()
+                            .one()
+                            .map(row -> (Long) row.get("total_elements"));
+
+                    return Mono.zip(firstQueryMono, secondQueryMono);
                 })
-                .onErrorResume(err -> Mono.error(new MailException(err.getMessage())));
+                .onErrorMap(err -> new MailException(err.getMessage()))
+                .map(result -> new PaginationWrapper<MailResponse>(result.getT1(), result.getT2(), page, size));
     }
 
     @Override

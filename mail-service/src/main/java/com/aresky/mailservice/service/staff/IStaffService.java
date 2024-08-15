@@ -24,4 +24,10 @@ public interface IStaffService {
     Mono<Boolean> existsByEmail(String email);
 
     Mono<Void> deleteStaff(Integer staffId);
+
+    Mono<Staff> enablePermission(String email);
+
+    Mono<Staff> disablePermission(String email);
+
+    Mono<Boolean> checkPermission(String email);
 }

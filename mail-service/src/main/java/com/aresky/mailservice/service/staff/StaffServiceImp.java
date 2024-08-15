@@ -57,24 +57,38 @@ public class StaffServiceImp implements IStaffService {
 
     @Override
     public Mono<Staff> getRandomStaff() {
-        return staffRepository.findAll()
-                .collectList()
-                .zipWith(staffRepository.count())
-                .flatMap(tuple -> {
-                    int count = tuple.getT2().intValue();
-                    List<Staff> staffs = tuple.getT1();
+//        SELECT * FROM staff s
+//        JOIN (SELECT ROUND(
+//                (RAND() * (
+//                        (SELECT MAX(id) FROM staff s1 WHERE s1.permission = FALSE) -
+//                (SELECT MIN(id) FROM staff s2 WHERE s2.permission = FALSE)
+//          ) + (SELECT MIN(id) FROM staff s3 WHERE s3.permission = FALSE))) as random) AS r
+//        WHERE s.permission = TRUE
+//        AND (s.id >= r.random OR s.id < r.random)
+//        LIMIT 1;
 
-                    if(count == 0) {
-                        return Mono.empty();
-                    }
+        String queryCount = "SELECT COUNT(*) FROM staff s"
+                + " WHERE s.permission = :permission;";
 
-                    if(count == 1){
-                        return Mono.just(staffs.get(0));
-                    }
+        String queryStaff = "SELECT * FROM staff s"
+                + " WHERE s.permission = :permission LIMIT 1 OFFSET :offset;";
 
-                    int random = (int) RandomUtils.random(0, count - 1);
-                    return Mono.just(staffs.get(random));
-                });
+        Mono<Integer> countMono = databaseClient.sql(queryCount)
+                .bind("permission", true)
+                .map(row -> row.get("COUNT(*)", Integer.class))
+                .one();
+
+        return countMono.filter(count -> count > 0).flatMap(count -> {
+            int minOffset = 0;
+            int maxOffset = count - 1;
+            int randomOffset = (int) RandomUtils.random(minOffset, maxOffset);
+
+            return databaseClient.sql(queryStaff)
+                    .bind("permission", true)
+                    .bind("offset", randomOffset)
+                    .map((row, metadata) -> mapRowToStaff(row))
+                    .one();
+        });
     }
 
     @Override
@@ -103,6 +117,33 @@ public class StaffServiceImp implements IStaffService {
                 .then();
     }
 
+    @Override
+    public Mono<Staff> enablePermission(String email) {
+        return staffRepository.findByEmail(email)
+                .switchIfEmpty(Mono.error(MailException.STAFF_NOT_FOUND_EX))
+                .filter(staff -> staff.getPermission().equals(Boolean.FALSE))
+                .switchIfEmpty(Mono.error(MailException.STAFF_PERMISSION_HAS_BEEN_ALLOWED_EX))
+                .doOnNext(staff -> staff.setPermission(Boolean.TRUE))
+                .flatMap(staffRepository::save);
+    }
+
+    @Override
+    public Mono<Staff> disablePermission(String email) {
+        return staffRepository.findByEmail(email)
+                .switchIfEmpty(Mono.error(MailException.STAFF_NOT_FOUND_EX))
+                .filter(staff -> staff.getPermission().equals(Boolean.TRUE))
+                .switchIfEmpty(Mono.error(MailException.STAFF_PERMISSION_HAS_BEEN_DENIED_EX))
+                .doOnNext(staff -> staff.setPermission(Boolean.FALSE))
+                .flatMap(staffRepository::save);
+    }
+
+    @Override
+    public Mono<Boolean> checkPermission(String email) {
+        return staffRepository.findByEmail(email)
+                .switchIfEmpty(Mono.error(MailException.STAFF_NOT_FOUND_EX))
+                .map(Staff::getPermission);
+    }
+
     private Mono<Staff> insert(Staff staff){
         String query = "INSERT INTO staff(id, email, full_name, avatar_url) VALUES(:id, :email, :fullName, :avatarUrl);";
         return databaseClient.sql(query)
@@ -110,6 +151,7 @@ public class StaffServiceImp implements IStaffService {
                 .bind("email", staff.getEmail())
                 .bind("fullName", staff.getFullName())
                 .bind("avatarUrl", staff.getAvatarUrl())
+                .bind("permission", staff.getPermission())
                 .map((row, metadata) -> mapRowToStaff(row))
                 .one();
     }
@@ -120,6 +162,7 @@ public class StaffServiceImp implements IStaffService {
                 .email(row.get("email", String.class))
                 .fullName(row.get("full_name", String.class))
                 .avatarUrl(row.get("avatar_url", String.class))
+                .permission(row.get("permission", Boolean.class))
                 .build();
     }
 }
