@@ -21,7 +21,7 @@ public class BookingException extends RuntimeException {
     public static final String INVALID_PAYMENT_RESULT = "Kết quả trả về từ giao dịch không hợp lệ!";
 
     public static final String PAYMENT_RESULT_REQUIRED = "Yêu cầu thông tin kết quả giao dịch!";
-    public static final String UNSUPPORTED_PAYMENT_TYPE = "Hiện không hỗ trợ hình thức thanh toán này!";
+    public static final BookingException UNSUPPORTED_PAYMENT_TYPE = new BookingException("Hiện không hỗ trợ hình thức thanh toán này!");
     public static final String UNKNOWN_ERROR = "Lỗi không xác định!";
 
     public static final String SUB_TOUR_NOT_FOUND = "SubTour was not found!";
@@ -30,6 +30,16 @@ public class BookingException extends RuntimeException {
 
     public static final BookingException PERMISSION_DENIED = new BookingException("Permission denied!");
     public static final BookingException CANCELLATION_REQUEST_DOES_NOT_EXIST = new BookingException("Cancellation request does not exist!");
+    public static final BookingException PAID_BOOKING = new BookingException("Bạn đã đặt và thanh toán thành công!");
+    public static final BookingException BOOKING_EXISTS = new BookingException("Bạn đã đặt tour này rồi, vui lòng kiểm tra trong hồ sơ của bạn!");;
+    public static final BookingException BOOKING_NOT_FOUND_EX = new BookingException("This booking info not found!");
+    public static final BookingException INVALID_BOOKING_ID_EX = new BookingException("Invalid booking id!");
+    public static final BookingException CANCELLATION_REQUESTED_CANNOT_APPROVE = new BookingException("This request cannot be approved!");
+    public static final BookingException CANCELLATION_REQUESTED_CANNOT_REJECT = new BookingException("This request cannot be rejected!");
+    public static final BookingException CANCELLATION_REQUEST_ALREADY_EXIST = new BookingException("This request already exist!");
+    public static final BookingException CANCELLATION_REQUESTED_CANNOT_DELETE = new BookingException("Yêu cầu này đã được xử lý, không thể xoá!");
+    public static final BookingException BOOKING_STATUS_MUST_BE_REJECTED = new BookingException("Yêu cầu cập nhật trạng thái thanh toán thành \"Từ chối\" trước khi tiếp tục!");
+    public static final BookingException VNPAY_TRANSACTION_INFO_NOT_FOUND = new BookingException("VNPAY transaction info not found!");
 
     public BookingException(String message) {
         super(message);
