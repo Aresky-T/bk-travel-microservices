@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -78,4 +79,28 @@ public class Booking {
 
     @Transient
     private CancellationRequested cancellationRequested;
+
+    @Transient
+    private VnPayTransactionInfo transactionInfo;
+
+    @Transient
+    private SubTour subTour;
+
+    @Transient
+    private List<Tourist> touristList;
+
+    public Booking touristList(List<Tourist> touristList){
+        this.touristList = touristList;
+        return this;
+    }
+
+    public Booking transactionInfo(VnPayTransactionInfo vnPayTransactionInfo){
+        this.transactionInfo = vnPayTransactionInfo;
+        return this;
+    }
+
+    public Booking subTour(SubTour subTour) {
+        this.subTour = subTour;
+        return this;
+    }
 }
