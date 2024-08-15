@@ -8,6 +8,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MailException extends RuntimeException {
+    public static final MailException STAFF_NOT_FOUND_EX = new MailException(ExceptionMessage.STAFF_NOT_FOUND);
+    public static final MailException STAFF_PERMISSION_HAS_BEEN_ALLOWED_EX = new MailException(ExceptionMessage.STAFF_PERMISSION_HAS_BEEN_ALLOWED);
+    public static final MailException STAFF_PERMISSION_HAS_BEEN_DENIED_EX = new MailException(ExceptionMessage.STAFF_PERMISSION_HAS_BEEN_DENIED);
+
     private String message;
 
     public MailException(String message) {
