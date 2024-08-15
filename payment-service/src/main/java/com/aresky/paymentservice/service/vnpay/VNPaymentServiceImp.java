@@ -1,6 +1,7 @@
 package com.aresky.paymentservice.service.vnpay;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Optional;
 
@@ -86,20 +87,42 @@ public class VNPaymentServiceImp implements IVNPayService {
         checkValidBooking(booking);
 
         ZonedDateTime current = DateUtils.now();
-        String payAt = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT).format(current);
+        DateTimeFormatter formatter = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
+
+        String payAt = formatter.format(current);
+
         KafkaMessageType.NotificationRequest notificationRequest = KafkaMessageType.NotificationRequest.builder()
                 .userId(booking.getAccountId())
                 .entityId(bookingId)
+                .keyword("tourId", booking.getTourId())
+                .keyword("subTourId", booking.getSubTourId())
                 .keyword("tourCode", booking.getTourCode())
                 .keyword("bookingCode", booking.getBookingCode())
+                .keyword("status", booking.getStatus())
                 .keyword("payAt", payAt);
 
 
         String vnp_ResponseCode = result.getResponseCode();
+        boolean isPayingBooking = booking.getStatus().equals("IS_PAYING");
+        boolean isNotPayBooking = booking.getStatus().equals("NOT_PAY");
 
         if ("00".equals(vnp_ResponseCode)) {
-            kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS, notificationRequest);
-            vnPayRepository.save(createVnPayTransactionInfo(result));
+            // Generate new VnPayTransactionInfo object from parameter
+            VnPayTransactionInfo transactionInfo = createVnPayTransactionInfo(result);
+            transactionInfo.setBookingCode(booking.getBookingCode());
+
+            // Save new VnPayTransactionInfo entity object to database
+            vnPayRepository.save(transactionInfo);
+
+            // Send message to kafka broker
+            if(isNotPayBooking){
+                kafkaSender.sendMessage(KafkaTopic.VNPAY_PAYMENT_SUCCESS, notificationRequest);
+            }
+
+            if(isPayingBooking){
+                kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS, notificationRequest);
+            }
+
             return EPaymentStatus.SUCCESS;
         }
 
@@ -107,10 +130,10 @@ public class VNPaymentServiceImp implements IVNPayService {
             if(booking.getStatus().equals("IS_PAYING")){
                 kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_CANCELLED, notificationRequest);
             }
-            return EPaymentStatus.CANCELED;
+            return EPaymentStatus.CANCELLED;
         }
 
-        if(booking.getStatus().equals("IS_PAYING")){
+        if(isPayingBooking){
             kafkaSender.sendMessage(KafkaTopic.BOOKING_WITH_VNPAY_FAILED, notificationRequest);
         }
         return EPaymentStatus.FAILED;
@@ -148,10 +171,16 @@ public class VNPaymentServiceImp implements IVNPayService {
     }
 
     @Override
+    public Boolean checkVnPayTransactionInfo(Integer bookingId) {
+        return vnPayRepository.existsByBookingId(bookingId);
+    }
+
+    @Override
     public boolean existsTransactionInfoBy(Integer bookingId) {
         return vnPayRepository.existsByBookingId(bookingId);
     }
 
+    @SuppressWarnings("unused")
     private void checkValidBooking(Booking booking){
         if(booking.getStatus().equals("PAY_UP")){
             throw new PaymentException(PaymentMessage.PAID_BOOKING);
@@ -162,6 +191,7 @@ public class VNPaymentServiceImp implements IVNPayService {
         }
     }
 
+    @SuppressWarnings("unused")
     private Booking getBookingByBookingId(int bookingId) {
         Booking booking = bookingGrpcService.getBookingById(bookingId);
 
@@ -172,6 +202,7 @@ public class VNPaymentServiceImp implements IVNPayService {
         return booking;
     }
 
+    @SuppressWarnings("unused")
     private Session openSession(BookingResponse booking) {
         Session session = sessionManager.openSession(booking.getBookingId());
 
@@ -186,6 +217,7 @@ public class VNPaymentServiceImp implements IVNPayService {
         return session;
     }
 
+    @SuppressWarnings("unused")
     private Session openSession(Booking booking) {
         Session session = sessionManager.openSession(booking.getId());
 
@@ -199,6 +231,7 @@ public class VNPaymentServiceImp implements IVNPayService {
         return session;
     }
 
+    @SuppressWarnings("unused")
     private static VnPayTransactionInfo createVnPayTransactionInfo(VnPayPaymentResult result) {
         String vnp_BankCode = result.getBank();
         String vnp_CardType = result.getCardType();

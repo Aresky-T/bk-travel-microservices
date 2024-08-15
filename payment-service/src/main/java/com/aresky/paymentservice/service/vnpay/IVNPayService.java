@@ -20,4 +20,6 @@ public interface IVNPayService {
     void closeSession(Integer bookingId);
 
     void deleteTransactionInfo(Integer bookingId);
+
+    Boolean checkVnPayTransactionInfo(Integer bookingId);
 }
