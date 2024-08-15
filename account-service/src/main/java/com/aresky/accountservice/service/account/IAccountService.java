@@ -11,6 +11,8 @@ import com.aresky.accountservice.model.ERole;
 
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 public interface IAccountService {
     Mono<Page<AccountResponse>> findAll(Pageable pageable);
 
@@ -30,7 +32,9 @@ public interface IAccountService {
 
     Mono<Boolean> delete(int id);
 
-    Mono<Boolean> updateRole(int id, ERole role);
+    Mono<Void> updateRole(int id, ERole role);
+
+    Mono<AccountResponse> update(Integer accountId, Map<String, Object> fields);
 
     Mono<Boolean> isExistsById(int id);
 

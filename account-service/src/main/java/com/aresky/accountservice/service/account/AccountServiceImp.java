@@ -4,6 +4,7 @@ import com.aresky.accountservice.exception.AccountException;
 import com.aresky.accountservice.exception.ExceptionNotification;
 import com.aresky.accountservice.model.Profile;
 import com.aresky.accountservice.repository.ProfileRepository;
+import com.aresky.accountservice.utils.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -22,6 +23,9 @@ import com.aresky.accountservice.model.ERole;
 import com.aresky.accountservice.repository.AccountRepository;
 
 import reactor.core.publisher.Mono;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 @Service
 public class AccountServiceImp implements IAccountService {
@@ -116,14 +120,47 @@ public class AccountServiceImp implements IAccountService {
     }
 
     @Override
-    public Mono<Boolean> updateRole(int id, ERole role) {
+    public Mono<Void> updateRole(int id, ERole role) {
         return accountRepository.findById(id)
+                .switchIfEmpty(Mono.error(AccountException.ACCOUNT_NOT_FOUND))
+                .filter(account -> {
+                    ERole currentRole = account.getRole();
+                    return !currentRole.equals(ERole.ADMIN) && !currentRole.equals(role);
+                })
+                .switchIfEmpty(Mono.error(AccountException.ACCOUNT_ROLE_CANNOT_BE_CHANGED))
                 .flatMap(account -> {
                     account.setRole(role);
                     return accountRepository.save(account)
-                            .thenReturn(true);
+                            .thenReturn(true)
+                            .then();
+                });
+    }
+
+    @Override
+    public Mono<AccountResponse> update(Integer accountId, Map<String, Object> fields) {
+        return accountRepository.findById(accountId)
+                .switchIfEmpty(Mono.error(AccountException.INVALID_ACCOUNT_ID))
+                .filter(account -> !account.getRole().equals(ERole.ADMIN))
+                .switchIfEmpty(Mono.error(AccountException.CANNOT_UPDATE_ADMIN_ACCOUNT))
+                .map(account -> {
+                    for(Map.Entry<String, Object> entry : fields.entrySet()){
+                        String key = entry.getKey();
+                        Object value = entry.getValue();
+
+                        if(key.equals("status")){
+                            key = "activationStatus";
+                        }
+
+                        Field field = FieldUtils.findField(account, key);
+                        FieldUtils.setFieldValue(account, field, value);
+                    }
+
+                    return account;
                 })
-                .switchIfEmpty(Mono.just(false));
+                .filter(account -> !account.getRole().equals(ERole.ADMIN))
+                .switchIfEmpty(Mono.error(AccountException.CANNOT_UPDATE_TO_ADMIN_ROLE))
+                .flatMap(accountRepository::save)
+                .map(AccountResponse::toDTO);
     }
 
     @Override
