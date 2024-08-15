@@ -26,4 +26,7 @@ public class Staff {
 
     @Column("avatar_url")
     private String avatarUrl;
+
+    @Column("permission")
+    private Boolean permission;
 }
