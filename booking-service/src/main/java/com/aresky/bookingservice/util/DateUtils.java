@@ -1,5 +1,6 @@
 package com.aresky.bookingservice.util;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -21,6 +22,13 @@ public class DateUtils {
         return DateTimeFormatter.ofLocalizedDateTime(style).withLocale(locale);
     }
 
+    public static SimpleDateFormat getSimpleDateFormat(){
+        return new SimpleDateFormat("yyyyMMddHHmmss");
+    }
+
+    public static SimpleDateFormat getSimpleDateFormat(String pattern){
+        return new SimpleDateFormat(pattern);
+    }
 
     public static ZonedDateTime now() {
         return ZonedDateTime.now(ZoneId.systemDefault());
