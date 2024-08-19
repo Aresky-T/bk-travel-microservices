@@ -4,13 +4,13 @@ spring:
   application:
     name: tour-service
   datasource:
-    url: jdbc:mysql://mysql-server:3306/bk_travel_tour
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bk_travel_tour}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
   liquibase:
-    url: jdbc:mysql://mysql-server:3306/bk_travel_tour
-    user: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bk_travel_tour}
+    user: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
     change-log: classpath:db/changelog/changelog-master.xml
   jpa:
     hibernate:
@@ -33,7 +33,7 @@ eureka:
     hostname: tour-service
   client:
     service-url:
-      defaultZone: http://discovery-server:8761/eureka
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:${SERVICE_REGISTRY_PORT:8761}/eureka
 # ---------------
 # gRPC config
 # ---------------
@@ -49,8 +49,7 @@ cloudinary:
 # Kafka config
 # ---------------
 kafka:
-  bootstrap-servers:
-    url: kafka-broker-01:19092
+  bootstrap-servers: ${KAFKA_BROKER_HOST:localhost}:${KAFKA_BROKER_PORT:9092}
   consumer:
     group-id: bk-travel-group
     auto-offset-reset: latest
