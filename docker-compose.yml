@@ -17,10 +17,8 @@ services:
   discovery-server:
     image: discovery-server-image:v1.0.0
     container_name: discovery-server
-    depends_on:
-      - mysql-server
     ports:
-      - 8761:8761
+      - "8761:8761"
     build:
       context: ./discovery-server
       dockerfile: Dockerfile
@@ -37,7 +35,7 @@ services:
       - mysql-server
       - discovery-server
     ports:
-      - 8080:8080
+      - "8080:8080"
     build:
       context: ./gateway-service
       dockerfile: Dockerfile
@@ -54,7 +52,7 @@ services:
       - mysql-server
       - discovery-server
     ports:
-      - 8081:8081
+      - "8081:8081"
     build:
       context: ./auth-service
       dockerfile: Dockerfile
@@ -71,7 +69,7 @@ services:
       - mysql-server
       - discovery-server
     ports:
-      - 8082:8082
+      - "8082:8082"
     build:
       context: ./account-service
       dockerfile: Dockerfile
@@ -89,6 +87,16 @@ services:
     build:
       context: ./tour-service
       dockerfile: Dockerfile
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_tour
+      DB_USER: root
+      DB_PASSWORD: root
+      KAFKA_BROKER_HOST: kafka-broker-01
+      KAFKA_BROKER_PORT: 19092
     ports:
       - "8083:8083"
     volumes:
@@ -106,7 +114,7 @@ services:
       context: ./booking-service
       dockerfile: Dockerfile
     ports:
-      - 8084:8084
+      - "8084:8084"
     networks:
       - bk-travel-ms-network
     volumes:
@@ -117,7 +125,7 @@ services:
     container_name: staff-service
     image: staff-service-image:v1.0.0
     ports:
-      - 8085:8085
+      - "8085:8085"
     depends_on:
       - mysql-server
     build:
@@ -135,7 +143,7 @@ services:
     depends_on:
       - mysql-server
     ports:
-      - 8090:8090
+      - "8090:8090"
     build:
       context: ./payment-service
       dockerfile: Dockerfile
@@ -151,7 +159,7 @@ services:
     depends_on:
       - mysql-server
     ports:
-      - 8086:8086
+      - "8086:8086"
     build:
       context: ./tourist-attraction-service
       dockerfile: Dockerfile
