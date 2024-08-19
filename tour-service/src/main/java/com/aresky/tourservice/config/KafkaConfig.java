@@ -19,7 +19,7 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
-    @Value("${kafka.bootstrap-servers.url}")
+    @Value("${kafka.bootstrap-servers}")
     private String bootstrapServer;
 
     @Value("${kafka.consumer.group-id}")
@@ -37,6 +37,7 @@ public class KafkaConfig {
         factory.setConsumerFactory(consumerFactory());
         factory.setConcurrency(3);
         factory.getContainerProperties().setPollTimeout(3000);
+        factory.setAutoStartup(false);
         return factory;
     }
 
