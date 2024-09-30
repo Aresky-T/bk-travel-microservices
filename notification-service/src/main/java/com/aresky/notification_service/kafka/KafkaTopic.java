@@ -1,5 +1,7 @@
 package com.aresky.notification_service.kafka;
 
+import java.util.Set;
+
 public class KafkaTopic {
     // For booking service topic
     public static final String BOOKING_SUCCESS = "BOOKING_SUCCESS";
@@ -23,4 +25,18 @@ public class KafkaTopic {
 
     // For auth service topic
     public static final String FIRST_TIME_LOGIN = "FIRST_TIME_LOGIN";
+    
+    public static Set<String> ALL = Set.of(
+            BOOKING_SUCCESS,
+            BOOKING_CANCEL_APPROVED,
+            BOOKING_CANCEL_PENDING,
+            BOOKING_WITH_VNPAY_SUCCESS,
+            VNPAY_PAYMENT_SUCCESS,
+            TOUR_CANCELLED,
+            TOUR_DAILY_REMINDER,
+            CUSTOMER_MAIL_RECEIVED,
+            MAIL_REPLIED,
+            MAIL_SENT,
+            FIRST_TIME_LOGIN
+    );
 }
