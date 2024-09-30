@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package service;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.v2.service";
+
+import "account/v2/dto/request/create-account-request.proto";
+import "account/v2/dto/request/create-profile-request.proto";
+import "account/v2/dto/response/create-account-response.proto";
+import "account/v2/dto/response/create-profile-response.proto";
+
+service AccountCreatingService {
+  rpc CreateAccount(request.CreateAccountRequest) returns (response.CreateAccountResponse){};
+  rpc CreateProfile(request.CreateProfileRequest) returns (response.CreateProfileResponse){};
+}
