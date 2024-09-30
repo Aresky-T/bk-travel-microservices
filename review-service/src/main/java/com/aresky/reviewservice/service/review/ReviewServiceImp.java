@@ -182,8 +182,10 @@ public class ReviewServiceImp implements IReviewService {
     }
 
     private Mono<Reviewer> createReviewerIfNotExists(Integer accountId) {
-        return accountService.getProfileById(accountId)
+        return accountService.checkExistsAccountById(accountId)
+                .filter(Boolean.TRUE::equals)
                 .switchIfEmpty(Mono.error(new ReviewException(MessageResponse.INVALID_ACCOUNT_ID)))
+                .flatMap(existsAccount -> accountService.getProfileById(accountId))
                 .flatMap(profile -> createReviewer(accountId, profile.getFullName(), profile.getAvatarUrl()));
     }
 

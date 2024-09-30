@@ -1,6 +1,6 @@
 package com.aresky.reviewservice.service.account;
 
-import grpc.account.dto.response.ProfileResponse;
+import grpc.account.v2.dto.response.ProfileResponse;
 import reactor.core.publisher.Mono;
 
 public interface IAccountService {
