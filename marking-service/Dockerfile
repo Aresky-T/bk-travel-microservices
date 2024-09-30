@@ -1,20 +1,15 @@
-# Filename: Dockerfile
-# Image base
-FROM openjdk:17-alpine
-# Set working directory and building environment
+# Stage 1: building
+FROM maven:3.6.3-openjdk-17 AS building
 WORKDIR /app
-COPY .mvn .mvn/
-COPY mvnw pom.xml ./
-# Install dependencies
-RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline
-# Copy all file after install dependencies to /app
-COPY . .
-# Setup TimeZone for container server
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
+# Stage 2: running
+FROM openjdk:17-alpine AS running
+WORKDIR /app
+COPY --from=building /app/target/*.jar app.jar
 ENV TZ=Asia/Ho_Chi_Minh
-# Specify Port for container
 EXPOSE 8091
-# Specify cmd for start application
-ENTRYPOINT ["./mvnw", "spring-boot:run"]
-# Author
-LABEL author="Aresky"
+ENTRYPOINT [ "java", "-jar", "app.jar" ]
+LABEL auth="Aresky"
