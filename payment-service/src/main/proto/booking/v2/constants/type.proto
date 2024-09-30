@@ -3,7 +3,7 @@ syntax = "proto3";
 package constants;
 
 option java_multiple_files = true;
-option java_package = "grpc.booking.constants";
+option java_package = "grpc.booking.v2.constants";
 
 enum PaymentMethod {
   VNPAY = 0;
