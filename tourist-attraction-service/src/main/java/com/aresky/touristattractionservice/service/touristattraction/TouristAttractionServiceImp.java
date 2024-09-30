@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.aresky.touristattractionservice.specification.TouristAttractionSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +44,16 @@ public class TouristAttractionServiceImp implements ITouristAttractionService {
     }
 
     @Override
+    public Page<TouristAttractionResponse> findAll(String search, Pageable pageable) {
+        return touristAttractionRepository
+                .findAll(TouristAttractionSpec.buildWhere(search), pageable)
+                .map(TouristAttractionResponse::toDto);
+    }
+
+    @Override
     public List<TouristAttractionResponse> findAll(SearchRequest searchRequest) {
         Integer limit = searchRequest.getSize();
-        Integer offset = (0 + searchRequest.getPage()) * limit;
+        Integer offset = searchRequest.getPage() * limit;
         String search = searchRequest.getSearch();
 
         if (search == null || search.trim().isEmpty()) {
