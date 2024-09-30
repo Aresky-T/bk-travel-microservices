@@ -16,6 +16,7 @@ import com.aresky.notification_service.repository.INotificationTypeRepository;
 import com.aresky.notification_service.service.account.IAccountGrpcClientService;
 import com.aresky.notification_service.utils.DateUtils;
 import io.r2dbc.spi.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class NotificationServiceImp implements INotificationService {
     @Autowired
@@ -97,6 +99,11 @@ public class NotificationServiceImp implements INotificationService {
     }
 
     @Override
+    public Flux<NotificationType> getAllNotificationTypes() {
+        return typeRepository.findAll();
+    }
+
+    @Override
     public Mono<NotificationTypeResponse> getNotificationTypeResponse(Integer typeId) {
         return typeRepository.findById(typeId)
                 .switchIfEmpty(Mono.error(NotificationException.INVALID_TYPE_ID))
@@ -133,7 +140,12 @@ public class NotificationServiceImp implements INotificationService {
 
     @Override
     public Mono<Void> createNotification(NotificationRequest request) {
-        return typeRepository.findByName(request.getTypeName())
+        log.info("Creating notification from request: {}", request.toString());
+        return accountGrpcClientService.checkExistsAccountById(request.getUserId())
+                .onErrorResume(err -> Mono.just(Boolean.FALSE))
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(NotificationException.INVALID_USER_ID))
+                .then(typeRepository.findByName(request.getTypeName()))
                 .switchIfEmpty(Mono.error(NotificationException.INVALID_TYPE_NAME))
                 .flatMap(type -> findAllKeywords(type).map(type::keywords).thenReturn(type))
                 .flatMap(type -> {
@@ -149,6 +161,7 @@ public class NotificationServiceImp implements INotificationService {
                     String message = buildMessage(type, request.getKeywords());
                     notification.setMessage(message);
 
+                    System.out.println("New notification built: "+ notification);
                     return notificationRepository.save(notification).then();
                 });
     }
