@@ -5,9 +5,9 @@ spring:
     name: mail-service
   liquibase:
     change-log: classpath:db/changelog/changelog-master.xml
-    url: jdbc:mysql://mysql-server:3306/bk_travel_mail
-    user: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/bk_travel_mail
+    user: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
   mail:
     host: smtp.gmail.com
     port: 587
@@ -25,14 +25,14 @@ spring:
 eureka:
   instance:
     appname: mail-service
-    hostname: mail-service
+    # hostname: mail-service
   client:
     service-url:
-      defaultZone: http://discovery-server:8761/eureka
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:${SERVICE_REGISTRY_PORT:8761}/eureka
 bk-travel:
   database:
     config:
       server:
-        url: r2dbc:mysql://mysql-server:3306/bk_travel_mail
-        username: root
-        password: root
+        url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/bk_travel_mail
+        username: ${DB_USER:root}
+        password: ${DB_PASSWORD:root}
