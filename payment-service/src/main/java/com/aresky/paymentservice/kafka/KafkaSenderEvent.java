@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 public class KafkaSenderEvent {
 
     @Autowired
-    private KafkaTemplate<String, Object> template;
+    private KafkaTemplate<String, String> template;
 
     public final String KEY = "payment-service-key";
     private final Gson gson = new Gson();
@@ -20,7 +20,7 @@ public class KafkaSenderEvent {
     public void sendMessage(String topic, Object value){
         try {
             String message = gson.toJson(value);
-            CompletableFuture<SendResult<String, Object>> future = template.send(topic, KEY, message);
+            CompletableFuture<SendResult<String, String>> future = template.send(topic, KEY, message);
             future.whenComplete((result, ex) -> {
                 if (ex != null) {
                     System.err.println("Error sending message: " + ex.getMessage());
