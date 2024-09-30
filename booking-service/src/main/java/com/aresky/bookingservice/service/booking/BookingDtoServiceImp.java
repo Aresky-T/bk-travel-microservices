@@ -377,7 +377,8 @@ public class BookingDtoServiceImp implements IBookingDtoService {
                 .keyword("status", booking.getStatus().name())
                 .keyword("tourCode", booking.getTourCode())
                 .keyword("bookingCode", booking.getBookingCode())
-                .keyword("bookedTime", formatter.format(booking.getBookedTime()));
+                .keyword("bookedTime", formatter.format(booking.getBookedTime()))
+                .keyword("totalTourists", booking.getAdultNumber() + booking.getChildrenNumber() + booking.getBabyNumber());
 
         kafkaSenderEvent.sendMessage(topic, "booking-service-key", GSON.toJson(request))
                 .subscribeOn(Schedulers.boundedElastic())

@@ -18,12 +18,15 @@ import java.util.concurrent.TimeUnit;;
 
 @Service
 public class TourGrpcService implements ITourService {
+    public static final String HOST = "tour-service";
+    public static final int PORT = 50083;
+
     private ManagedChannel channel;
     private TourServiceBlockingStub stub;
 
     @PostConstruct
     public void init() {
-        channel = ManagedChannelBuilder.forAddress("tour-service", 50083).usePlaintext().build();
+        channel = ManagedChannelBuilder.forAddress(HOST, PORT).usePlaintext().build();
     }
 
     @PreDestroy
