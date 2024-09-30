@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package tour;
+
+option java_multiple_files = true;
+option java_package = "grpc.tour.check";
+
+import "tour/dto/request/check-tour-by-id-request.proto";
+import "tour/dto/request/check-subtour-by-id-request.proto";
+import "tour/dto/response/check-tour-by-id-response.proto";
+import "tour/dto/response/check-subtour-by-id-response.proto";
+
+service TourCheckService {
+  rpc CheckTourById(request.CheckTourByIdRequest) returns (response.CheckTourByIdResponse){};
+  rpc CheckSubTourById(request.CheckSubTourByIdRequest) returns (response.CheckSubTourByIdResponse){};
+}
