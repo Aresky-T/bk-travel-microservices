@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package response;
+
+import "staff/dto/response/staff_response.proto";
+
+option java_multiple_files = true;
+option java_package = "grpc.staff.dto.response";
+
+message CheckStaffByEmailResponse {
+  bool is_exists = 1;
+  response.StaffResponse staff = 2;
+}

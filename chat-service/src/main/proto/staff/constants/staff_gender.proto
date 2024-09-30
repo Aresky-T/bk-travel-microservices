@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package constants;
+
+option java_multiple_files = true;
+option java_package = "grpc.staff.constants.type";
+
+enum StaffGender {
+  MALE = 0;
+  FEMALE = 1;
+  OTHER = 2;
+}
