@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Configuration
 public class ReactorKafkaConfig {
-    @Value("${kafka.bootstrap-servers.url}")
+    @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     // Producer properties
@@ -26,6 +26,9 @@ public class ReactorKafkaConfig {
     // Consumer properties
     @Value("${kafka.consumer.group-id}")
     private String groupID;
+
+    @Value("${kafka.consumer.client-id}")
+    private String clientID;
 
     @Value("${kafka.consumer.auto-offset-reset}")
     private String autoOffsetReset;
@@ -54,10 +57,11 @@ public class ReactorKafkaConfig {
         Map<String, Object> consumerProps = new HashMap<>();
         consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupID);
+        consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, clientID);
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializerClass);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializerClass);
 
-        return ReceiverOptions.create(consumerProps);
+        return ReceiverOptions.<String, String>create(consumerProps);
     }
 }
