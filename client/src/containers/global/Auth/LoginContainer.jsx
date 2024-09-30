@@ -46,45 +46,42 @@ const LoginContainer = () => {
         const account = res.data;
         const { id, token, email, username, role, type, status } = res.data;
 
-        switch (account.role) {
-          case ROLE.USER:
-            setTimeout(() => {
-              toast.dismiss(loading);
-              if (status === "BLOCKED") {
-                warningAlert("Cảnh báo", "Tài khoản của bạn đã bị khoá!");
-              } else {
-                toast.success("Xác thực thành công!", { duration: 1000 });
-                dispatch(
-                  saveAccountInfo({
-                    id,
-                    token,
-                    email,
-                    username,
-                    role,
-                    type,
-                    status,
-                  })
-                );
+        if (!account.role || account.role !== ROLE.USER) {
+          setTimeout(() => {
+            toast.dismiss(loading);
+            warningAlert(
+              "Cảnh báo",
+              "Tài khoản của bạn bị giới hạn quyền đăng nhập do vai trò không hợp lệ!",
+              {
+                cancelButtonText: "Đăng nhập lại",
+                confirmButtonText: "Trang Chủ",
               }
-            }, 1000);
-            break;
-          case ROLE.ADMIN:
-            setTimeout(() => {
-              toast.dismiss(loading);
-              warningAlert(
-                "Cảnh báo",
-                "Bạn không thể đăng nhập bằng tài khoản admin!",
-                {
-                  cancelButtonText: "Đăng nhập lại",
-                  confirmButtonText: "Trang Chủ",
-                }
-              ).then((result) => {
-                result.isConfirmed && navigate(ROUTE.HOME);
-              });
-            }, 1000);
-            break;
-          default:
+            ).then((result) => {
+              result.isConfirmed && navigate(ROUTE.HOME);
+            });
+          }, 1000);
+          return;
         }
+
+        setTimeout(() => {
+          toast.dismiss(loading);
+          if (status === "BLOCKED") {
+            warningAlert("Cảnh báo", "Tài khoản của bạn đã bị khoá!");
+          } else {
+            toast.success("Xác thực thành công!", { duration: 1000 });
+            dispatch(
+              saveAccountInfo({
+                id,
+                token,
+                email,
+                username,
+                role,
+                type,
+                status,
+              })
+            );
+          }
+        }, 1000);
       })
       .catch((err) => {
         const message = err?.response?.data?.message;

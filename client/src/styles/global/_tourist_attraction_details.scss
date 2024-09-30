@@ -47,6 +47,10 @@
     gap: 50px;
     color: var(--font-color);
 
+    @media screen and (max-width: 450px) {
+      padding-inline: 10px;
+    }
+
     .tourist-attraction-details-content_item {
       max-width: 700px;
     }
@@ -60,7 +64,7 @@
       &.blogs {
         display: flex;
         flex-direction: column;
-        gap: 40px;
+        gap: 60px;
 
         .blog-card {
           display: flex;
@@ -68,11 +72,19 @@
           width: 100%;
           height: fit-content;
 
+          @media screen and (max-width: 650px) {
+            flex-direction: column;
+          }
+
           .blog-card-image {
             width: 300px;
             min-height: 100%;
             min-width: 300px;
             overflow: hidden;
+
+            @media screen and (max-width: 650px) {
+              width: 100%;
+            }
 
             img {
               width: 100%;
@@ -88,6 +100,10 @@
             justify-content: center;
             gap: 20px;
 
+            @media screen and (max-width: 650px) {
+              align-items: center;
+            }
+
             .blog-card-info_item {
               &.title {
                 font-size: 1.3rem;
@@ -102,6 +118,8 @@
               }
 
               &.action {
+                width: fit-content;
+
                 button {
                   outline: none;
                   border: 1px solid var(--secondary-color);

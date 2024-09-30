@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import React from "react";
 import { animateScroll } from "react-scroll";
-import { useLocation } from "react-router-dom";
 
 export const handleScrollToTop = () => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -12,12 +11,6 @@ export const handleScrollToTop = () => {
 }
 
 const PublicRoute = (props) => {
-    const location = useLocation();
-
-    useEffect(() => {
-        handleScrollToTop()
-    }, [location.pathname])
-
     return (
         <>
             {props.children}

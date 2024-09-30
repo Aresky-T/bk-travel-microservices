@@ -142,6 +142,7 @@ const BlogFormContainer = ({ isShowForm, onHiddenForm }) => {
       imageUrl: "",
       content: "",
       isValid: false,
+      isExists: false,
     };
 
     setBlogItems([...blogItems, newBlogItem]);
@@ -158,7 +159,15 @@ const BlogFormContainer = ({ isShowForm, onHiddenForm }) => {
   };
 
   const handleRemoveBlogItem = (selectedItem) => {
-    const newItems = blogItems.filter((item) => item.id !== selectedItem.id);
+    // const newItems = blogItems.filter((item) => item.id !== selectedItem.id);
+    const newItems = blogItems.map((item) => {
+      if (item.id === selectedItem.id) {
+        return { ...item, isDelete: true };
+      }
+
+      return item;
+    });
+
     setBlogItems(newItems);
   };
 
@@ -185,11 +194,22 @@ const BlogFormContainer = ({ isShowForm, onHiddenForm }) => {
           }
         );
       } else {
+        const items = blogItems.map((item) => {
+          const { id, subTitle, imageUrl, content, isExists, isDelete } = item;
+
+          if (!isExists) {
+            return { subTitle, imageUrl, content };
+          }
+
+          return { id, subTitle, imageUrl, content, isDelete };
+        });
+
         const formData = {
           title: blogForm.title.value,
           imageUrl: blogForm.imageUrl.value,
           intro: blogForm.intro.value,
           author: blogForm.author,
+          items: items,
         };
 
         const response = await updateTouristAttractionBlogApi(
@@ -302,7 +322,11 @@ const BlogFormContainer = ({ isShowForm, onHiddenForm }) => {
           newBlogForm.title.value = title;
 
           // update blogForm items;
-          const reduceItems = items.map((item) => ({ ...item, isValid: true }));
+          const reduceItems = items.map((item) => ({
+            ...item,
+            isValid: true,
+            isExists: true,
+          }));
 
           // update blogForm state
           setBlogForm({ ...newBlogForm });

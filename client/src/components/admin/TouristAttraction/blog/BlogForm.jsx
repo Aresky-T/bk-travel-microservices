@@ -21,25 +21,27 @@ const BlogForm = ({
   const isExistCurrentBlog = formData.id;
 
   const blogItemsRender = useMemo(() => {
-    return blogItems.map((blogItem, index) => (
-      <Box
-        borderBottom={"2px dashed var(--primary-color)"}
-        padding={"15px 0"}
-        key={index}
-      >
-        <Box display={"flex"} alignItems={"center"} gap={"10px"}>
-          <TiFlowChildren size={"1.3rem"} color="var(--primary-color)" />
-          <span>
-            <strong>Mục {index + 1}</strong>
-          </span>
+    return blogItems
+      .filter((item) => !item.isDelete)
+      .map((item, index) => (
+        <Box
+          borderBottom={"2px dashed var(--primary-color)"}
+          padding={"15px 0"}
+          key={index}
+        >
+          <Box display={"flex"} alignItems={"center"} gap={"10px"}>
+            <TiFlowChildren size={"1.3rem"} color="var(--primary-color)" />
+            <span>
+              <strong>Mục {index + 1}</strong>
+            </span>
+          </Box>
+          <BlogItemForm
+            onRemoveItem={onRemoveItem}
+            blogItem={item}
+            onSubmitUpdate={onUpdateItem}
+          />
         </Box>
-        <BlogItemForm
-          onRemoveItem={onRemoveItem}
-          blogItem={blogItem}
-          onSubmitUpdate={onUpdateItem}
-        />
-      </Box>
-    ));
+      ));
 
     //eslint-disable-next-line
   }, [blogItems]);

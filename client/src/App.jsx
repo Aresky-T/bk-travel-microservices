@@ -33,16 +33,7 @@ function App() {
         // const message =
         //   e?.response?.data?.message ||
         //   "Không thể xác thực thông tin người dùng!";
-        // warningAlert("Cảnh báo", message);
-        // warningAlertNoCancel("Cảnh báo", message)
-        //   .then((result) => {
-        //     if (result.isConfirmed) {
-        //       navigate(ROUTE.LOGIN);
-        //       dispatch(logout());
-        //     }
-        //   })
-        //   .catch((err) => {});
-        //handle catch error here
+        // toast.error(message, { position: "bottom-center" });
       }
     }
     // eslint-disable-next-line

@@ -1,17 +1,22 @@
 import axios from "axios";
+import { BASE_ENDPOINTS } from "..";
 
-const tourAttURL = "http://localhost:8080/api/v1/tourist-attraction"
+const tourAttURL = BASE_ENDPOINTS.TOURIST_ATTRACTION;
 
 export const getAllTouristAttractionsApi = (fields) => {
-    return axios.get(`${tourAttURL}`, {
+    return axios.get(tourAttURL, {
         params: fields
     });
 }
 
-export const getDataBySearchApi = (fields) => {
-    return axios.get(`${tourAttURL}/search`, {
-        params: fields
-    })
+export const getAllTouristAttractionsWithSearchApi = (search, page, size) => {
+    const params = new URLSearchParams();
+    params.set("page", page || 0);
+    params.set("size", size || 5);
+
+    if (search && search.trim() !== "") params.set("search", search);
+
+    return axios.get(`${tourAttURL}?${params.toString()}`)
 }
 
 export const getTouristAttractionDetailsApi = (id) => {

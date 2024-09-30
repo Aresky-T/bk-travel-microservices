@@ -8,7 +8,7 @@ const AppRouter = () => {
         }
 
         if (route.isPrivate) {
-            // return account.role && route.role.includes(account.role);
+            // return auth.role && route.roles.includes(auth.role);
             return true;
         }
 
