@@ -5,6 +5,8 @@ import com.aresky.notification_service.dto.request.TypeRequest;
 import com.aresky.notification_service.dto.response.NotificationResponse;
 import com.aresky.notification_service.dto.response.NotificationTypeResponse;
 import com.aresky.notification_service.dto.response.UserNotification;
+import com.aresky.notification_service.entity.NotificationType;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -13,6 +15,7 @@ public interface INotificationService {
     Mono<Long> getNewNotificationCount(Integer userId);
     Mono<List<NotificationResponse>> getAllNotifications(Integer accountId,  Integer limit, Integer offset);
     Mono<UserNotification> getUserNotificationDto(Integer accountId, Integer page, Integer size);
+    Flux<NotificationType> getAllNotificationTypes();
     Mono<NotificationTypeResponse> getNotificationTypeResponse(Integer typeId);
     Mono<NotificationTypeResponse> getNotificationTypeResponse(String typeName);
     Mono<List<NotificationTypeResponse>> getAllNotificationTypesByEntityType(String entityType);
