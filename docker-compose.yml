@@ -15,73 +15,75 @@ services:
     networks:
       - bk-travel-ms-network
   discovery-server:
-    image: discovery-server-image:v1.0.0
+    image: discovery-server-image:v1.0.1
     container_name: discovery-server
     ports:
       - "8761:8761"
     build:
       context: ./discovery-server
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./discovery-server
-        target: /app
     networks:
       - bk-travel-ms-network
   gateway-service:
-    image: gateway-service-image:v1.0.0
+    image: gateway-service-image:v1.0.1
     container_name: gateway-service
-    depends_on:
-      - mysql-server
-      - discovery-server
     ports:
       - "8080:8080"
     build:
       context: ./gateway-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./gateway-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
     networks:
       - bk-travel-ms-network
   auth-service:
-    image: auth-service-image:v1.0.0
+    image: auth-service-image:v1.0.1
     container_name: auth-service
     depends_on:
       - mysql-server
-      - discovery-server
     ports:
       - "8081:8081"
     build:
       context: ./auth-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./auth-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_auth
+      DB_USER: root
+      DB_PASSWORD: root
+      KAFKA_BROKER_HOST: kafka-broker-01
+      KAFKA_BROKER_PORT: 19092
     networks:
       - bk-travel-ms-network
   account-service:
-    image: account-service-image:v1.0.0
+    image: account-service-image:v1.0.1
     container_name: account-service
     depends_on:
       - mysql-server
-      - discovery-server
     ports:
       - "8082:8082"
     build:
       context: ./account-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./account-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_account
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   tour-service:
-    image: tour-service-image:v1.0.0
+    image: tour-service-image:v1.0.1
     container_name: tour-service
+    ports:
+      - "8083:8083"
     depends_on:
       - mysql-server
     build:
@@ -97,33 +99,33 @@ services:
       DB_PASSWORD: root
       KAFKA_BROKER_HOST: kafka-broker-01
       KAFKA_BROKER_PORT: 19092
-    ports:
-      - "8083:8083"
-    volumes:
-      - type: bind
-        source: ./tour-service
-        target: /app
     networks:
       - bk-travel-ms-network
   booking-service:
-    image: booking-service-image:v1.0.0
+    image: booking-service-image:v1.0.1
     container_name: booking-service
+    ports:
+      - "8084:8084"
     depends_on:
       - mysql-server
     build:
       context: ./booking-service
       dockerfile: Dockerfile
-    ports:
-      - "8084:8084"
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_booking
+      DB_USER: root
+      DB_PASSWORD: root
+      KAFKA_BROKER_HOST: kafka-broker-01
+      KAFKA_BROKER_PORT: 19092
     networks:
       - bk-travel-ms-network
-    volumes:
-      - type: bind
-        source: ./booking-service
-        target: /app
   staff-service:
+    image: staff-service-image:v1.0.1
     container_name: staff-service
-    image: staff-service-image:v1.0.0
     ports:
       - "8085:8085"
     depends_on:
@@ -131,14 +133,18 @@ services:
     build:
       context: ./staff-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./staff-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_staff
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   payment-service:
-    image: payment-service-image:v1.0.0
+    image: payment-service-image:v1.0.1
     container_name: payment-service
     depends_on:
       - mysql-server
@@ -147,14 +153,20 @@ services:
     build:
       context: ./payment-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./payment-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_payment
+      DB_USER: root
+      DB_PASSWORD: root
+      KAFKA_BROKER_HOST: kafka-broker-01
+      KAFKA_BROKER_PORT: 19092
     networks:
       - bk-travel-ms-network
   tourist-attraction-service:
-    image: tourist-attraction-service-image:v1.0.0
+    image: tourist-attraction-service-image:v1.0.1
     container_name: tourist-attraction-service
     depends_on:
       - mysql-server
@@ -163,15 +175,19 @@ services:
     build:
       context: ./tourist-attraction-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./tourist-attraction-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_tourist_attraction
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   chat-service:
     container_name: chat-service
-    image: chat-service-image:v1.0.0
+    image: chat-service-image:v1.0.1
     ports:
       - "8087:8087"
     depends_on:
@@ -179,15 +195,19 @@ services:
     build:
       context: ./chat-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./chat-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_chat
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   mail-service:
     container_name: mail-service
-    image: mail-service-image:v1.0.0
+    image: mail-service-image:v1.0.1
     ports:
       - "8088:8088"
     depends_on:
@@ -195,15 +215,19 @@ services:
     build:
       context: ./mail-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./mail-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_mail
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   review-service:
+    image: review-service-image:v1.0.1
     container_name: review-service
-    image: review-service-image:v1.0.0
     ports:
       - "8089:8089"
     depends_on:
@@ -211,15 +235,19 @@ services:
     build:
       context: ./review-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./review-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_review
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   marking-service:
+    image: marking-service-image:v1.0.1
     container_name: marking-service
-    image: marking-service-image:v1.0.0
     ports:
       - "8091:8091"
     depends_on:
@@ -227,15 +255,19 @@ services:
     build:
       context: ./marking-service
       dockerfile: Dockerfile
-    volumes:
-      - type: bind
-        source: ./marking-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_marking
+      DB_USER: root
+      DB_PASSWORD: root
     networks:
       - bk-travel-ms-network
   notification-service:
+    image: notification-service-image:v1.0.1
     container_name: notification-service
-    image: notification-service-image:v1.0.0
     ports:
       - "8100:8100"
     depends_on:
@@ -243,10 +275,16 @@ services:
     build:
       dockerfile: Dockerfile
       context: ./notification-service
-    volumes:
-      - type: bind
-        source: ./notification-service
-        target: /app
+    environment:
+      SERVICE_REGISTRY_HOST: discovery-server
+      SERVICE_REGISTRY_PORT: 8761
+      DB_HOST: mysql-server
+      DB_PORT: 3306
+      DB_NAME: bk_travel_notification
+      DB_USER: root
+      DB_PASSWORD: root
+      KAFKA_BROKER_HOST: kafka-broker-01
+      KAFKA_BROKER_PORT: 19092
     networks:
       - bk-travel-ms-network
 volumes:
