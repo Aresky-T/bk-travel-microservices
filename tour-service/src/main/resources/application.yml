@@ -30,7 +30,7 @@ spring:
 eureka:
   instance:
     appname: tour-service
-    hostname: tour-service
+#    hostname: ${SERVICE_INSTANCE_HOST:localhost}
   client:
     service-url:
       defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:${SERVICE_REGISTRY_PORT:8761}/eureka
@@ -51,5 +51,5 @@ cloudinary:
 kafka:
   bootstrap-servers: ${KAFKA_BROKER_HOST:localhost}:${KAFKA_BROKER_PORT:9092}
   consumer:
-    group-id: bk-travel-group
+    group-id: tour-service-group
     auto-offset-reset: latest
