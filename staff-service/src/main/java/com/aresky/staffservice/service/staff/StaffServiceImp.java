@@ -17,7 +17,7 @@ import com.aresky.staffservice.service.account.IAccountService;
 import com.aresky.staffservice.utils.FieldUtils;
 import com.google.common.base.Objects;
 
-import grpc.account.dto.response.AccountResponse;
+import grpc.account.v2.dto.response.AccountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -180,15 +180,8 @@ public class StaffServiceImp implements IStaffService {
                         return Mono.just("Đã có tài khoản trong hệ thống!");
                     }
 
-                    return accountService.checkAccountByEmail(email)
-                            .flatMap(account -> {
-                                staff.setAccountId(account.getId());
-                                return staffRepository.save(staff)
-                                        .then()
-                                        .thenReturn("Đã có tài khoản trong hệ thống!");
-                            });
-                })
-                .switchIfEmpty(Mono.just("Chưa có tài khoản trong hệ thống!"));
+                    return Mono.just("Chưa có tài khoản trong hệ thống!");
+                });
 
     }
 
@@ -239,6 +232,8 @@ public class StaffServiceImp implements IStaffService {
     public Mono<Void> bindAccountToStaff(String email) {
         return staffRepository.findByEmail(email)
                 .switchIfEmpty(Mono.error(StaffException.STAFF_DOES_NOT_EXIST_EX))
+                .filter(staff -> staff.getAccountId() == null)
+                .switchIfEmpty(Mono.error(StaffException.STAFF_HAS_BEEN_BOUND_TO_ACCOUNT_EX))
                 .flatMap(staff -> accountService.checkAccountByEmail(staff.getEmail())
                         .switchIfEmpty(Mono.error(StaffException.ACCOUNT_NOT_FOUND_EX))
                         .filter(account -> account.getRole().equals("STAFF"))
