@@ -23,6 +23,7 @@ public class BlogUpdateForm {
         private String subTitle;
         private String imageUrl;
         private String content;
+        private Boolean isDelete;
 
         public static BlogItem toBlogItem(ItemDTO dto) {
             return new BlogItem(dto.id, dto.subTitle, dto.imageUrl, dto.content);
