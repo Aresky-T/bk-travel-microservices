@@ -1,11 +1,11 @@
 package com.aresky.staffservice.service.account;
 
 import com.aresky.staffservice.exception.StaffException;
-import grpc.account.check.ReactorAccountServiceCheckGrpc;
-import grpc.account.dto.request.CheckAccountByEmailRequest;
-import grpc.account.dto.response.AccountResponse;
-import grpc.account.dto.response.CheckAccountByEmailResponse;
-import grpc.account.fields.AccountEmailField;
+import grpc.account.v2.dto.request.GetAccountByEmailRequest;
+import grpc.account.v2.dto.response.AccountResponse;
+import grpc.account.v2.dto.response.GetAccountByEmailResponse;
+import grpc.account.v2.service.ReactorAccountCheckingServiceGrpc;
+import grpc.account.v2.service.ReactorAccountGettingServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -37,21 +37,16 @@ public class AccountServiceImp implements IAccountService {
 
     @Override
     public Mono<AccountResponse> checkAccountByEmail(String email) {
-        AccountEmailField accountEmailField = AccountEmailField
+        GetAccountByEmailRequest request = GetAccountByEmailRequest
                 .newBuilder()
                 .setEmail(email)
                 .build();
 
-        CheckAccountByEmailRequest request = CheckAccountByEmailRequest
-                .newBuilder()
-                .setAccountEmail(accountEmailField)
-                .build();
-
-        return initStub()
-                .checkAccountByEmail(request)
-                .filter(CheckAccountByEmailResponse::getIsExists)
+        return initGettingStub()
+                .getAccountByEmail(request)
+                .filter(GetAccountByEmailResponse::hasAccount)
                 .switchIfEmpty(Mono.empty())
-                .map(CheckAccountByEmailResponse::getAccount)
+                .map(GetAccountByEmailResponse::getAccount)
                 .onErrorResume(err -> {
                     if(err instanceof UnknownHostException || err instanceof StatusRuntimeException){
                         return Mono.error(new StaffException("Unable to connect to account-service!"));
@@ -61,8 +56,14 @@ public class AccountServiceImp implements IAccountService {
                 });
     }
 
-    private ReactorAccountServiceCheckGrpc.ReactorAccountServiceCheckStub initStub(){
-        return ReactorAccountServiceCheckGrpc
+    private ReactorAccountCheckingServiceGrpc.ReactorAccountCheckingServiceStub initCheckingStub(){
+        return ReactorAccountCheckingServiceGrpc
+                .newReactorStub(this.channel)
+                .withDeadlineAfter(3000, TimeUnit.MILLISECONDS);
+    }
+
+    private ReactorAccountGettingServiceGrpc.ReactorAccountGettingServiceStub initGettingStub(){
+        return ReactorAccountGettingServiceGrpc
                 .newReactorStub(this.channel)
                 .withDeadlineAfter(3000, TimeUnit.MILLISECONDS);
     }
