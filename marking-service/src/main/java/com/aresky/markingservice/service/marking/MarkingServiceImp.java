@@ -67,13 +67,11 @@ public class MarkingServiceImp implements IMarkingService {
     @Override
     public Mono<Void> unmarkTour(Integer accountId, Integer subTourId) {
         return Mono.zip(checkAccountBy(accountId), checkSubTourBy(subTourId))
-                .flatMap(tuple -> {
-                    return isMarkedTourBy(accountId, subTourId)
+                .flatMap(tuple -> isMarkedTourBy(accountId, subTourId)
                             .filter(Boolean.TRUE::equals)
                             .switchIfEmpty(Mono.error(new MarkingException(MessageResponse.NOT_MARKED_THIS_TOUR)))
                             .then(markedTourRepository.deleteByAccountIdAndSubTourId(accountId, subTourId))
-                            .then();
-                });
+                            .then());
     }
 
     @Override
