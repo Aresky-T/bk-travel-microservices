@@ -23,6 +23,7 @@ public class StaffException extends RuntimeException {
     public static final String ACCOUNT_NOT_FOUND = "Tài khoản không tồn tại!";
     public static final String ACCOUNT_ROLE_MUST_BE_STAFF = "Tài khoản phải có vai trò nhân viên!";
     public static final String STAFF_HAS_NOT_BOUND_TO_ACCOUNT = "Nhân viên này chưa kết với tài khoản!";
+    public static final String STAFF_HAS_BEEN_BOUND_TO_ACCOUNT = "Nhân viên này đã kết với tài khoản!";
 
     public static final StaffException INVALID_STAFF_ID_EX = new StaffException(INVALID_STAFF_ID);
     public static final StaffException ACCOUNT_NOT_FOUND_EX = new StaffException(ACCOUNT_NOT_FOUND);
@@ -30,6 +31,7 @@ public class StaffException extends RuntimeException {
     public static final StaffException INVALID_STAFF_EMAIL_EX = new StaffException(INVALID_STAFF_EMAIL);
     public static final StaffException STAFF_HAS_NOT_BOUND_TO_ACCOUNT_EX = new StaffException(STAFF_HAS_NOT_BOUND_TO_ACCOUNT);
     public static final StaffException STAFF_DOES_NOT_EXIST_EX = new StaffException(STAFF_DOES_NOT_EXIST);
+    public static final StaffException STAFF_HAS_BEEN_BOUND_TO_ACCOUNT_EX = new StaffException(STAFF_HAS_BEEN_BOUND_TO_ACCOUNT);
 
     public StaffException(String message) {
         super(message);
