@@ -1,6 +1,7 @@
 package com.aresky.touristattractionservice.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.List;
 
 @Repository
-public interface ITouristAttractionRepository extends JpaRepository<TouristAttraction, Integer> {
+public interface ITouristAttractionRepository extends JpaRepository<TouristAttraction, Integer>, JpaSpecificationExecutor<TouristAttraction> {
     Optional<TouristAttraction> findByName(String name);
 
     List<TouristAttraction> findAllByNameLike(String name);
