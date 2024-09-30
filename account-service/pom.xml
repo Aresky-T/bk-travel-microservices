@@ -195,7 +195,8 @@
 				<configuration>
 					<protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
 					<pluginId>grpc-java</pluginId>
-					<pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+					<pluginArtifact>
+						io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
 					<protoSourceRoot>
 						${basedir}/src/main/proto
 					</protoSourceRoot>
@@ -209,7 +210,7 @@
 							<goal>compile</goal>
 							<goal>compile-custom</goal>
 						</goals>
-						<phase>generate-sources</phase>
+						<!-- <phase>generate-sources</phase> -->
 						<configuration>
 							<protocPlugins>
 								<protocPlugin>
