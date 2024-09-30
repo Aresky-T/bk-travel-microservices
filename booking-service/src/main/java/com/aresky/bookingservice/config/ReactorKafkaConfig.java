@@ -7,6 +7,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
@@ -21,11 +22,14 @@ public class ReactorKafkaConfig {
     private final Class<StringDeserializer> keyDeserializerClass = StringDeserializer.class;
     private final Class<StringDeserializer> valueDeserializerClass = StringDeserializer.class;
 
-    @Value("${kafka.bootstrap-servers.url}")
+    @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Value("${kafka.consumer.group-id}")
     private String groupId;
+
+    @Value("${kafka.consumer.client-id}")
+    private String consumerClientId;
 
     @Value("${kafka.consumer.auto-offset-reset}")
     private String autoOffsetReset;
@@ -51,6 +55,7 @@ public class ReactorKafkaConfig {
         Map<String, Object> consumerProperties = new HashMap<>();
         consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        consumerProperties.put(ConsumerConfig.CLIENT_ID_CONFIG, consumerClientId);
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, keyDeserializerClass);
         consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, valueDeserializerClass);
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
