@@ -74,7 +74,7 @@ const SearchContainer = ({
             name="search"
             value={search}
             onChange={handleChange}
-            placeholder="Tìm kiếm tên địa danh..."
+            placeholder="Nhập vào tên địa danh..."
           />
           <span className="search-icon" onClick={handleSubmit}>
             <FiSearch />

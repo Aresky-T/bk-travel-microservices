@@ -1,15 +1,17 @@
 package com.aresky.reviewservice.service.account;
 
+import grpc.account.v2.dto.request.CheckAccountByIdRequest;
+import grpc.account.v2.dto.request.GetProfileByAccountIdRequest;
+import grpc.account.v2.dto.response.CheckAccountByIdResponse;
+import grpc.account.v2.dto.response.GetProfileByAccountIdResponse;
+import grpc.account.v2.dto.response.ProfileResponse;
+import grpc.account.v2.service.ReactorAccountCheckingServiceGrpc;
+import grpc.account.v2.service.ReactorAccountGettingServiceGrpc;
 import io.grpc.*;
 import org.springframework.stereotype.Service;
 
 import com.aresky.reviewservice.exception.ReviewException;
 
-import grpc.account.check.ReactorAccountProfileCheckServiceGrpc;
-import grpc.account.dto.request.CheckProfileByAccountIdRequest;
-import grpc.account.dto.response.CheckProfileByAccountIdResponse;
-import grpc.account.dto.response.ProfileResponse;
-import grpc.account.fields.AccountIdField;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import reactor.core.publisher.Mono;
@@ -36,31 +38,30 @@ public class AccountGrpcServiceIml implements IAccountService {
 
     @Override
     public Mono<Boolean> checkExistsAccountById(Integer accountId) {
-        CheckProfileByAccountIdRequest request = buildCheckProfileByAccountIdRequest(accountId);
-        return initStub().checkProfileByAccountId(request)
-                .map(CheckProfileByAccountIdResponse::getIsExistsAccountId)
+        CheckAccountByIdRequest request = CheckAccountByIdRequest.newBuilder().setAccountId(accountId).build();
+        return initCheckingStub().checkAccountById(request)
+                .map(CheckAccountByIdResponse::getIsExists)
                 .onErrorResume(this::handleException);
     }
 
     @Override
     public Mono<ProfileResponse> getProfileById(Integer accountId) {
-        CheckProfileByAccountIdRequest request = buildCheckProfileByAccountIdRequest(accountId);
-        return initStub().checkProfileByAccountId(request)
-                .filter(CheckProfileByAccountIdResponse::getIsExistsAccountId)
+        GetProfileByAccountIdRequest request = GetProfileByAccountIdRequest.newBuilder().setAccountId(accountId).build();
+        return initGettingStub()
+                .getProfileByAccountId(request)
                 .switchIfEmpty(Mono.empty())
-                .map(CheckProfileByAccountIdResponse::getProfile)
+                .map(GetProfileByAccountIdResponse::getProfile)
                 .onErrorResume(this::handleException);
     }
 
-    private ReactorAccountProfileCheckServiceGrpc.ReactorAccountProfileCheckServiceStub initStub() {
-        return ReactorAccountProfileCheckServiceGrpc.newReactorStub(channel)
+    private ReactorAccountCheckingServiceGrpc.ReactorAccountCheckingServiceStub initCheckingStub() {
+        return ReactorAccountCheckingServiceGrpc.newReactorStub(channel)
                 .withDeadline(Deadline.after(2000, TimeUnit.MILLISECONDS));
     }
 
-    private CheckProfileByAccountIdRequest buildCheckProfileByAccountIdRequest(Integer accountId) {
-        AccountIdField accountIdField = AccountIdField.newBuilder().setId(accountId).build();
-        return CheckProfileByAccountIdRequest.newBuilder()
-                .setAccountId(accountIdField).build();
+    private ReactorAccountGettingServiceGrpc.ReactorAccountGettingServiceStub initGettingStub() {
+        return ReactorAccountGettingServiceGrpc.newReactorStub(channel)
+                .withDeadline(Deadline.after(2000, TimeUnit.MILLISECONDS));
     }
 
     private void shutdownChannel() {

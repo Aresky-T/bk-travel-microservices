@@ -10,6 +10,7 @@ import com.aresky.paymentservice.grpc.mappers.SessionResponseMapper;
 import com.aresky.paymentservice.grpc.mappers.TransactionInfoResponseMapper;
 import com.aresky.paymentservice.model.EPaymentStatus;
 import com.aresky.paymentservice.model.Session;
+import com.aresky.paymentservice.model.SessionManager;
 import com.aresky.paymentservice.service.vnpay.IVNPayService;
 import com.aresky.paymentservice.utils.VnPayUtils;
 import grpc.payment.type.PaymentStatus;
@@ -26,6 +27,9 @@ public class VnPayGrpcProvider extends VnPayServiceGrpc.VnPayServiceImplBase {
 
     @Autowired
     private IVNPayService vnpayService;
+
+    @Autowired
+    private SessionManager sessionManager;
 
     @Override
     public void createPayment(BookingInfoRequest request, StreamObserver<PaymentUrlResponse> responseObserver) {
@@ -106,7 +110,7 @@ public class VnPayGrpcProvider extends VnPayServiceGrpc.VnPayServiceImplBase {
         }
 
         // open new payment session
-        vnpayService.openSession(bookingId);
+        sessionManager.openSession(bookingId);
 
         String urlReturn = "http://localhost:3000/payment" + "?bookingId=" + bookingId;
         String content = "THANH TOAN TOUR " + tourCode;

@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import TouristAttraction from "../../../components/global/TouristAttraction/TouristAttraction";
-import { getAllTouristAttractionsApi } from "../../../api/global/tourist_attraction.api";
-import SearchContainer from "./SearchContainer";
+import { getAllTouristAttractionsWithSearchApi } from "../../../api/global/tourist_attraction.api";
+// import SearchContainer from "./SearchContainer";
+import useDebounce from "../../../hook/useDebounce";
 
 const TouristAttractionContainer = () => {
   const [data, setData] = useState([]);
@@ -13,8 +14,9 @@ const TouristAttractionContainer = () => {
   });
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpenSearch, setIsOpenSearch] = useState(false);
+  // const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isShowMore, setIsShowMore] = useState(false);
+  const debounceSearch = useDebounce(search, 1000);
 
   const handleOffLoading = () => {
     setTimeout(() => {
@@ -22,32 +24,46 @@ const TouristAttractionContainer = () => {
     }, 1000);
   };
 
-  const handleOpenSearch = () => setIsOpenSearch(true);
-  const handleCloseSearch = () => setIsOpenSearch(false);
+  // const handleOpenSearch = () => setIsOpenSearch(true);
+  // const handleCloseSearch = () => setIsOpenSearch(false);
 
   const handleChangeSearch = (e) => {
     setSearch(e.target.value);
   };
 
-  const fetchAllTouristAttractions = useCallback(() => {
-    if (data.length === 0) {
-      setIsLoading(true);
-    }
+  const searchTouristAttractions = useCallback(() => {
+    if (debounceSearch.length > 0 && debounceSearch.trim() === "") return;
 
-    getAllTouristAttractionsApi(pagination)
+    const currentPage = pagination.page ?? 0;
+    const pageSize = pagination.size ?? 5;
+
+    if (currentPage === 0) setIsLoading(true);
+    getAllTouristAttractionsWithSearchApi(
+      debounceSearch.trim(),
+      currentPage,
+      pageSize
+    )
       .then((res) => {
         handleOffLoading();
-        const { content, totalPages } = res.data;
-        setData((prev) => [...prev, ...content]);
-        setPagination((prev) => ({ ...prev, totalPages: totalPages }));
+        const { content, totalPages, last, totalElements } = res.data;
+        setData((prevData) =>
+          currentPage > 0 ? [...prevData, ...content] : content
+        );
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: totalPages,
+          totalElements,
+          last,
+        }));
         handleCloseShowMore();
       })
       .catch((err) => {
         handleOffLoading();
         handleCloseShowMore();
       });
+
     //eslint-disable-next-line
-  }, [pagination.page]);
+  }, [debounceSearch, pagination.page]);
 
   const handleShowMore = () => {
     setIsShowMore(true);
@@ -64,27 +80,31 @@ const TouristAttractionContainer = () => {
   };
 
   useEffect(() => {
-    fetchAllTouristAttractions();
-  }, [fetchAllTouristAttractions]);
+    setPagination((prev) => ({ ...prev, page: 0 }));
+  }, [debounceSearch]);
+
+  useEffect(() => {
+    searchTouristAttractions();
+  }, [searchTouristAttractions]);
 
   return (
     <>
       <TouristAttraction
         data={data}
-        handleOpenSearch={handleOpenSearch}
+        search={search}
+        handleChangeSearch={handleChangeSearch}
         handleShowMore={handleShowMore}
         isLoading={isLoading}
         isShowMore={isShowMore}
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
+        pagination={pagination}
       />
-      {isOpenSearch && (
+      {/* {isOpenSearch && (
         <SearchContainer
           search={search}
           handleClose={handleCloseSearch}
           handleChange={handleChangeSearch}
         />
-      )}
+      )} */}
     </>
   );
 };

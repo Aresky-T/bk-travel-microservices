@@ -4,32 +4,32 @@ spring:
   application:
     name: booking-service
   liquibase:
-    url: jdbc:mysql://mysql-server:3306/bk_travel_booking
-    user: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/bk_travel_booking
+    user: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: booking-service
+#    hostname: booking-service
     appname: booking-service
   client:
     service-url:
-      defaultZone: http://discovery-server:8761/eureka
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:${SERVICE_REGISTRY_PORT:8761}/eureka
 bk-travel:
   config:
     database:
       server:
-        url: r2dbc:mysql://mysql-server:3306/bk_travel_booking
-        username: root
-        password: root
+        url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/bk_travel_booking
+        username: ${DB_USER:root}
+        password: ${DB_PASSWORD:root}
 grpc:
   server:
     port: 50084
 kafka:
-  bootstrap-servers:
-    url: http://kafka-broker-01:19092
+  bootstrap-servers: ${KAFKA_BROKER_HOST:localhost}:${KAFKA_BROKER_PORT:9092}
   consumer:
-    group-id: bk-travel-group
+    client-id: booking-service-consumer
+    group-id: booking-service-group
     auto-offset-reset: latest
     key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

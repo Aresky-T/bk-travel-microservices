@@ -13,7 +13,8 @@ export const getAllBookedToursApi = (page, size, sort) => {
     });
 }
 
-export const getAllBookingsApi = (page, size, sort) => {
+export const getAllBookingsApi = (pagination) => {
+    const { page, size, sort } = pagination;
     return axios.get(bookingURL, {
         params: {
             page: page,

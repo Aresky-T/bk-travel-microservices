@@ -7,15 +7,13 @@ import SpinnerLoading from "../Loading/SpinnerLoading";
 
 const TouristAttraction = ({
   data,
-  handleOpenSearch,
+  search,
+  handleChangeSearch,
   handleShowMore,
   isLoading,
   isShowMore,
-  currentPage,
-  totalPages,
+  pagination,
 }) => {
-  const isLastPage = currentPage >= totalPages - 1;
-
   return (
     <div className="main-session tourist-attraction-container">
       <section className="main-session-header tourist-attraction-header">
@@ -27,12 +25,14 @@ const TouristAttraction = ({
           <input
             type="text"
             name="search"
-            placeholder="Tìm kiếm tên địa danh..."
-            onFocus={handleOpenSearch}
-            autoComplete="off"
-            readOnly
+            placeholder="Tìm kiếm địa danh..."
+            value={search}
+            onChange={handleChangeSearch}
+            // onFocus={handleOpenSearch}
+            // autoComplete="off"
+            // readOnly
           />
-          <span className="search-icon" onClick={handleOpenSearch}>
+          <span className="search-icon">
             <FiSearch />
           </span>
         </div>
@@ -49,7 +49,7 @@ const TouristAttraction = ({
                 {data.map((item) => (
                   <TouristAttractionCard data={item} key={item.name} />
                 ))}
-                {!isLastPage && (
+                {!pagination?.last && (
                   <div className="show-more">
                     {isShowMore ? (
                       <SpinnerLoading />

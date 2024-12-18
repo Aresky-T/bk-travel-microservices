@@ -17,6 +17,8 @@ public interface ITouristAttractionService {
 
     Page<TouristAttractionResponse> findAll(Pageable pageable);
 
+    Page<TouristAttractionResponse> findAll(String search, Pageable pageable);
+
     List<TouristAttractionResponse> findAll(SearchRequest searchRequest);
 
     TouristAttractionDetails findById(Integer id);

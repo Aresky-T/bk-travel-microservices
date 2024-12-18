@@ -36,7 +36,7 @@ export const routes = [
         element: <LayoutAdmin />,
         title: 'Admin',
         isPrivate: true,
-        role: [ROLE.ADMIN],
+        roles: [ROLE.ADMIN],
         children: [
             { path: '', element: <HomeAdminContainer />, title: "Home" },
             { path: ROUTE.ADMIN_TOUR_MANAGER, element: <TourManagerContainer /> },
@@ -75,7 +75,7 @@ export const routes = [
         path: ROUTE.LAYOUT,
         element: <Layout />,
         isPrivate: true,
-        role: [ROLE.USER],
+        roles: [ROLE.USER],
         children: [
             { path: ROUTE.PROFILE, element: <ProfilePage /> },
             { path: ROUTE.CHECKOUT, element: <CheckoutPage /> },
@@ -90,7 +90,7 @@ export const routes = [
         return {
             ...route,
             element: (
-                <PrivateRoute role={route.role}>
+                <PrivateRoute roles={route.roles}>
                     {route.element}
                 </PrivateRoute>
             )

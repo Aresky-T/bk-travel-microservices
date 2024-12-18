@@ -10,10 +10,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "blog_item")
@@ -48,5 +50,14 @@ public class BlogItem implements Serializable {
         this.subTitle = subTitle;
         this.imageUrl = imageUrl;
         this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Blog item: [ id = " + this.id
+                + ", subTitle = " + this.subTitle
+                + ", imageUrl = " + this.imageUrl
+                + ", content = " + this.content
+                + " ]\n";
     }
 }

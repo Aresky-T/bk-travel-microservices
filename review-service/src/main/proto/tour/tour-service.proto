@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+// import "google/protobuf/wrappers.proto";
+
+option java_multiple_files=true;
+option java_package="grpc.tour";
+
+service TourService {
+    rpc getSubTourById(SubTourIdRequest) returns (SubTourDetailsResponse);
+}
+
+message SubTourIdRequest {
+    int32 id = 1;
+}
+
+message SubTourDetailsResponse {
+    int32 id = 1;
+    int32 tour_id = 2;
+    string title = 3;
+    string tour_title = 4;
+    string tour_code = 5;
+    string image1 = 6;
+    string image2 = 7;
+    string image3 = 8;
+    string image4 = 9;
+    string destinations = 10;
+    string duration = 11;
+    string departure_time = 12;
+    string departure_location = 13;
+    string schedules = 14;
+    string vehicle = 15;
+    string status = 16;
+    int32 total_seats = 17;
+    int32 available_seats = 18;
+    int32 adult_price = 19;
+    int32 children_price = 20;
+    int32 baby_price = 21;
+    int32 tour_guide_id = 22;
+    string created_time = 23;
+}

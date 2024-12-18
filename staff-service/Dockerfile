@@ -1,19 +1,15 @@
-# Dockefile
-FROM openjdk:17-alpine
-# Set working directory
+# Stage 1: building
+FROM maven:3.6.3-openjdk-17 AS building
 WORKDIR /app
-# Setup maven install dependencies
-COPY .mvn .mvn/
-COPY mvnw pom.xml ./
-RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline
-# Copy source app to workdir
-COPY . .
-# Setup timezone for server
-ENV TZ=Ho_Chi_Minh
-# Specify port for container
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
+# Stage 2: running
+FROM openjdk:17-alpine AS running
+WORKDIR /app
+COPY --from=building /app/target/*.jar app.jar
+ENV TZ=Asia/Ho_Chi_Minh
 EXPOSE 8085
-# CMD for start app
-ENTRYPOINT ["./mvnw", "spring-boot:run"]
-# Label
+ENTRYPOINT [ "java", "-jar", "app.jar" ]
 LABEL auth="Aresky"

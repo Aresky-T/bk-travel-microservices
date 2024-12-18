@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package service;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.v2.service";
+
+import "account/v2/dto/request/check-account-by-id-request.proto";
+import "account/v2/dto/request/check-account-by-email-request.proto";
+import "account/v2/dto/request/check-account-by-username-request.proto";
+import "account/v2/dto/request/check-profile-by-account-id-request.proto";
+import "account/v2/dto/request/check-profile-by-email-request.proto";
+
+import "account/v2/dto/response/check-account-by-id-response.proto";
+import "account/v2/dto/response/check-account-by-email-response.proto";
+import "account/v2/dto/response/check-account-by-username-response.proto";
+import "account/v2/dto/response/check-profile-by-account-id-response.proto";
+import "account/v2/dto/response/check-profile-by-email-response.proto";
+
+service AccountCheckingService {
+  rpc CheckAccountById(request.CheckAccountByIdRequest) returns (response.CheckAccountByIdResponse){};
+  rpc CheckAccountByEmail(request.CheckAccountByEmailRequest) returns (response.CheckAccountByEmailResponse){};
+  rpc CheckAccountByUsername(request.CheckAccountByUsernameRequest) returns (response.CheckAccountByUsernameResponse){};
+  rpc CheckProfileByAccountId(request.CheckProfileByAccountIdRequest) returns (response.CheckProfileByAccountIdResponse){};
+  rpc CheckProfileByEmail(request.CheckProfileByEmailRequest) returns (response.CheckProfileByEmailResponse){};
+}

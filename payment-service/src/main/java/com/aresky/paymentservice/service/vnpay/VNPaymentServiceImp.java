@@ -13,7 +13,6 @@ import com.aresky.paymentservice.kafka.KafkaTopic;
 import com.aresky.paymentservice.service.booking.IBookingService;
 import com.aresky.paymentservice.utils.DateUtils;
 import com.aresky.paymentservice.utils.VnPayUtils;
-import grpc.booking.BookingResponse;
 import grpc.booking.v2.model.Booking;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +89,7 @@ public class VNPaymentServiceImp implements IVNPayService {
         DateTimeFormatter formatter = DateUtils.getDateTimeFormatter(DateUtils.CommonLocales.VIETNAM, FormatStyle.SHORT);
 
         String payAt = formatter.format(current);
+        Integer totalTourists = booking.getAdultNumber() + booking.getChildNumber() + booking.getBabyNumber();
 
         KafkaMessageType.NotificationRequest notificationRequest = KafkaMessageType.NotificationRequest.builder()
                 .userId(booking.getAccountId())
@@ -99,7 +99,8 @@ public class VNPaymentServiceImp implements IVNPayService {
                 .keyword("tourCode", booking.getTourCode())
                 .keyword("bookingCode", booking.getBookingCode())
                 .keyword("status", booking.getStatus())
-                .keyword("payAt", payAt);
+                .keyword("payAt", payAt)
+                .keyword("totalTourists", totalTourists);
 
 
         String vnp_ResponseCode = result.getResponseCode();
@@ -200,21 +201,6 @@ public class VNPaymentServiceImp implements IVNPayService {
         }
 
         return booking;
-    }
-
-    @SuppressWarnings("unused")
-    private Session openSession(BookingResponse booking) {
-        Session session = sessionManager.openSession(booking.getBookingId());
-
-        // check session validity
-        if (session == null) {
-            throw new PaymentException(PaymentMessage.CAN_NOT_OPEN_SESSION);
-        }
-
-        // set booking info for session
-        session.setBookingInfo(booking);
-
-        return session;
     }
 
     @SuppressWarnings("unused")

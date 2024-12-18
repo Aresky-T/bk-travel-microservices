@@ -48,6 +48,10 @@
     align-items: center;
     color: var(--font-color);
 
+    @media screen and (max-width: 450px) {
+      padding-inline: 10px;
+    }
+
     .blog-content__intro,
     .blog-content__list-item {
       max-width: 700px;

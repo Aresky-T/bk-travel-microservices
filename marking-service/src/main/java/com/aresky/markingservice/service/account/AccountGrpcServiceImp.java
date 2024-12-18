@@ -1,16 +1,18 @@
 package com.aresky.markingservice.service.account;
 
 import com.aresky.markingservice.exception.MarkingException;
-import grpc.account.check.ReactorAccountProfileCheckServiceGrpc;
-import grpc.account.dto.request.CheckProfileByAccountIdRequest;
-import grpc.account.dto.response.CheckProfileByAccountIdResponse;
-import grpc.account.fields.AccountIdField;
+import grpc.account.v2.dto.request.CheckAccountByIdRequest;
+import grpc.account.v2.dto.response.CheckAccountByIdResponse;
+import grpc.account.v2.service.ReactorAccountCheckingServiceGrpc;
+import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AccountGrpcServiceImp implements IAccountService {
@@ -31,22 +33,16 @@ public class AccountGrpcServiceImp implements IAccountService {
 
     @Override
     public Mono<Boolean> checkExistsAccountById(Integer accountId) {
-        CheckProfileByAccountIdRequest request = buildCheckProfileByAccountIdRequest(accountId);
+        CheckAccountByIdRequest request = CheckAccountByIdRequest.newBuilder().setAccountId(accountId).build();
         return initStub()
-                .flatMap(stub -> stub.checkProfileByAccountId(request))
-                .map(CheckProfileByAccountIdResponse::getIsExistsAccountId)
+                .checkAccountById(request)
+                .map(CheckAccountByIdResponse::getIsExists)
                 .onErrorResume(ex -> Mono.error(new MarkingException(ex.getMessage())));
     }
 
-    private Mono<ReactorAccountProfileCheckServiceGrpc.ReactorAccountProfileCheckServiceStub> initStub() {
-        return Mono.justOrEmpty(ReactorAccountProfileCheckServiceGrpc.newReactorStub(channel))
-                .switchIfEmpty(Mono.error(new MarkingException("Connect to account-service failed!")));
-    }
-
-    private CheckProfileByAccountIdRequest buildCheckProfileByAccountIdRequest(Integer accountId) {
-        AccountIdField accountIdField = AccountIdField.newBuilder().setId(accountId).build();
-        return CheckProfileByAccountIdRequest.newBuilder()
-                .setAccountId(accountIdField).build();
+    private ReactorAccountCheckingServiceGrpc.ReactorAccountCheckingServiceStub initStub() {
+        return ReactorAccountCheckingServiceGrpc.newReactorStub(channel)
+                .withDeadline(Deadline.after(3000, TimeUnit.MILLISECONDS));
     }
 
     private void shutdownChannel() {

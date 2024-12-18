@@ -17,7 +17,7 @@ import java.util.Map;
 @Configuration
 public class ReactiveKafkaConfig {
 
-    @Value("${kafka.bootstrap-servers.url}")
+    @Value("${kafka.bootstrap-servers}")
     private String SERVER;
 
     // Producer properties
@@ -27,6 +27,9 @@ public class ReactiveKafkaConfig {
     // Consumer properties
     @Value("${kafka.consumer.group-id}")
     private String GROUP_ID;
+
+    @Value("${kafka.consumer.client-id}")
+    private String CONSUMER_CLIENT_ID;
 
     @Value("${kafka.consumer.auto-offset-reset}")
     private String AUTO_OFFSET_RESET;
@@ -79,9 +82,9 @@ public class ReactiveKafkaConfig {
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
 
         // ID định danh của consumer
-        consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, "auth-service-consumer");
+        consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, CONSUMER_CLIENT_ID);
 
-
+        // Cấu hình offset để nhận message mới trong partition cho consumer
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET);
 
         // Class chuyển đổi key từ byte thành object

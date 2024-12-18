@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package request;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.v2.dto.request";
+
+message CreateAccountRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}

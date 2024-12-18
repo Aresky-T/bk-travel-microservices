@@ -22,7 +22,7 @@ import { fetchAllBookingsThunk } from "../../../redux/slices/admin.slice";
 
 const BookingManagerContainer = () => {
   const [pagination, setPagination] = useState({
-    size: 10,
+    size: 5,
     page: 0,
     sort: "bookedTime,DESC",
   });

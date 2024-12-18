@@ -1,12 +1,11 @@
 package com.aresky.notification_service.kafka;
 
 import com.aresky.notification_service.dto.request.NotificationRequest;
+import com.aresky.notification_service.entity.NotificationType;
 import com.aresky.notification_service.service.notification.INotificationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -34,27 +33,13 @@ public class KafkaConsumerEvent {
 
     private Disposable disposable;
 
-    private final Set<String> topics = Set.of(
-            KafkaTopic.BOOKING_SUCCESS,
-            KafkaTopic.BOOKING_CANCEL_APPROVED,
-            KafkaTopic.BOOKING_CANCEL_PENDING,
-            KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS,
-            KafkaTopic.VNPAY_PAYMENT_SUCCESS,
-            KafkaTopic.TOUR_CANCELLED,
-            KafkaTopic.TOUR_DAILY_REMINDER,
-            KafkaTopic.CUSTOMER_MAIL_RECEIVED,
-            KafkaTopic.MAIL_REPLIED,
-            KafkaTopic.MAIL_SENT,
-            KafkaTopic.FIRST_TIME_LOGIN
-    );
-
     @PostConstruct
     public void startConsumer() {
-        KafkaReceiver<String, String> receiver = KafkaReceiver.create(
-                receiverOptions.subscription(topics)
-        );
-
-        disposable = receiver.receive()
+        notificationService.getAllNotificationTypes()
+                .map(NotificationType::getName)
+                .collectList()
+                .map(typeList -> KafkaReceiver.create(receiverOptions.subscription(typeList)))
+                .flatMapMany(KafkaReceiver::receive)
                 .flatMap(this::buildNotificationRequest)
                 .flatMap(notificationService::createNotification)
                 .subscribe();
@@ -65,20 +50,17 @@ public class KafkaConsumerEvent {
                 .flatMap(rec -> {
                     String topic = rec.topic();
                     String message = rec.value();
+                    System.out.println("Received message from topic: " + topic);
+                    System.out.println("Message: " + message);
+
                     Set<String> keys = new HashSet<>();
                     keys.add("userId");
                     keys.add("entityId");
                     keys.add("keywords");
 
-                    NotificationRequest request = buildNotificationRequest(message, keys);
-
-                    if(request != null){
-                        request.setTypeName(topic);
-                    }
-
-                    System.out.println(request);
-
-                    return Mono.justOrEmpty(request);
+                    return Mono.justOrEmpty(buildNotificationRequest(message, keys))
+                            .filter(req -> req.getUserId() != null)
+                            .doOnNext(req -> req.setTypeName(topic));
                 });
     }
 
@@ -111,28 +93,38 @@ public class KafkaConsumerEvent {
 
     @SuppressWarnings("unused")
     private <T> T convertFromJsonMessageUsingGson(String jsonString, Class<T> destinationType, Set<String> keys){
-        Gson gson = new Gson();
-        JsonObject rootObject = JsonParser.parseString(jsonString).getAsJsonObject();
-        JsonObject filteredObject = new JsonObject();
+        try {
+            Gson gson = new Gson();
+            JsonObject rootObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject filteredObject = new JsonObject();
 
-        if (keys != null) keys.forEach(key -> {
-            filteredObject.add(key, rootObject.get(key));
-        });
+            if (keys != null) keys.forEach(key -> {
+                filteredObject.add(key, rootObject.get(key));
+            });
 
-        String filteredObjectStr = gson.toJson(filteredObject);
-        return gson.fromJson(filteredObjectStr, destinationType);
+            String filteredObjectStr = gson.toJson(filteredObject);
+            return gson.fromJson(filteredObjectStr, destinationType);
+        } catch (JsonParseException ex){
+            log.error("Convert json string failed from value: {}", jsonString);
+            return null;
+        }
     }
 
     private NotificationRequest buildNotificationRequest(String jsonString, Set<String> keys){
-        Gson gson = new Gson();
-        JsonObject rootObject = JsonParser.parseString(jsonString).getAsJsonObject();
-        JsonObject filteredObject = new JsonObject();
+        try {
+            Gson gson = new Gson();
+            JsonObject rootObject = JsonParser.parseString(jsonString).getAsJsonObject();
+            JsonObject filteredObject = new JsonObject();
 
-        if (keys != null) keys.forEach(key -> {
-            filteredObject.add(key, rootObject.get(key));
-        });
+            if (keys != null) keys.forEach(key -> {
+                filteredObject.add(key, rootObject.get(key));
+            });
 
-        String filteredObjectStr = gson.toJson(filteredObject);
-        return gson.fromJson(filteredObjectStr, NotificationRequest.class);
+            String filteredObjectStr = gson.toJson(filteredObject);
+            return gson.fromJson(filteredObjectStr, NotificationRequest.class);
+        } catch (JsonParseException ex){
+            log.error("Build notification request failed from json string: {}", jsonString);
+            return null;
+        }
     }
 }

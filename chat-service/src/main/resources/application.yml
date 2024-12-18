@@ -3,26 +3,22 @@ server:
 spring:
   application:
     name: chat-service
-  #  r2dbc:
-  #    url: r2dbc:mysql://localhost:3306/bk_travel_chat
-  #    username: root
-  #    password: root
   liquibase:
-    url: jdbc:mysql://mysql-server:3306/bk_travel_chat
-    user: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/bk_travel_chat
+    user: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
     change-log: classpath:db/changelog/changelog-master.xml
 eureka:
   instance:
-    hostname: chat-service
+    # hostname: chat-service
     appname: chat-service
   client:
     service-url:
-      defaultZone: http://discovery-server:8761/eureka
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:${SERVICE_REGISTRY_PORT:8761}/eureka
 bk-travel:
   database:
     config:
       server:
-        url: r2dbc:mysql://mysql-server:3306/bk_travel_chat
-        username: root
-        password: root
+        url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/bk_travel_chat
+        username: ${DB_USER:root}
+        password: ${DB_PASSWORD:root}

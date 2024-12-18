@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package response;
+
+option java_multiple_files = true;
+option java_package = "grpc.tour.dto.response";
+
+import "tour/dto/response/subtour-response.proto";
+
+message CheckSubTourByIdResponse {
+  bool is_exists = 1;
+  response.SubTourResponse sub_tour = 2;
+}

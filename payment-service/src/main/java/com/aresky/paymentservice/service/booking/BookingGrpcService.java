@@ -1,11 +1,7 @@
 package com.aresky.paymentservice.service.booking;
 
 import com.aresky.paymentservice.exception.PaymentException;
-import grpc.booking.*;
-import grpc.booking.constants.PaymentMethod;
-import grpc.booking.v2.dto.request.CheckBookingByIdRequest;
 import grpc.booking.v2.dto.request.GetBookingByIdRequest;
-import grpc.booking.v2.dto.response.CheckBookingByIdResponse;
 import grpc.booking.v2.dto.response.GetBookingByIdResponse;
 import grpc.booking.v2.model.Booking;
 import grpc.booking.v2.service.ReactorBookingCheckingServiceGrpc;
@@ -14,7 +10,6 @@ import grpc.booking.v2.service.ReactorBookingGettingServiceGrpc;
 import grpc.booking.v2.service.ReactorBookingGettingServiceGrpc.ReactorBookingGettingServiceStub;
 import org.springframework.stereotype.Service;
 
-import grpc.booking.ReactorBookingServiceGrpc.ReactorBookingServiceStub;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
@@ -42,73 +37,73 @@ public class BookingGrpcService implements IBookingService {
         }
     }
 
-    @Override
-    public boolean checkExistBookingBy(Integer bookingId) {
-        try {
-            var stub = initCheckingStub();
-            CheckBookingByIdRequest request = CheckBookingByIdRequest.newBuilder().setBookingId(bookingId).build();
-            CheckBookingByIdResponse response = stub.checkBookingById(request).block();
-            if(response == null){
-                throw new PaymentException("No response from booking service");
-            }
-            return response.getIsExists();
-        } catch (Exception ex){
-            throw new PaymentException(ex.getMessage());
-        }
-    }
+//    @Override
+//    public boolean checkExistBookingBy(Integer bookingId) {
+//        try {
+//            var stub = initCheckingStub();
+//            CheckBookingByIdRequest request = CheckBookingByIdRequest.newBuilder().setBookingId(bookingId).build();
+//            CheckBookingByIdResponse response = stub.checkBookingById(request).block();
+//            if(response == null){
+//                throw new PaymentException("No response from booking service");
+//            }
+//            return response.getIsExists();
+//        } catch (Exception ex){
+//            throw new PaymentException(ex.getMessage());
+//        }
+//    }
 
-    @Override
-    public void updateBookingAfterPaymentSucceeded(Integer bookingId, PaymentMethod method) {
-        ReactorBookingServiceStub stub = initStub();
-        UpdateBookingAfterPaymentRequest request = UpdateBookingAfterPaymentRequest.newBuilder()
-                .setBookingId(bookingId)
-                .setPaymentMethod(method)
-                .build();
-        try {
-            UpdateBookingResponse response = stub.updateBookingAfterPaymentSucceeded(request).block();
-            if (response != null && !response.getMessage().equalsIgnoreCase("SUCCESS")) {
-                throw new PaymentException(response.getMessage());
-            }
+//    @Override
+//    public void updateBookingAfterPaymentSucceeded(Integer bookingId, PaymentMethod method) {
+//        ReactorBookingServiceStub stub = initStub();
+//        UpdateBookingAfterPaymentRequest request = UpdateBookingAfterPaymentRequest.newBuilder()
+//                .setBookingId(bookingId)
+//                .setPaymentMethod(method)
+//                .build();
+//        try {
+//            UpdateBookingResponse response = stub.updateBookingAfterPaymentSucceeded(request).block();
+//            if (response != null && !response.getMessage().equalsIgnoreCase("SUCCESS")) {
+//                throw new PaymentException(response.getMessage());
+//            }
+//
+//            System.out.println("Response of updateBookingAfterPaymentSucceeded: " + response.getMessage());
+//        } catch (Exception ex) {
+//            throw new PaymentException(ex.getMessage());
+//        }
+//    }
 
-            System.out.println("Response of updateBookingAfterPaymentSucceeded: " + response.getMessage());
-        } catch (Exception ex) {
-            throw new PaymentException(ex.getMessage());
-        }
-    }
-
-    @Override
-    public void updateBookingAfterPaymentFailed(Integer bookingId, PaymentMethod method) {
-        ReactorBookingServiceStub stub = initStub();
-        UpdateBookingAfterPaymentRequest request = UpdateBookingAfterPaymentRequest.newBuilder()
-                .setBookingId(bookingId)
-                .setPaymentMethod(method)
-                .build();
-        try {
-            UpdateBookingResponse response = stub.updateBookingAfterPaymentFailed(request).block();
-            if (response != null && !response.getMessage().equalsIgnoreCase("SUCCESS")) {
-                throw new PaymentException(response.getMessage());
-            }
-
-            System.out.println("Response of updateBookingAfterPaymentFailed: " + response.getMessage());
-        } catch (Exception ex) {
-            throw new PaymentException(ex.getMessage());
-        }
-    }
-
-    @Override
-    public void updateBookingAfterPaymentCanceled(Integer bookingId) {
-        ReactorBookingServiceStub stub = initStub();
-        BookingIdRequest request = BookingIdRequest.newBuilder().setId(bookingId).build();
-        stub.updateBookingAfterPaymentCanceled(request)
-                .subscribe(res -> {
-                    System.out.println("Response update booking: " + res.getMessage());
-                    if(!res.getMessage().equalsIgnoreCase("SUCCESS")){
-                        throw new RuntimeException("Update booking failed");
-                    }
-                }, err -> {
-                    throw new PaymentException(err.getMessage());
-                });
-    }
+//    @Override
+//    public void updateBookingAfterPaymentFailed(Integer bookingId, PaymentMethod method) {
+//        ReactorBookingServiceStub stub = initStub();
+//        UpdateBookingAfterPaymentRequest request = UpdateBookingAfterPaymentRequest.newBuilder()
+//                .setBookingId(bookingId)
+//                .setPaymentMethod(method)
+//                .build();
+//        try {
+//            UpdateBookingResponse response = stub.updateBookingAfterPaymentFailed(request).block();
+//            if (response != null && !response.getMessage().equalsIgnoreCase("SUCCESS")) {
+//                throw new PaymentException(response.getMessage());
+//            }
+//
+//            System.out.println("Response of updateBookingAfterPaymentFailed: " + response.getMessage());
+//        } catch (Exception ex) {
+//            throw new PaymentException(ex.getMessage());
+//        }
+//    }
+//
+//    @Override
+//    public void updateBookingAfterPaymentCanceled(Integer bookingId) {
+//        ReactorBookingServiceStub stub = initStub();
+//        BookingIdRequest request = BookingIdRequest.newBuilder().setId(bookingId).build();
+//        stub.updateBookingAfterPaymentCanceled(request)
+//                .subscribe(res -> {
+//                    System.out.println("Response update booking: " + res.getMessage());
+//                    if(!res.getMessage().equalsIgnoreCase("SUCCESS")){
+//                        throw new RuntimeException("Update booking failed");
+//                    }
+//                }, err -> {
+//                    throw new PaymentException(err.getMessage());
+//                });
+//    }
 
     @Override
     public Booking getBookingById(Integer bookingId){
@@ -124,10 +119,6 @@ public class BookingGrpcService implements IBookingService {
         } catch (Exception ex) {
             throw new PaymentException(ex.getMessage());
         }
-    }
-
-    private ReactorBookingServiceStub initStub() {
-        return ReactorBookingServiceGrpc.newReactorStub(this.channel).withDeadlineAfter(TIMEOUT, TimeUnit.MILLISECONDS);
     }
 
     private ReactorBookingCheckingServiceStub initCheckingStub(){

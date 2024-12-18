@@ -39,8 +39,8 @@ public class TouristAttractionController {
 
     // GET - getAllTouristAttractions()
     @GetMapping
-    public ResponseEntity<?> getAllTouristAttractions(Pageable pageable) {
-        return ResponseEntity.ok(touristAttractionService.findAll(pageable));
+    public ResponseEntity<?> getAllTouristAttractions(@RequestParam(required = false) String search, Pageable pageable) {
+        return ResponseEntity.ok(touristAttractionService.findAll(search, pageable));
     }
 
     // GET - getAllTouristAttractions()

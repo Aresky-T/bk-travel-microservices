@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package response;
+
+option java_multiple_files=true;
+option java_package="grpc.booking.v2.dto.response";
+
+import "booking/v2/model/booking.proto";
+
+message GetBookingByIdResponse {
+  model.Booking booking = 1;
+}

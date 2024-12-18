@@ -32,7 +32,7 @@ public class ReactorBookingGettingGrpcProvider extends ReactorBookingGettingServ
                 .setBookingCode(booking.getBookingCode())
                 .setAccountId(booking.getAccountId())
                 .setTourId(booking.getTourId())
-                .setSubTourId(booking.getTourId())
+                .setSubTourId(booking.getSubTourId())
                 .setTourCode(booking.getTourCode())
                 .setAdultNumber(booking.getAdultNumber())
                 .setChildNumber(booking.getChildrenNumber())

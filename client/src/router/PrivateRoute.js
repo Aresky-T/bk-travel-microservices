@@ -1,27 +1,22 @@
 import { useEffect } from "react";
-import { handleScrollToTop } from "./PublicRoute";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../redux/selector";
 import { ROUTE } from "../constant/route";
+import { ROLE } from "../constant/role";
 const PrivateRoute = (props) => {
     const account = useAuth();
-    const location = useLocation();
     const navigate = useNavigate();
-    const role = props.role;
+    const roles = props.roles;
 
     useEffect(() => {
-        if (role && !role.includes(account.role)) {
-            if (role.includes("ADMIN")) {
+        if (roles && !roles.includes(account.role)) {
+            if (roles.includes(ROLE.ADMIN)) {
                 navigate(ROUTE.ADMIN_LOGIN)
-            } else if (role.includes("USER")) {
+            } else if (roles.includes(ROLE.USER)) {
                 navigate(ROUTE.LOGIN)
             }
         }
-    }, [role, account, navigate])
-
-    useEffect(() => {
-        handleScrollToTop();
-    }, [location.pathname])
+    }, [roles, account, navigate])
 
     return (
         <>

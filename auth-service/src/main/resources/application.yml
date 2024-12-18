@@ -5,9 +5,9 @@ bk-travel:
   config:
     database:
       server:
-        url: r2dbc:mysql://mysql-server:3306/bk_travel_auth
-        username: root
-        password: root
+        url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bk_travel_auth}
+        username: ${DB_USER:root}
+        password: ${DB_PASSWORD:root}
 # ---------------
 # Other config
 # ---------------
@@ -17,9 +17,9 @@ spring:
   application:
     name: auth-service
   liquibase:
-    url: jdbc:mysql://mysql-server:3306/bk_travel_auth
-    user: root
-    password: root
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:bk_travel_auth}
+    user: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
     change-log: classpath:db/changelog/changelog-master.xml
   mail:
     host: smtp.gmail.com
@@ -40,11 +40,12 @@ eureka:
     hostname: discovery-server
     port: 8761
   instance:
-    hostname: auth-service
+#    prefer-ip-address: true
+#    hostname: auth-service
     appname: auth-service
   client:
     service-url:
-      defaultZone: http://${eureka.server.hostname}:${eureka.server.port}/eureka
+      defaultZone: http://${SERVICE_REGISTRY_HOST:localhost}:${SERVICE_REGISTRY_PORT:8761}/eureka
 auth:
   jwt:
     header: Authorization
@@ -52,8 +53,8 @@ auth:
     secret: aresky_sercret_ast5ld3mdkisbaoyqmtnx7casdkycgajgf334twi5y35_124qwirweaser234
     expiration: 86400000
 kafka:
-  bootstrap-servers:
-    url: kafka-broker-01:19092
+  bootstrap-servers: ${KAFKA_BROKER_HOST:localhost}:${KAFKA_BROKER_PORT:9092}
   consumer:
     auto-offset-reset: latest
-    group-id: bk-travel-group
+    group-id: auth-service-group
+    client-id: auth-service-consumer

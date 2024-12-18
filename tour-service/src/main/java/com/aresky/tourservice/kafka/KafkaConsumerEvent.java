@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -22,22 +23,35 @@ public class KafkaConsumerEvent {
             KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS,
             KafkaTopic.BOOKING_SUCCESS,
             KafkaTopic.BOOKING_CANCEL_APPROVED
-    }, groupId = "bk-travel-group")
+    }, containerFactory = "kafkaListenerContainerFactory")
     public void handleEventListener(ConsumerRecord<String, String> record){
 
         String topic = record.topic();
         String recordValue = record.value();
 
-        log.info("Tour service received data from kafka: {}", recordValue);
-        KafkaMessageType.NotificationRequest data = KafkaMessageType.NotificationRequest.build(recordValue);
-        log.info("Data: {}", data);
-        AtomicDouble subTourIdAtomic = new AtomicDouble(0);
+        log.info("Tour service received data from topic: {}", topic);
+        log.info("Received data: {}", recordValue);
 
-        if(data != null && data.getKeywords().containsKey("subTourId")){
-            subTourIdAtomic.set((Double) data.getKeywords().get("subTourId"));
+        KafkaMessageType.NotificationRequest data =
+                Optional.ofNullable(KafkaMessageType.NotificationRequest.build(recordValue))
+                        .orElse(new KafkaMessageType.NotificationRequest());
+        log.info("Converted data: {}", data);
+
+        Map<String, Object> keywordsFromData = data.getKeywords();
+
+        AtomicDouble subTourIdAtomic = new AtomicDouble(0);
+        AtomicDouble totalTouristsOfNewBookingAtomic = new AtomicDouble(0);
+
+        if(keywordsFromData != null && keywordsFromData.containsKey("subTourId")){
+            subTourIdAtomic.set((Double) keywordsFromData.get("subTourId"));
+        }
+
+        if(keywordsFromData != null && keywordsFromData.containsKey("totalTourists")){
+            totalTouristsOfNewBookingAtomic.set((Double) keywordsFromData.get("totalTourists"));
         }
 
         int subTourId = subTourIdAtomic.intValue();
+        int totalTourists = totalTouristsOfNewBookingAtomic.intValue();
         Optional<SubTour> subTourOptional = Optional.empty();
 
         if(subTourId != 0){
@@ -52,15 +66,22 @@ public class KafkaConsumerEvent {
 
             switch (topic){
                 case KafkaTopic.BOOKING_SUCCESS, KafkaTopic.BOOKING_WITH_VNPAY_SUCCESS:
-                    subTour.setAvailableSeats(Math.max(availableSeats - 1, 0));
+                {
+                    int newAvailableSeats = availableSeats - totalTourists;
+                    subTour.setAvailableSeats(Math.max(newAvailableSeats, 0));
                     subTourRepository.save(subTour);
-                    log.info("Decrease numbers of availableSeats by 1 for subTourId = {}", subTourId);
+                    log.info("Decreased numbers of availableSeats for subTourId = {} to {}", subTourId, totalTourists);
                     break;
+                }
                 case KafkaTopic.BOOKING_CANCEL_APPROVED:
-                    subTour.setAvailableSeats(Math.min(availableSeats + 1, totalSeats));
+                {
+                    int newAvailableSeats = availableSeats + totalTourists;
+                    subTour.setAvailableSeats(Math.min(newAvailableSeats, totalSeats));
                     subTourRepository.save(subTour);
-                    log.info("Increase numbers of availableSeats by 1 for subTourId = {}", subTourId);
+                    log.info("Increase numbers of availableSeats for subTourId = {} to {}", subTourId, totalTourists);
                     break;
+                }
+
             }
         }
     }

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package response;
+
+option java_multiple_files = true;
+option java_package = "grpc.account.v2.dto.response";
+
+message CreateAccountResponse {
+  bool is_success = 1;
+}

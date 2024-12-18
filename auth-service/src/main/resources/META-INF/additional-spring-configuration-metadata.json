@@ -51,9 +51,9 @@
       "description": "A description for 'mysql-server.port'"
     },
     {
-      "name": "kafka.bootstrap-servers.url",
+      "name": "kafka.bootstrap-servers",
       "type": "java.lang.String",
-      "description": "A description for 'kafka.bootstrap-servers.url'"
+      "description": "A description for 'kafka.bootstrap-servers'"
     },
     {
       "name": "kafka.consumer.auto-offset-reset",
@@ -64,6 +64,11 @@
       "name": "kafka.consumer.group-id",
       "type": "java.lang.String",
       "description": "A description for 'kafka.consumer.group-id'"
+    },
+    {
+      "name": "kafka.consumer.client-id",
+      "type": "java.lang.String",
+      "description": "A description for 'kafka.consumer.client-id'"
     }
   ]
 }

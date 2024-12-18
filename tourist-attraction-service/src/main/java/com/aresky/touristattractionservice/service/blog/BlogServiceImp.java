@@ -1,11 +1,7 @@
 package com.aresky.touristattractionservice.service.blog;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,12 +116,6 @@ public class BlogServiceImp implements IBlogService {
     public BlogUpdatedResponse updateBlog(Integer blogId, BlogUpdateForm form) {
 
         Blog blog = findBlogEntity(blogId);
-        List<BlogItem> items = form.getItems().stream().map(dto -> {
-            BlogItem item = BlogUpdateForm.ItemDTO.toBlogItem(dto);
-            item.setBlog(blog);
-            return item;
-        }).toList();
-
         Field[] formFields = FieldUtils.findFields(form);
         FieldUtils.checkFieldsNotNullOrNotEmpty(formFields);
 
@@ -133,7 +123,7 @@ public class BlogServiceImp implements IBlogService {
             dtoField.setAccessible(true);
             String fieldName = dtoField.getName();
 
-            if (fieldName == "items") {
+            if (fieldName.equals("items")) {
                 continue;
             }
 
@@ -151,7 +141,24 @@ public class BlogServiceImp implements IBlogService {
         }
 
         Blog updatedBlog = blogRepository.save(blog);
-        blogItemRepository.saveAll(items);
+
+        List<BlogItem> savingItems = new ArrayList<>();
+        List<BlogItem> deleteItems = new ArrayList<>();
+
+        form.getItems().forEach(dto -> {
+            BlogItem blogItem = BlogUpdateForm.ItemDTO.toBlogItem(dto);
+            blogItem.setBlog(blog);
+
+            if(dto.getIsDelete() != null && dto.getIsDelete()){
+                deleteItems.add(blogItem);
+            } else {
+                savingItems.add(blogItem);
+            }
+        });
+
+        blogItemRepository.deleteAll(deleteItems);
+        blogItemRepository.saveAll(savingItems);
+
         return BlogUpdatedResponse.toDto(updatedBlog);
     }
 

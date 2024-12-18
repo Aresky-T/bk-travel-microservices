@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "staff/dto/request/check_staff_by_id_request.proto";
+import "staff/dto/request/check_staff_by_email_request.proto";
+import "staff/dto/response/check_staff_by_id_response.proto";
+import "staff/dto/response/check_staff_by_email_response.proto";
+
+option java_multiple_files = true;
+option java_package = "grpc.staff.check";
+
+service StaffCheckService {
+  rpc CheckStaffById(request.CheckStaffByIdRequest) returns (response.CheckStaffByIdResponse);
+  rpc CheckStaffByEmail(request.CheckStaffByEmailRequest) returns (response.CheckStaffByEmailResponse);
+}
